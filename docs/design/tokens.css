@@ -1,0 +1,210 @@
+/*
+ * Design tokens — Notes + Reminders
+ * Source of truth for every visual value. Decisions: style-guide-decisions.md.
+ *
+ * Two layers:
+ *   1. core     — raw values (palette, type, space, motion). Never used
+ *                 directly by components.
+ *   2. semantic — roles that components use (--color-page, --font-title…).
+ *                 Light and dark themes only remap this layer.
+ */
+
+/* ───────────────────────── 1. CORE ───────────────────────── */
+:root {
+  /* Palette: paper (light) */
+  --core-paper-desk: #E2DED5;
+  --core-paper-page: #FFFEFA;
+  --core-paper-soft: #F6F3EB;
+  --core-paper-panel: #ECE8DF;
+  --core-paper-rule: #E4DFD4;
+  --core-paper-rail: #BDB6A8;
+  --core-paper-shadow-edge: #CFC9BC;
+
+  /* Palette: ink (light) */
+  --core-ink-900: #191918;
+  --core-ink-600: #5D5A53;
+
+  /* Palette: night (dark) */
+  --core-night-desk: #0E0E0D;
+  --core-night-panel: #161513;
+  --core-night-page: #1C1B19;
+  --core-night-soft: #22211E;
+  --core-night-rule: #2F2D29;
+  --core-night-rail: #55524B;
+  --core-night-ink-100: #EDE9E0;
+  --core-night-ink-400: #A6A196;
+
+  /* Palette: vermilion (the single accent, SG2) */
+  --core-vermilion-600: #C23B22;
+  --core-vermilion-400: #E5674E;
+  --core-vermilion-ink-dark: #1B0905;
+  --core-white: #FFFFFF;
+
+  /* Type families (SG5) */
+  --core-font-archivo: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --core-font-plex-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Type scale (px values taken from the boards) */
+  --core-size-11: 0.6875rem;
+  --core-size-12: 0.75rem;
+  --core-size-13: 0.8125rem;
+  --core-size-14: 0.875rem;
+  --core-size-15: 0.9375rem;
+  --core-size-17: 1.0625rem;
+  --core-size-18: 1.125rem;
+  --core-size-24: 1.5rem;
+  --core-size-60: 3.75rem;
+  --core-size-104: 6.5rem;
+
+  --core-weight-regular: 400;
+  --core-weight-medium: 500;
+  --core-weight-semibold: 600;
+  --core-weight-bold: 700;
+  --core-weight-black: 800;
+
+  /* Spacing (4 px base) */
+  --core-space-1: 0.25rem;  /* 4 */
+  --core-space-2: 0.5rem;   /* 8 */
+  --core-space-3: 0.75rem;  /* 12 */
+  --core-space-4: 0.875rem; /* 14 */
+  --core-space-5: 1rem;     /* 16 */
+  --core-space-6: 1.5rem;   /* 24 */
+  --core-space-7: 2rem;     /* 32 */
+
+  /* Radius */
+  --core-radius-none: 0;
+  --core-radius-sm: 3px;
+  --core-radius-md: 8px;
+  --core-radius-lg: 12px;
+  --core-radius-round: 50%;
+
+  /* Sizes */
+  --core-size-target: 44px;  /* minimum touch/click target (SG13) */
+  --core-size-row: 48px;
+  --core-size-focus: 2px;
+
+  /* Motion (SG15) */
+  --core-duration-instant: 0ms;
+  --core-duration-80: 80ms;
+  --core-duration-150: 150ms;
+  --core-duration-180: 180ms;
+  --core-duration-200: 200ms;
+  --core-duration-240: 240ms;
+  --core-duration-360: 360ms;
+  --core-ease-paper: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --core-ease-linear: linear;
+}
+
+/* ───────────────────────── 2. SEMANTIC ───────────────────────── */
+/* Light theme (default) */
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --color-desk: var(--core-paper-desk);       /* background behind the page */
+  --color-page: var(--core-paper-page);       /* the day page */
+  --color-soft: var(--core-paper-soft);       /* focused row, quiet fills */
+  --color-panel: var(--core-paper-panel);     /* "still open" group, statusline, sheets */
+
+  /* Ink */
+  --color-ink: var(--core-ink-900);           /* primary text, focus outline, strike */
+  --color-ink-muted: var(--core-ink-600);     /* times, tags, metadata */
+  --color-ink-inverse: var(--core-paper-page);/* text on ink (statusline mode, primary button) */
+
+  /* Lines (decorative only: never for text, SG4) */
+  --color-rule: var(--core-paper-rule);
+  --color-rail: var(--core-paper-rail);
+
+  /* The single accent (SG2): the date block, nothing else */
+  --color-date: var(--core-vermilion-600);
+  --color-date-ink: var(--core-white);
+
+  --shadow-page: 0 1px 0 var(--core-paper-shadow-edge), 0 14px 30px rgba(50, 40, 20, 0.10);
+
+  /* Typography roles */
+  --font-title: var(--core-font-archivo);
+  --font-mono: var(--core-font-plex-mono);
+
+  --text-date-numeral: var(--core-weight-black) var(--core-size-104) / 0.9 var(--font-title);
+  --text-date-numeral-mobile: var(--core-weight-black) var(--core-size-60) / 1 var(--font-title);
+  --text-page-title: var(--core-weight-bold) var(--core-size-24) / 1.2 var(--font-title);
+  --text-item-title: var(--core-weight-medium) var(--core-size-17) / 1.35 var(--font-title);
+  --text-body: var(--core-weight-regular) var(--core-size-15) / 1.55 var(--font-title);
+  --text-meta: var(--core-weight-regular) var(--core-size-13) / 1.4 var(--font-mono);
+  --text-meta-strong: var(--core-weight-semibold) var(--core-size-13) / 1.4 var(--font-mono);
+  --text-label: var(--core-weight-medium) var(--core-size-12) / 1.3 var(--font-mono);
+  --text-time: var(--core-weight-medium) var(--core-size-14) / 1.3 var(--font-mono);
+  --text-preview: italic var(--core-weight-regular) var(--core-size-13) / 1.4 var(--font-mono); /* unsaved */
+
+  /* Layout */
+  --space-xs: var(--core-space-1);
+  --space-sm: var(--core-space-2);
+  --space-md: var(--core-space-3);
+  --space-row-x: var(--core-space-4);
+  --space-lg: var(--core-space-5);
+  --space-xl: var(--core-space-6);
+  --space-2xl: var(--core-space-7);
+  --radius-control: var(--core-radius-none);
+  --radius-sheet: var(--core-radius-md);
+  --radius-notification: var(--core-radius-lg);
+  --size-target: var(--core-size-target);
+  --size-row: var(--core-size-row);
+  --focus-ring: var(--core-size-focus) solid var(--color-ink);
+
+  /* Motion roles (SG15) */
+  --motion-tear: var(--core-duration-360);
+  --motion-snooze: var(--core-duration-240);
+  --motion-whichkey-delay: var(--core-duration-200);
+  --motion-strike: var(--core-duration-180);
+  --motion-fade: var(--core-duration-80);
+  --motion-crossfade: var(--core-duration-150);
+  --ease-paper: var(--core-ease-paper);
+}
+
+/* Dark theme: follows the system unless the user forced light (SG18) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-desk: var(--core-night-desk);
+    --color-page: var(--core-night-page);
+    --color-soft: var(--core-night-soft);
+    --color-panel: var(--core-night-panel);
+    --color-ink: var(--core-night-ink-100);
+    --color-ink-muted: var(--core-night-ink-400);
+    --color-ink-inverse: var(--core-night-page);
+    --color-rule: var(--core-night-rule);
+    --color-rail: var(--core-night-rail);
+    --color-date: var(--core-vermilion-400);
+    --color-date-ink: var(--core-vermilion-ink-dark);
+    --shadow-page: 0 1px 0 #000, 0 16px 32px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Dark theme forced by the user */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-desk: var(--core-night-desk);
+  --color-page: var(--core-night-page);
+  --color-soft: var(--core-night-soft);
+  --color-panel: var(--core-night-panel);
+  --color-ink: var(--core-night-ink-100);
+  --color-ink-muted: var(--core-night-ink-400);
+  --color-ink-inverse: var(--core-night-page);
+  --color-rule: var(--core-night-rule);
+  --color-rail: var(--core-night-rail);
+  --color-date: var(--core-vermilion-400);
+  --color-date-ink: var(--core-vermilion-ink-dark);
+  --shadow-page: 0 1px 0 #000, 0 16px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Reduced motion (SG16): nothing travels; only opacity, ≤ 150 ms */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-tear: var(--core-duration-150);
+    --motion-snooze: var(--core-duration-instant);
+    --motion-strike: var(--core-duration-instant);
+    --motion-fade: var(--core-duration-instant);
+    --motion-crossfade: var(--core-duration-150);
+    --ease-paper: var(--core-ease-linear);
+  }
+}

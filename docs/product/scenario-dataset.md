@@ -1,11 +1,15 @@
 # Scenario dataset — Jorge's week
 
 Concrete data behind the key moments in `brief.md`. Used by the design
-reference sheets, the dev seed script, and the acceptance tests.
+boards (`docs/design/chosen/`), the dev seed script, and the acceptance
+tests. IDs (N1…N15) exist only in this document, the seed and the tests;
+they are never shown in the UI.
 Every count in the brief must be derivable from this table.
 
 - User: Jorge, timezone `America/Mexico_City`.
-- Days: Tuesday, Wednesday, Thursday of the same week (local time).
+- Days: Tue 6, Wed 7 and Thu 8 October 2026 (local time). Mexico City
+  has no DST since 2022, so these days are a constant UTC−6. DST cases
+  are covered by separate tests with another timezone.
 - Assumption (from the brief): no notes are created between Tue 11:12
   and Wed 9:05, and none before the Thu 14:30 moment either.
 
@@ -59,3 +63,21 @@ Staging: https://staging.client-b.example
 - `qa-admin` / see 1Password
 - `qa-viewer` / see 1Password
 ```
+
+## Derived values shown in the UI
+
+| Moment       | Value                     | Rule (formalized in CONTRACT.md)                    |
+|--------------|---------------------------|-----------------------------------------------------|
+| Tue 11:12    | "in 5h48m" (N1 preview)   | Time until `due_at`, from now.                      |
+| Tue 11:12    | "+1 h · 12:12" preset     | +1 h is always **now + 1 h**.                       |
+| Tue 11:12    | "12 other notes"          | Notes not on today's page: 14 − 2.                  |
+| Tue 17:00    | "12 other notes"          | 15 − 3 (N1 stays on the page, struck through).      |
+| Wed 09:05    | "late 15h05" (N2)         | Time since `due_at` for a not-done item.            |
+| Wed 09:05    | "late 14h35" (N3)         | Same rule.                                          |
+| Wed 09:05    | "in 25 min" (N4)          | Time until `due_at`.                                |
+| Wed 09:05    | "11 other notes"          | 15 − 4. Not "undated": N1 and N6 have dates.        |
+| Wed 09:05    | Snooze N2 +1 h → 10:05    | Now + 1 h; `original_due_at` stays Tue 18:00, `snooze_count` = 1 ("was Tue 18:00 · 1×"). |
+| Wed 09:05    | Snooze N2 tomorrow → Thu 09:00 | Next local day at 09:00.                       |
+| Thu 14:30    | "in 30 min" (N6)          | Time until `due_at`.                                |
+| Thu 14:30    | "10 notes hidden"         | Filter on: 15 − 5.                                  |
+
