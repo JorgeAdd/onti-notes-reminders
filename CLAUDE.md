@@ -28,9 +28,11 @@ phases.
    `test:`, `refactor:`, `ci:`).
    Why: a readable history shows how the project evolved, phase by phase.
 
-6. **Never push without asking.**
+6. **Ask before every commit and every push. Each approval covers only
+   that specific commit or push.**
    Why: the repository is public and part of the evaluation. Anything
-   pushed is visible immediately.
+   pushed is visible immediately, and the history is part of what gets
+   reviewed. Approving one push never authorizes the next.
 
 7. **Save every prompt in `prompts/`** under `antes/` (before
    implementation), `durante/` (during) or `despues/` (after), numbered
