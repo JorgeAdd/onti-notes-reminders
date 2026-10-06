@@ -28,11 +28,11 @@ phases.
    `test:`, `refactor:`, `ci:`).
    Why: a readable history shows how the project evolved, phase by phase.
 
-6. **Ask before every commit and every push. Each approval covers only
-   that specific commit or push.**
+6. **Ask before every push. Each approval covers only that specific
+   push.** Local commits do not need approval.
    Why: the repository is public and part of the evaluation. Anything
-   pushed is visible immediately, and the history is part of what gets
-   reviewed. Approving one push never authorizes the next.
+   pushed is visible immediately. Local commits stay private and can
+   still be fixed; approving one push never authorizes the next.
 
 7. **Save every prompt in `prompts/`** under `antes/` (before
    implementation), `durante/` (during) or `despues/` (after), numbered
