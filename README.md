@@ -3,8 +3,8 @@
 A notes app where a note and its reminder are one object. Built for people
 who capture follow-ups mid-call and need to see only what matters today.
 
-> Status: Phase 3 done — product brief and design system. The stack is
-> decided in `docs/adr/` (Phase 4).
+> Status: Phase 4 — architecture decisions, schema and behavior contract.
+> Next: end-to-end hello world (Phase 5).
 
 ## Repository structure
 
@@ -17,12 +17,16 @@ packages/
 docs/
   product/        Product brief (source of truth for scenarios and data)
   design/         Chosen design boards, style guide decisions, tokens.css
-  adr/            Architecture Decision Records
+  adr/            Architecture Decision Records (ADR-001..003)
+  db/schema.md    Database schema (ERD + table notes)
+  CONTRACT.md     Behavior rules + event matrix (source of truth for tests)
   time-log.md     Time spent per stage
 prompts/
   antes/          Prompts used before implementation
   durante/        Prompts used during implementation
   despues/        Prompts used after implementation
+supabase/
+  migrations/     SQL migrations (source of truth for the schema)
 CLAUDE.md         Rules for working with AI on this project, and why
 ```
 
@@ -42,7 +46,15 @@ To be documented once the stack is set up (Phase 5).
 
 ## Key decisions
 
-To be documented as ADRs are written (Phase 4).
+- **Supabase Auth issues the JWT; our own API does everything else**
+  (ADR-001). The API verifies tokens via JWKS and runs each request as
+  `authenticated`, so Postgres RLS is a second lock.
+- **Stack** (ADR-002): TypeScript, React + Vite (Vercel), Fastify with
+  hexagonal layers (Railway), Supabase Postgres, Kysely, SQL migrations.
+- **A note and its reminder are one row** (ADR-003). UTC instants plus the
+  user's IANA timezone; "today" is computed per local day (DST-safe).
+- **Behavior is a contract** (`docs/CONTRACT.md`): general rules proven by
+  the brief's scenario with exact numbers, asserted by tests.
 
 ## Deployment
 

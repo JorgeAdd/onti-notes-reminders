@@ -75,3 +75,42 @@ Sources of truth: `docs/design/style-guide-decisions.md` (SG1–SG18),
 13. **No internal IDs in the UI.** Seed IDs (N1…N15) exist only in the
     dataset, the seed and the tests.
     Why: they leaked into the design boards once (SG17).
+
+## Architecture rules
+
+14. **Sources of truth, in order:** `docs/CONTRACT.md` (behavior),
+    `supabase/migrations/` (data), `docs/adr/` (decisions),
+    `docs/design/` (UI), `docs/product/scenario-dataset.md` (scenario
+    data). Code follows them; if code and a source disagree, fix the
+    source first, in its own commit.
+    Why: AI-generated code drifts quietly. Named sources make the drift
+    visible and reviewable.
+
+15. **Hexagonal layers in the API:** `domain` (pure rules, no IO, no
+    framework imports) → `application` (use cases and ports) →
+    `infrastructure` (Fastify, Postgres, JWKS, Web Push, clock). Imports
+    only point inward.
+    Why: the CONTRACT rules ("today", "late", snooze) must be testable
+    with an injected clock and no database.
+
+16. **Time comes from the `Clock` port.** No `new Date()` or `Date.now()`
+    outside the clock adapter.
+    Why: every CONTRACT row is a moment in time; tests must be able to
+    stand at Wed 09:05.
+
+17. **`packages/shared` has no IO.** Only zod schemas, types and pure
+    helpers; no network, database, storage or environment access.
+    Why: both apps import it; IO there leaks infrastructure into the web
+    bundle and breaks the layer boundaries.
+
+18. **The API verifies the JWT on every request** (signature via Supabase
+    JWKS, `iss`, `aud`, expiry) and runs user queries as `authenticated`
+    with the verified claims. Another user's resource is `404`; a missing
+    or invalid token is `401`.
+    Why: identity is the only thing the API trusts from the client
+    (ADR-001); RLS is the second lock if a query forgets its `where`.
+
+19. **Schema changes only through a new migration.** Never edit an applied
+    migration; update `docs/db/schema.md` in the same commit.
+    Why: the schema document is a deliverable and must match what is
+    deployed.

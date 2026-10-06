@@ -68,7 +68,7 @@ Staging: https://staging.client-b.example
 
 | Moment       | Value                     | Rule (formalized in CONTRACT.md)                    |
 |--------------|---------------------------|-----------------------------------------------------|
-| Tue 11:12    | "in 5h48m" (N1 preview)   | Time until `due_at`, from now.                      |
+| Tue 11:12    | "in 5h48" (N1 preview)    | Time until `due_at`, from now (CONTRACT R6).        |
 | Tue 11:12    | "+1 h · 12:12" preset     | +1 h is always **now + 1 h**.                       |
 | Tue 11:12    | "12 other notes"          | Notes not on today's page: 14 − 2.                  |
 | Tue 17:00    | "12 other notes"          | 15 − 3 (N1 stays on the page, struck through).      |
