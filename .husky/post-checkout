@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# $3 = 1 for branch checkouts (0 for file checkouts).
+[ "${3:-0}" = "1" ] || exit 0
+sh scripts/engram-sync.sh import

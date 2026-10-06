@@ -114,3 +114,19 @@ Sources of truth: `docs/design/style-guide-decisions.md` (SG1–SG18),
     migration; update `docs/db/schema.md` in the same commit.
     Why: the schema document is a deliverable and must match what is
     deployed.
+
+## Tracking and memory rules
+
+20. **Ask for the day's hours every night** (one question), then update
+    `docs/time-log.md`: hours as reported, a summary from the day's commits
+    and prompts, and the stage totals. Never estimate hours.
+    Why: the time log is a deliverable and only the human knows the real
+    time; logging per day is how it is actually tracked.
+
+21. **Engram memories are shared through `.engram/`, for this project only.**
+    The pre-commit hook exports with `--project onti-notes-reminders` and
+    blocks chunks that look like secrets; post-merge and post-checkout
+    import them. Never run `engram sync --all` here, and never commit a
+    chunk the scan blocked.
+    Why: the repo is public, and Engram also stores prompts and memories
+    from other projects.

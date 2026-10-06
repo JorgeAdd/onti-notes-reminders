@@ -27,6 +27,9 @@ prompts/
   despues/        Prompts used after implementation
 supabase/
   migrations/     SQL migrations (source of truth for the schema)
+scripts/          Repo scripts (Engram sync)
+.husky/           Git hooks (Engram export/import)
+.engram/          Shared AI memory chunks (this project only)
 CLAUDE.md         Rules for working with AI on this project, and why
 ```
 
@@ -39,6 +42,20 @@ the date and nothing else.
 - Boards: `docs/design/chosen/`
 - Decisions: `docs/design/style-guide-decisions.md`
 - Tokens: `docs/design/tokens.css` (core + semantic layers)
+
+## AI memory (Engram)
+
+Decisions and discoveries from AI sessions are stored with
+[Engram](https://github.com/Gentleman-Programming/engram) and shared
+through `.engram/` (compressed chunks, this project only):
+
+- `pre-commit` → `npm run engram:export`: exports new memories, scans them
+  for secrets, and stages them.
+- `post-merge` / `post-checkout` → `npm run engram:import`: loads chunks
+  pulled from the remote.
+
+Hooks are installed by Husky on `npm install` and skip silently when
+Engram is not installed or in CI (`HUSKY=0`).
 
 ## Running locally
 
