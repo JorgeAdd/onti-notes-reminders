@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction A — Card Catalog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --desk: #E7DFD0;
+  --desk-grain: #DDD3C1;
+  --card: #FBF7EE;
+  --card-edge: #E2D8C6;
+  --rule: #C9D6E3;
+  --header-rule: #D9826F;
+  --ink: #1F1B16;
+  --ink-muted: #6B6255;
+  --accent: #B8432B;          /* vermilion: the FILED stamp only */
+  --accent-ink: #FFFFFF;
+  --focus: #1F1B16;
+  --shadow: 0 1px 0 rgba(31,27,22,.06), 0 2px 6px rgba(31,27,22,.08);
+  --font-title: "Newsreader", Georgia, serif;
+  --font-ui: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desk: #17140F; --desk-grain: #1D1913; --card: #26211B; --card-edge: #352E25;
+    --rule: #33383C; --header-rule: #8A4A3C; --ink: #EDE4D3; --ink-muted: #A39883;
+    --accent: #E06A4F; --accent-ink: #17140F; --focus: #EDE4D3;
+    --shadow: 0 1px 0 rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --desk: #17140F; --desk-grain: #1D1913; --card: #26211B; --card-edge: #352E25;
+  --rule: #33383C; --header-rule: #8A4A3C; --ink: #EDE4D3; --ink-muted: #A39883;
+  --accent: #E06A4F; --accent-ink: #17140F; --focus: #EDE4D3;
+  --shadow: 0 1px 0 rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--desk); color: var(--ink);
+  font: 15px/1.5 var(--font-ui);
+  background-image: repeating-linear-gradient(90deg, transparent 0 3px, var(--desk-grain) 3px 4px);
+  background-size: 7px 100%;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding: 32px 16px 80px; }
+h1, h2, h3 { font-family: var(--font-title); font-weight: 600; margin: 0; }
+h1 { font-size: 40px; line-height: 1.1; }
+h2 { font-size: 26px; margin: 56px 0 6px; }
+.lede { color: var(--ink-muted); max-width: 62ch; }
+.mono { font-family: var(--font-mono); font-size: 13px; }
+.muted { color: var(--ink-muted); }
+.section-meta { font-family: var(--font-mono); font-size: 12px; color: var(--ink-muted); letter-spacing: .04em; text-transform: uppercase; }
+
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+button, .btn {
+  min-height: 44px; min-width: 44px; padding: 0 14px; border-radius: 6px;
+  border: 1px solid var(--card-edge); background: var(--card); color: var(--ink);
+  font: 500 14px var(--font-ui); cursor: pointer;
+}
+button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+kbd {
+  font-family: var(--font-mono); font-size: 12px; padding: 1px 6px; border-radius: 4px;
+  border: 1px solid var(--card-edge); border-bottom-width: 2px; background: var(--card); color: var(--ink);
+}
+
+/* Spec table */
+.spec { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 24px; }
+.spec .card { padding-top: 40px; }
+
+/* The index card */
+.card {
+  position: relative; background: var(--card); border: 1px solid var(--card-edge);
+  border-radius: 3px; box-shadow: var(--shadow); padding: 44px 18px 16px;
+  background-image:
+    linear-gradient(var(--header-rule), var(--header-rule)),
+    repeating-linear-gradient(transparent 0 23px, var(--rule) 23px 24px);
+  background-size: 100% 1px, 100% 100%;
+  background-position: 0 34px, 0 34px;
+  background-repeat: no-repeat, no-repeat;
+}
+.card .meta { position: absolute; top: 9px; left: 18px; right: 18px; display: flex; justify-content: space-between; font: 12px var(--font-mono); color: var(--ink-muted); }
+.card h3 { font-size: 19px; line-height: 24px; }
+.card p, .card li { line-height: 24px; margin: 0; }
+.card ul { margin: 0; padding-left: 18px; }
+.card code { font: 13px var(--font-mono); background: var(--desk); padding: 0 4px; border-radius: 3px; }
+.card .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.tag { font: 12px var(--font-mono); color: var(--ink-muted); }
+.due { font: 500 12px var(--font-mono); color: var(--ink); }
+
+/* Overdue: left on the desk (layout, not the signature) */
+.card.left-on-desk { transform: rotate(-1.2deg); }
+.card.left-on-desk:nth-child(2) { transform: rotate(.9deg); }
+.card.left-on-desk .due::before { content: "since "; color: var(--ink-muted); }
+
+/* SIGNATURE: the FILED stamp, reserved for completion */
+.stamp {
+  position: absolute; right: 14px; bottom: 14px; transform: rotate(-8deg);
+  border: 2px solid var(--accent); color: var(--accent); border-radius: 4px;
+  font: 600 13px var(--font-mono); letter-spacing: .14em; padding: 4px 10px;
+  mix-blend-mode: multiply; opacity: .92;
+}
+:root[data-theme="dark"] .stamp { mix-blend-mode: normal; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stamp { mix-blend-mode: normal; } }
+.card.filed h3 { color: var(--ink-muted); }
+
+/* Swatches */
+.swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 16px; }
+.sw { border: 1px solid var(--card-edge); border-radius: 3px; overflow: hidden; background: var(--card); }
+.sw i { display: block; height: 52px; }
+.sw span { display: block; padding: 6px 8px; font: 11px/1.4 var(--font-mono); }
+
+/* Screens */
+.screen { margin-top: 20px; border: 1px solid var(--card-edge); border-radius: 8px; background: var(--desk); overflow: hidden; }
+.screen-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--card-edge); background: var(--card); flex-wrap: wrap; }
+.screen-bar .title { font-family: var(--font-title); font-size: 20px; }
+.screen-body { padding: 20px 16px; }
+.desk-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 24px; }
+.pile { display: grid; gap: 18px; align-content: start; }
+.stack-label { font: 12px var(--font-mono); color: var(--ink-muted); margin: 0 0 10px; text-transform: uppercase; letter-spacing: .06em; }
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.drawer {
+  margin-top: 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  border: 1px dashed var(--card-edge); border-radius: 6px; padding: 10px 14px; background: var(--card);
+}
+.shortcuts { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--ink-muted); }
+
+/* Capture */
+.capture { max-width: 560px; margin: 0 auto; }
+.capture .card { padding-bottom: 12px; }
+.capture input {
+  width: 100%; border: 0; background: transparent; color: var(--ink);
+  font: 600 19px/24px var(--font-title); padding: 0; outline: none;
+}
+.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.chip { font: 12px var(--font-mono); border: 1px solid var(--card-edge); border-radius: 999px; padding: 4px 10px; background: var(--desk); }
+.toast { margin: 14px auto 0; max-width: 560px; font: 13px var(--font-mono); color: var(--ink-muted); text-align: center; }
+
+/* Notification */
+.notif { max-width: 380px; border-radius: 12px; padding: 12px 14px; background: #2B2B2B; color: #F2F2F2; font: 13px/1.4 system-ui, sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+.notif b { display: block; }
+
+.two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; align-items: start; }
+.rules { columns: 2 280px; gap: 32px; }
+.rules li { break-inside: avoid; margin-bottom: 8px; }
+.filter-pill { font: 500 12px var(--font-mono); border: 1px solid var(--ink); border-radius: 999px; padding: 4px 10px; }
+
+@media (max-width: 760px) {
+  .desk-layout { grid-template-columns: 1fr; }
+  h1 { font-size: 32px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card { transition: transform 160ms ease-out, box-shadow 160ms ease-out; }
+  .card:hover { box-shadow: 0 2px 0 rgba(0,0,0,.06), 0 8px 18px rgba(0,0,0,.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card.left-on-desk, .card.left-on-desk:nth-child(2) { transform: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div>
+      <div class="section-meta">Design direction A · reference sheet</div>
+      <h1>Card Catalog</h1>
+    </div>
+    <button id="theme" type="button" aria-label="Toggle light or dark theme">Light / Dark</button>
+  </div>
+  <p class="lede">Every note is an index card on Jorge's desk. Cards that should have been done stay on the desk, a little crooked. Done cards get stamped and filed away. It's warm and tactile, and reads like a reference library more than a to-do app.</p>
+
+  <div class="spec">
+    <div class="card"><div class="meta"><span>CONCEPT</span></div><p>Index cards on a desk. Notes are physical objects; the Today view is "what's on the desk right now".</p></div>
+    <div class="card"><div class="meta"><span>TYPE</span></div><p><span style="font-family:var(--font-title);font-weight:600">Newsreader</span> for titles, <span>IBM Plex Sans</span> for UI, <span class="mono">IBM Plex Mono</span> for times, tags and shortcuts.</p></div>
+    <div class="card"><div class="meta"><span>SIGNATURE</span></div><p>The <b>FILED stamp</b>, in vermilion. Reserved for one concept: <em>completion</em>. The accent never appears anywhere else.</p></div>
+    <div class="card"><div class="meta"><span>DARK MODE</span></div><p>Dark cardstock on a walnut desk under a lamp. The ruled lines dim; the ink becomes cream.</p></div>
+  </div>
+
+  <h2>Palette</h2>
+  <p class="muted">Paper + ink + one accent. Toggle the theme to see the dark values.</p>
+  <div class="swatches">
+    <div class="sw"><i style="background:var(--desk)"></i><span>--desk</span></div>
+    <div class="sw"><i style="background:var(--card)"></i><span>--card</span></div>
+    <div class="sw"><i style="background:var(--rule)"></i><span>--rule</span></div>
+    <div class="sw"><i style="background:var(--header-rule)"></i><span>--header-rule</span></div>
+    <div class="sw"><i style="background:var(--ink)"></i><span>--ink</span></div>
+    <div class="sw"><i style="background:var(--ink-muted)"></i><span>--ink-muted</span></div>
+    <div class="sw"><i style="background:var(--accent)"></i><span>--accent (stamp only)</span></div>
+  </div>
+
+  <h2>Moment 1 · Mid-call capture</h2>
+  <p class="section-meta">Tue 11:12 · <kbd>c</kbd> opens a blank card · target &lt; 5 s</p>
+  <div class="screen"><div class="screen-body">
+    <div class="capture">
+      <div class="card">
+        <div class="meta"><span>NEW CARD</span><span><kbd>Enter</kbd> save · <kbd>Esc</kbd> discard</span></div>
+        <input aria-label="Note" value="Notify Ana: move repo permissions from me to Luis">
+        <div class="chips">
+          <span class="chip">⏰ today 17:00</span>
+          <span class="chip"># Client A</span>
+          <span class="chip muted">@ to set time · # to tag</span>
+        </div>
+      </div>
+      <p class="toast">Saved · 15 notes · 3 due today</p>
+    </div>
+  </div></div>
+
+  <h2>Moment 2 · Reminder fires</h2>
+  <p class="section-meta">Tue 17:00 · Web Push · done in 1 click</p>
+  <div class="two-col" style="margin-top:20px">
+    <div>
+      <p class="stack-label">System notification</p>
+      <div class="notif"><b>17:00 · Notify Ana: move repo permissions from me to Luis</b>Ana needs to move admin permissions on client-a/web from me to Luis before Friday's release.<br><span style="opacity:.7">Mark done · Snooze 1 h</span></div>
+    </div>
+    <div>
+      <p class="stack-label">After "Mark done" · 2 left today</p>
+      <div class="card filed">
+        <div class="meta"><span class="tag"># Client A</span><span class="due">Tue 17:00</span></div>
+        <h3>Notify Ana: move repo permissions from me to Luis</h3>
+        <p>Ana needs to move <b>admin</b> permissions on <code>client-a/web</code> from me to Luis before Friday's release.</p>
+        <ul><li>Repo settings → Collaborators</li><li>Keep me as <em>maintainer</em> until the handoff</li></ul>
+        <span class="stamp">FILED 17:00</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>Moment 3 · Morning view</h2>
+  <p class="section-meta">Wed 09:05 · Today = 4 cards · 2 left on the desk + 2 due today · 11 others in the drawer</p>
+  <div class="screen">
+    <div class="screen-bar">
+      <span class="title">Wednesday · Today</span>
+      <span class="shortcuts"><span><kbd>c</kbd> new card</span><span><kbd>/</kbd> search</span><span><kbd>t</kbd> tags</span><span><kbd>?</kbd> all shortcuts</span></span>
+    </div>
+    <div class="screen-body">
+      <div class="desk-layout">
+        <div>
+          <p class="stack-label">Left on the desk · 2</p>
+          <div class="pile">
+            <div class="card left-on-desk">
+              <div class="meta"><span class="tag"># Client A</span><span class="due">Tue 18:00</span></div>
+              <h3>Reply to Marta about the staging deploy window</h3>
+              <div class="actions"><button>Done</button><button>+1 h</button><button>Tomorrow 9:00</button></div>
+            </div>
+            <div class="card left-on-desk">
+              <div class="meta"><span class="tag"># Client C</span><span class="due">Tue 18:30</span></div>
+              <h3>Update the estimate for the onboarding epic</h3>
+              <div class="actions"><button>Done</button><button>+1 h</button><button>Tomorrow 9:00</button></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <p class="stack-label">Due today · 2</p>
+          <div class="grid-cards">
+            <div class="card">
+              <div class="meta"><span class="tag"># Client A</span><span class="due">09:30</span></div>
+              <h3>Standup: mention the flaky checkout e2e test</h3>
+              <div class="actions"><button>Done</button><button>Snooze</button></div>
+            </div>
+            <div class="card">
+              <div class="meta"><span class="tag"># Client C</span><span class="due">16:00</span></div>
+              <h3>Send rate-limit numbers to the infra team</h3>
+              <div class="actions"><button>Done</button><button>Snooze</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="drawer"><span>11 other cards in the drawer</span><span class="mono muted"><kbd>a</kbd> open drawer</span></div>
+    </div>
+  </div>
+
+  <h2>Moment 4 · Project filter</h2>
+  <p class="section-meta">Thu 14:30 · # Client B · 5 cards · 1 due 15:00</p>
+  <div class="screen">
+    <div class="screen-bar">
+      <span class="title">Drawer <span class="filter-pill"># Client B ×</span></span>
+      <span class="mono muted">5 cards</span>
+    </div>
+    <div class="screen-body">
+      <div class="grid-cards">
+        <div class="card"><div class="meta"><span class="tag"># Client B</span><span class="due">today 15:00</span></div><h3>Prep demo of search filters for the review</h3></div>
+        <div class="card"><div class="meta"><span class="tag"># Client B</span><span></span></div><h3>API keys rotate every 90 days</h3></div>
+        <div class="card"><div class="meta"><span class="tag"># Client B</span><span></span></div><h3>Staging URL and test accounts</h3><p class="mono">qa-admin · qa-viewer</p></div>
+        <div class="card"><div class="meta"><span class="tag"># Client B</span><span></span></div><h3>Review agenda: search, exports, roles</h3></div>
+        <div class="card"><div class="meta"><span class="tag"># Client B</span><span></span></div><h3>Diego prefers async updates on Slack</h3></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>States</h2>
+  <p class="section-meta">Component states (illustrative, not part of a moment)</p>
+  <div class="grid-cards" style="margin-top:20px">
+    <div class="card"><div class="meta"><span class="tag">Note</span><span></span></div><h3>Domain glossary</h3><p class="muted">No reminder: a plain card.</p></div>
+    <div class="card"><div class="meta"><span class="tag">Due today</span><span class="due">16:00</span></div><h3>Due today</h3><p class="muted">Time in mono, top right.</p></div>
+    <div class="card left-on-desk"><div class="meta"><span class="tag">Overdue</span><span class="due">Tue 18:30</span></div><h3>Overdue</h3><p class="muted">Crooked on the desk. No red.</p></div>
+    <div class="card"><div class="meta"><span class="tag">Snoozed 1×</span><span class="due">10:05</span></div><h3>Snoozed</h3><p class="muted mono">was 09:05</p></div>
+    <div class="card filed"><div class="meta"><span class="tag">Done</span><span class="due">17:00</span></div><h3>Done</h3><span class="stamp">FILED</span></div>
+  </div>
+
+  <h2>Rules</h2>
+  <ul class="rules">
+    <li><b>Accent:</b> vermilion is used only for the FILED stamp. Overdue is shown by position and tilt, never by red.</li>
+    <li><b>Motion:</b> marking done stamps the card (120 ms scale 1.1→1) and then slides it down into the drawer (200 ms ease-out).</li>
+    <li><b>Motion:</b> cards lift 2 px on hover and focus (160 ms). Nothing loops, nothing bounces.</li>
+    <li><b>Reduced motion:</b> no tilt, no stamp scale, no slide. State changes are instant.</li>
+    <li><b>Targets:</b> every button and card action is at least 44×44 px.</li>
+    <li><b>Keyboard:</b> the main shortcuts are always visible in the top bar; <kbd>?</kbd> lists the rest.</li>
+    <li><b>Density:</b> cards keep the 24 px ruled baseline, which caps density at about 6 cards per screen on a laptop.</li>
+    <li><b>Risk:</b> the most decorative of the three directions. Ruled lines must stay subtle or long notes get noisy.</li>
+  </ul>
+</div>
+<script>
+(function () {
+  var root = document.documentElement;
+  document.getElementById('theme').addEventListener('click', function () {
+    var dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+  });
+})();
+</script>
+</body>
+</html>

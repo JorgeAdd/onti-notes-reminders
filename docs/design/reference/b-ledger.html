@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction B — Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Dark is the default for this direction; light is "printed ledger paper". */
+:root {
+  --bg: #14130F;
+  --surface: #1C1A15;
+  --line: #2C2922;
+  --ink: #E9E2CF;
+  --ink-muted: #8E8672;
+  --ink-faint: #5A5446;
+  --accent: #F0B43C;        /* amber: the NOW line only */
+  --selection: #26231C;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #F3EEE2; --surface: #FBF8F0; --line: #DCD4C2; --ink: #1E1B15;
+    --ink-muted: #6A6253; --ink-faint: #A69E8C; --accent: #9C6200; --selection: #EAE3D3;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #F3EEE2; --surface: #FBF8F0; --line: #DCD4C2; --ink: #1E1B15;
+  --ink-muted: #6A6253; --ink-faint: #A69E8C; --accent: #9C6200; --selection: #EAE3D3;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.6 var(--font-mono); }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 32px 16px 80px; }
+h1 { font-size: 30px; font-weight: 700; margin: 0; letter-spacing: -.01em; }
+h2 { font-size: 15px; font-weight: 700; margin: 56px 0 4px; text-transform: uppercase; letter-spacing: .08em; }
+h2::before { content: "## "; color: var(--ink-faint); }
+p { margin: 0 0 8px; }
+.lede { font-family: var(--font-body); font-size: 16px; color: var(--ink-muted); max-width: 64ch; margin-top: 10px; }
+.muted { color: var(--ink-muted); }
+.faint { color: var(--ink-faint); }
+.meta { color: var(--ink-muted); font-size: 12px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+button {
+  min-height: 44px; min-width: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 4px;
+  background: var(--surface); color: var(--ink); font: 500 13px var(--font-mono); cursor: pointer;
+}
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+kbd { font: 500 12px var(--font-mono); color: var(--ink); border: 1px solid var(--line); border-radius: 3px; padding: 0 5px; background: var(--surface); }
+
+/* Spec */
+.spec { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 24px; }
+.spec div { background: var(--surface); padding: 14px; }
+.spec b { display: block; font-size: 11px; letter-spacing: .1em; color: var(--ink-muted); margin-bottom: 6px; }
+.spec p { font-family: var(--font-body); }
+
+.swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-top: 14px; }
+.sw { border: 1px solid var(--line); }
+.sw i { display: block; height: 44px; }
+.sw span { display: block; padding: 4px 8px; font-size: 11px; background: var(--surface); }
+
+/* The app frame */
+.term { margin-top: 18px; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--bg); }
+.tabline { display: flex; gap: 0; border-bottom: 1px solid var(--line); background: var(--surface); font-size: 12px; overflow-x: auto; }
+.tabline span { padding: 6px 14px; border-right: 1px solid var(--line); white-space: nowrap; }
+.tabline .on { background: var(--bg); font-weight: 700; }
+.buffer { padding: 10px 0; }
+.row {
+  display: grid; grid-template-columns: 44px 92px minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  min-height: 44px; padding: 0 14px 0 0;
+}
+.row .ln { text-align: right; color: var(--ink-faint); font-size: 12px; }
+.row .time { color: var(--ink-muted); }
+.row .title { font-family: var(--font-body); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .tag { color: var(--ink-muted); font-size: 12px; }
+.row.cursor { background: var(--selection); }
+.row.cursor .ln { color: var(--ink); }
+.row.done .title { color: var(--ink-faint); text-decoration: line-through; text-decoration-thickness: 1px; }
+.fold { padding: 8px 14px 4px 56px; font-size: 12px; font-weight: 700; letter-spacing: .06em; color: var(--ink-muted); }
+.fold.closed { font-weight: 400; }
+
+/* SIGNATURE: the NOW line — reserved for the current time */
+.now {
+  display: grid; grid-template-columns: 44px 92px minmax(0, 1fr); gap: 12px; align-items: center;
+  color: var(--accent); font-size: 12px; font-weight: 700; padding-right: 14px; margin: 4px 0;
+}
+.now .rule { height: 1px; background: var(--accent); }
+.now .ln { text-align: right; }
+
+.statusline { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); background: var(--surface); font-size: 12px; }
+.statusline > span { display: flex; flex-wrap: wrap; }
+.statusline .seg { padding: 4px 12px; border-right: 1px solid var(--line); white-space: nowrap; }
+.statusline .mode { font-weight: 700; background: var(--ink); color: var(--bg); }
+.whichkey { border-top: 1px solid var(--line); padding: 8px 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 2px 18px; font-size: 12px; color: var(--ink-muted); }
+
+/* Capture line */
+.cmdline { border-top: 1px solid var(--line); padding: 10px 14px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.cmdline .prompt { color: var(--ink-muted); }
+.cmdline .text { font-family: var(--font-body); font-size: 15px; }
+.cmdline .token { border: 1px solid var(--line); padding: 0 6px; border-radius: 3px; }
+.caret { display: inline-block; width: 8px; height: 17px; background: var(--ink); vertical-align: -3px; }
+
+/* Detail pane */
+.split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.split > div + div { border-left: 1px solid var(--line); }
+.pane { padding: 14px 16px; }
+.pane h3 { font-family: var(--font-body); font-size: 18px; font-weight: 500; margin: 0 0 6px; }
+.pane .md { font-family: var(--font-body); font-size: 15px; }
+.pane code { font: 13px var(--font-mono); border: 1px solid var(--line); padding: 0 4px; border-radius: 3px; }
+.pane ul { margin: 6px 0; padding-left: 18px; }
+
+.notif { max-width: 380px; border-radius: 12px; padding: 12px 14px; background: #2B2B2B; color: #F2F2F2; font: 13px/1.4 system-ui, sans-serif; box-shadow: 0 8px 24px rgba(0,0,0,.35); margin-top: 18px; }
+.notif b { display: block; }
+.rules { columns: 2 280px; gap: 32px; font-family: var(--font-body); font-size: 15px; padding-left: 18px; }
+.rules li { break-inside: avoid; margin-bottom: 8px; }
+.rules b { font-family: var(--font-mono); font-size: 13px; }
+
+@media (max-width: 720px) {
+  .row { grid-template-columns: 28px 56px minmax(0, 1fr); }
+  .row .tag { display: none; }
+  .now { grid-template-columns: 28px 56px minmax(0, 1fr); }
+  .fold { padding-left: 40px; }
+  .split { grid-template-columns: 1fr; }
+  .split > div + div { border-left: 0; border-top: 1px solid var(--line); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .caret { animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div>
+      <div class="meta">design direction B · reference sheet</div>
+      <h1>Ledger</h1>
+    </div>
+    <button id="theme" type="button" aria-label="Toggle light or dark theme">:set bg</button>
+  </div>
+  <p class="lede">The app feels like a buffer in Jorge's editor. It's a dense, keyboard-first list, with time in a gutter and folds for each section. A statusline always says where you are. Nothing animates except the cursor, so it feels instant.</p>
+
+  <div class="spec">
+    <div><b>CONCEPT</b><p>LazyVim for notes: one list, folds, a cursor, a statusline and a which-key panel.</p></div>
+    <div><b>TYPE</b><p><span style="font-family:var(--font-mono)">JetBrains Mono</span> for everything structural; IBM Plex Sans only for what a human wrote (titles and bodies).</p></div>
+    <div><b>SIGNATURE</b><p>The amber <b style="display:inline;color:var(--accent);font-size:inherit;letter-spacing:0">NOW line</b>. It's reserved for the current time and splits what's past due from what's coming.</p></div>
+    <div><b>DARK MODE</b><p>Dark is home. Light mode is "the same ledger, printed": warm paper, the same ink and gutter.</p></div>
+  </div>
+
+  <h2>Palette</h2>
+  <div class="swatches">
+    <div class="sw"><i style="background:var(--bg)"></i><span>--bg</span></div>
+    <div class="sw"><i style="background:var(--surface)"></i><span>--surface</span></div>
+    <div class="sw"><i style="background:var(--line)"></i><span>--line</span></div>
+    <div class="sw"><i style="background:var(--ink)"></i><span>--ink</span></div>
+    <div class="sw"><i style="background:var(--ink-muted)"></i><span>--ink-muted</span></div>
+    <div class="sw"><i style="background:var(--accent)"></i><span>--accent (now)</span></div>
+  </div>
+
+  <h2>Moment 1 · Mid-call capture</h2>
+  <p class="meta">Tue 11:12 · <kbd>c</kbd> opens the capture line at the bottom · Enter saves · target &lt; 5 s</p>
+  <div class="term">
+    <div class="tabline"><span class="on">today</span><span>all</span><span>tags</span></div>
+    <div class="buffer">
+      <div class="fold">▾ TODAY · 2</div>
+      <div class="row"><span class="ln">1</span><span class="time">18:00</span><span class="title">Reply to Marta about the staging deploy window</span><span class="tag">#client-a</span></div>
+      <div class="row"><span class="ln">2</span><span class="time">18:30</span><span class="title">Update the estimate for the onboarding epic</span><span class="tag">#client-c</span></div>
+      <div class="fold closed">▸ 12 other notes</div>
+    </div>
+    <div class="cmdline">
+      <span class="prompt">capture ›</span>
+      <span class="text">Notify Ana: move repo permissions from me to Luis</span>
+      <span class="token">@today 17:00</span><span class="token">#client-a</span><span class="caret"></span>
+    </div>
+    <div class="statusline">
+      <span><span class="seg mode">CAPTURE</span><span class="seg">Tue 11:12</span></span>
+      <span><span class="seg">↵ save</span><span class="seg">esc cancel</span><span class="seg">14 notes · 2 today</span></span>
+    </div>
+  </div>
+  <p class="meta" style="margin-top:8px">Before saving: 14 notes, 2 due today. After <kbd>Enter</kbd>: 15 notes, 3 due today, and the new note lands at 17:00, above Marta's 18:00 reminder.</p>
+
+  <h2>Moment 2 · Reminder fires</h2>
+  <p class="meta">Tue 17:00 · Web Push · <kbd>x</kbd> marks done (1 keystroke or 1 click)</p>
+  <div class="notif"><b>17:00 · Notify Ana: move repo permissions from me to Luis</b>Ana needs to move admin permissions on client-a/web from me to Luis before Friday's release.<br><span style="opacity:.7">Mark done · Snooze 1 h</span></div>
+  <div class="term">
+    <div class="split">
+      <div class="buffer">
+        <div class="fold">▾ TODAY · 2 left</div>
+        <div class="row done"><span class="ln">1</span><span class="time">17:00</span><span class="title">Notify Ana: move repo permissions from me to Luis</span><span class="tag">done</span></div>
+        <div class="now"><span class="ln">—</span><span>17:00</span><span class="rule"></span></div>
+        <div class="row cursor"><span class="ln">2</span><span class="time">18:00</span><span class="title">Reply to Marta about the staging deploy window</span><span class="tag">#client-a</span></div>
+        <div class="row"><span class="ln">3</span><span class="time">18:30</span><span class="title">Update the estimate for the onboarding epic</span><span class="tag">#client-c</span></div>
+      </div>
+      <div class="pane">
+        <p class="meta">N1 · #client-a · Tue 17:00 · done</p>
+        <h3>Notify Ana: move repo permissions from me to Luis</h3>
+        <div class="md">
+          <p>Ana needs to move <b>admin</b> permissions on <code>client-a/web</code> from me to Luis before Friday's release.</p>
+          <ul><li>Repo settings → Collaborators</li><li>Keep me as <em>maintainer</em> until the handoff</li></ul>
+        </div>
+      </div>
+    </div>
+    <div class="statusline">
+      <span><span class="seg mode">NORMAL</span><span class="seg">Tue 17:00</span></span>
+      <span><span class="seg">2 left today</span></span>
+    </div>
+  </div>
+
+  <h2>Moment 3 · Morning view</h2>
+  <p class="meta">Wed 09:05 · 4 items: 2 overdue above the NOW line, 2 due today below it · 11 others folded</p>
+  <div class="term">
+    <div class="tabline"><span class="on">today</span><span>all</span><span>tags</span></div>
+    <div class="buffer">
+      <div class="fold">▾ OVERDUE · 2</div>
+      <div class="row cursor"><span class="ln">1</span><span class="time">Tue 18:00</span><span class="title">Reply to Marta about the staging deploy window</span><span class="tag">#client-a</span></div>
+      <div class="row"><span class="ln">2</span><span class="time">Tue 18:30</span><span class="title">Update the estimate for the onboarding epic</span><span class="tag">#client-c</span></div>
+      <div class="now"><span class="ln">—</span><span>09:05</span><span class="rule"></span></div>
+      <div class="fold">▾ TODAY · 2</div>
+      <div class="row"><span class="ln">3</span><span class="time">09:30</span><span class="title">Standup: mention the flaky checkout e2e test</span><span class="tag">#client-a</span></div>
+      <div class="row"><span class="ln">4</span><span class="time">16:00</span><span class="title">Send rate-limit numbers to the infra team</span><span class="tag">#client-c</span></div>
+      <div class="fold closed">▸ 11 other notes</div>
+    </div>
+    <div class="whichkey">
+      <span><kbd>c</kbd> capture</span><span><kbd>x</kbd> done</span><span><kbd>s</kbd> +1 h</span><span><kbd>S</kbd> tomorrow 9:00</span>
+      <span><kbd>/</kbd> search</span><span><kbd>#</kbd> filter tag</span><span><kbd>j</kbd>/<kbd>k</kbd> move</span><span><kbd>?</kbd> help</span>
+    </div>
+    <div class="statusline">
+      <span><span class="seg mode">NORMAL</span><span class="seg">Wed 09:05</span><span class="seg">America/Mexico_City</span></span>
+      <span><span class="seg">2 overdue</span><span class="seg">4 today</span><span class="seg">1/4</span></span>
+    </div>
+  </div>
+
+  <h2>Moment 4 · Project filter</h2>
+  <p class="meta">Thu 14:30 · <kbd>#</kbd> client-b · 5 notes · 1 due 15:00</p>
+  <div class="term">
+    <div class="tabline"><span>today</span><span class="on">all · #client-b</span><span>tags</span></div>
+    <div class="buffer">
+      <div class="now"><span class="ln">—</span><span>14:30</span><span class="rule"></span></div>
+      <div class="row cursor"><span class="ln">1</span><span class="time">15:00</span><span class="title">Prep demo of search filters for the review</span><span class="tag">#client-b</span></div>
+      <div class="row"><span class="ln">2</span><span class="time faint">—</span><span class="title">API keys rotate every 90 days</span><span class="tag">#client-b</span></div>
+      <div class="row"><span class="ln">3</span><span class="time faint">—</span><span class="title">Staging URL and test accounts</span><span class="tag">#client-b</span></div>
+      <div class="row"><span class="ln">4</span><span class="time faint">—</span><span class="title">Review agenda: search, exports, roles</span><span class="tag">#client-b</span></div>
+      <div class="row"><span class="ln">5</span><span class="time faint">—</span><span class="title">Diego prefers async updates on Slack</span><span class="tag">#client-b</span></div>
+    </div>
+    <div class="statusline">
+      <span><span class="seg mode">FILTER</span><span class="seg">Thu 14:30</span></span>
+      <span><span class="seg">#client-b · 5 notes · 1 reminder</span></span>
+    </div>
+  </div>
+
+  <h2>States</h2>
+  <p class="meta">Component states (illustrative, not part of a moment)</p>
+  <div class="term"><div class="buffer">
+    <div class="row"><span class="ln">1</span><span class="time faint">—</span><span class="title">Domain glossary</span><span class="tag">note</span></div>
+    <div class="row"><span class="ln">2</span><span class="time">16:00</span><span class="title">Due today</span><span class="tag">due</span></div>
+    <div class="row"><span class="ln">3</span><span class="time">Tue 18:30</span><span class="title">Overdue: sits above the NOW line, day shown</span><span class="tag">overdue</span></div>
+    <div class="row"><span class="ln">4</span><span class="time">10:05</span><span class="title">Snoozed <span class="meta">(was 09:05 · 1×)</span></span><span class="tag">snoozed</span></div>
+    <div class="row done"><span class="ln">5</span><span class="time">17:00</span><span class="title">Done</span><span class="tag">done</span></div>
+    <div class="row cursor"><span class="ln">6</span><span class="time">—</span><span class="title">Cursor / focused row</span><span class="tag">focus</span></div>
+  </div></div>
+
+  <h2>Rules</h2>
+  <ul class="rules">
+    <li><b>Accent:</b> amber is only the NOW line. Overdue isn't red: it's simply above the line.</li>
+    <li><b>Motion:</b> none, except the cursor moving between rows (instant) and the caret blink in capture mode.</li>
+    <li><b>Reduced motion:</b> the caret stops blinking. Nothing else changes.</li>
+    <li><b>Targets:</b> every row is 44 px tall, so mouse and touch users get full-width hit areas.</li>
+    <li><b>Keyboard:</b> the which-key panel is always visible on desktop. On mobile it collapses behind <kbd>?</kbd>.</li>
+    <li><b>Density:</b> about 14 rows per laptop screen, the densest of the three directions.</li>
+    <li><b>Risk:</b> too "developer" for non-developers, and the paper warmth is weaker than in A or C.</li>
+  </ul>
+</div>
+<script>
+(function () {
+  var root = document.documentElement;
+  document.getElementById('theme').addEventListener('click', function () {
+    var light = root.dataset.theme ? root.dataset.theme === 'light' : matchMedia('(prefers-color-scheme: light)').matches;
+    root.dataset.theme = light ? 'dark' : 'light';
+  });
+})();
+</script>
+</body>
+</html>
