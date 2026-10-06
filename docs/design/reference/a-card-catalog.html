@@ -110,6 +110,7 @@ kbd {
 :root[data-theme="dark"] .stamp { mix-blend-mode: normal; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stamp { mix-blend-mode: normal; } }
 .card.filed h3 { color: var(--ink-muted); }
+.card.filed { padding-bottom: 56px; }
 
 /* Swatches */
 .swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 16px; }
@@ -151,6 +152,29 @@ kbd {
 .rules { columns: 2 280px; gap: 32px; }
 .rules li { break-inside: avoid; margin-bottom: 8px; }
 .filter-pill { font: 500 12px var(--font-mono); border: 1px solid var(--ink); border-radius: 999px; padding: 4px 10px; }
+
+/* Morning view: today's card with yesterday's leftovers lying on top of it */
+.morning { max-width: 660px; margin: 0 auto; }
+.leftovers { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 6px -26px; }
+.card.leftover { transform: rotate(-2deg); }
+.card.leftover + .card.leftover { transform: rotate(1.6deg) translateY(6px); }
+.card.leftover .due::before { content: "since "; color: var(--ink-muted); }
+.card.day-card { padding-top: 64px; }
+.card.day-card .meta { top: 36px; }
+.card.day-card { background-position: 0 58px, 0 58px; }
+.day-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-top: 4px; }
+.day-name { font: 600 34px/48px var(--font-title); }
+.day-row { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: 48px; }
+.day-row .h { font: 500 13px var(--font-mono); color: var(--ink-muted); }
+.day-row .t { font: 600 17px/24px var(--font-title); }
+@media (max-width: 640px) {
+  .leftovers { grid-template-columns: 1fr; margin: 0 4px -20px; }
+  .day-row { grid-template-columns: 48px minmax(0, 1fr); }
+  .day-row .tag { grid-column: 2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card.leftover, .card.leftover + .card.leftover { transform: none; }
+}
 
 @media (max-width: 760px) {
   .desk-layout { grid-template-columns: 1fr; }
@@ -233,46 +257,38 @@ kbd {
   </div>
 
   <h2>Moment 3 · Morning view</h2>
-  <p class="section-meta">Wed 09:05 · Today = 4 cards · 2 left on the desk + 2 due today · 11 others in the drawer</p>
+  <p class="section-meta">Wed 09:05 · 2 cards left on the desk from Tuesday · today's card has 2 · 11 others in the drawer</p>
   <div class="screen">
     <div class="screen-bar">
-      <span class="title">Wednesday · Today</span>
+      <span class="title">Today</span>
       <span class="shortcuts"><span><kbd>c</kbd> new card</span><span><kbd>/</kbd> search</span><span><kbd>t</kbd> tags</span><span><kbd>?</kbd> all shortcuts</span></span>
     </div>
     <div class="screen-body">
-      <div class="desk-layout">
-        <div>
-          <p class="stack-label">Left on the desk · 2</p>
-          <div class="pile">
-            <div class="card left-on-desk">
-              <div class="meta"><span class="tag"># Client A</span><span class="due">Tue 18:00</span></div>
-              <h3>Reply to Marta about the staging deploy window</h3>
-              <div class="actions"><button>Done</button><button>+1 h</button><button>Tomorrow 9:00</button></div>
-            </div>
-            <div class="card left-on-desk">
-              <div class="meta"><span class="tag"># Client C</span><span class="due">Tue 18:30</span></div>
-              <h3>Update the estimate for the onboarding epic</h3>
-              <div class="actions"><button>Done</button><button>+1 h</button><button>Tomorrow 9:00</button></div>
-            </div>
+      <div class="morning">
+        <p class="stack-label">Left on the desk from Tuesday · 2</p>
+        <div class="leftovers">
+          <div class="card leftover">
+            <div class="meta"><span class="tag"># Client A</span><span class="due">Tue 18:00</span></div>
+            <h3>Reply to Marta about the staging deploy window</h3>
+            <div class="actions"><button>Done</button><button>+1 h</button><button>Tomorrow 9:00</button></div>
+          </div>
+          <div class="card leftover">
+            <div class="meta"><span class="tag"># Client C</span><span class="due">Tue 18:30</span></div>
+            <h3>Update the estimate for the onboarding epic</h3>
+            <div class="actions"><button>Done</button><button>+1 h</button><button>Tomorrow 9:00</button></div>
           </div>
         </div>
-        <div>
-          <p class="stack-label">Due today · 2</p>
-          <div class="grid-cards">
-            <div class="card">
-              <div class="meta"><span class="tag"># Client A</span><span class="due">09:30</span></div>
-              <h3>Standup: mention the flaky checkout e2e test</h3>
-              <div class="actions"><button>Done</button><button>Snooze</button></div>
-            </div>
-            <div class="card">
-              <div class="meta"><span class="tag"># Client C</span><span class="due">16:00</span></div>
-              <h3>Send rate-limit numbers to the infra team</h3>
-              <div class="actions"><button>Done</button><button>Snooze</button></div>
-            </div>
+        <div class="card day-card">
+          <div class="meta"><span>WEDNESDAY · TODAY</span><span class="due">09:05</span></div>
+          <div class="day-head">
+            <span class="day-name">Wednesday</span>
+            <span class="mono muted">4 today · 2 left from Tuesday · 2 due</span>
           </div>
+          <div class="day-row"><span class="h">09:30</span><span class="t">Standup: mention the flaky checkout e2e test</span><span class="tag"># Client A</span></div>
+          <div class="day-row"><span class="h">16:00</span><span class="t">Send rate-limit numbers to the infra team</span><span class="tag"># Client C</span></div>
         </div>
+        <div class="drawer"><span>11 other cards in the drawer</span><span class="mono muted"><kbd>a</kbd> open drawer</span></div>
       </div>
-      <div class="drawer"><span>11 other cards in the drawer</span><span class="mono muted"><kbd>a</kbd> open drawer</span></div>
     </div>
   </div>
 
