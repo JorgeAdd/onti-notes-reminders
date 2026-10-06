@@ -1,0 +1,11 @@
+{
+  "name": "onti-notes-reminders",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22"
+  }
+}
