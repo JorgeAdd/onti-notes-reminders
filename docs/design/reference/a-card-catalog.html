@@ -187,6 +187,44 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   .card.left-on-desk, .card.left-on-desk:nth-child(2) { transform: none; }
 }
+
+/* Mobile view: phone frames */
+.phones { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+.phones figure { margin: 0; }
+.phones figcaption { text-align: center; margin-top: 10px; font: 12px var(--font-mono); color: var(--ink-muted); }
+.phone { width: 340px; max-width: calc(100vw - 32px); height: 740px; border: 9px solid #121110; border-radius: 40px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+.os-bar { flex: none; height: 34px; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; font: 600 13px system-ui, sans-serif; }
+.m-scroll { flex: 1; overflow: hidden; padding: 12px; }
+.m-kb { flex: none; height: 210px; display: grid; place-items: center; font: 12px system-ui, sans-serif; background: rgba(128,128,128,.22); color: var(--ink-muted); }
+.m-dim { flex: 1; opacity: .35; padding: 12px; overflow: hidden; }
+
+.phone.a { background: var(--desk); color: var(--ink); }
+.phone.a .os-bar { background: var(--card); }
+.m-appbar { flex: none; display: flex; justify-content: space-between; align-items: center; padding: 6px 16px 10px; background: var(--card); border-bottom: 1px solid var(--card-edge); }
+.m-appbar .title { font: 600 22px var(--font-title); }
+.phone .leftovers { grid-template-columns: 1fr; margin: 0 4px -18px; gap: 10px; }
+.phone .card { padding-left: 14px; padding-right: 14px; }
+.phone .card .meta { left: 14px; right: 14px; }
+.phone .card .actions button { flex: 1; padding: 0 8px; }
+.phone .day-name { font-size: 28px; line-height: 40px; }
+.phone .card.day-card { padding-top: 54px; }
+.phone .card.day-card .meta { top: 28px; }
+.phone .card.day-card { background-position: 0 50px, 0 50px; }
+.phone .leftovers { margin-bottom: -12px; }
+.phone .card.leftover h3 { font-size: 17px; }
+.phone .day-row { grid-template-columns: 48px minmax(0, 1fr); gap: 8px; }
+.phone .day-row .tag { display: none; }
+.phone .day-row .t { font-size: 16px; }
+.phone .drawer { margin-top: 14px; }
+.m-nav { flex: none; display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 8px; padding: 10px 12px 18px; background: var(--card); border-top: 1px solid var(--card-edge); }
+.m-nav button { width: 100%; }
+.m-nav .primary { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.m-sheet { flex: none; margin: 0 8px; }
+.m-sheet .card { border-radius: 6px 6px 0 0; }
+.m-sheet .row { display: flex; gap: 8px; margin-top: 10px; }
+.m-sheet .row button { flex: 1; }
+.chip.on { border-color: var(--ink); background: var(--card); color: var(--ink); font-weight: 500; }
+.chip { min-height: 32px; display: inline-flex; align-items: center; }
 </style>
 </head>
 <body>
@@ -308,6 +346,62 @@ kbd {
         <div class="card"><div class="meta"><span class="tag"># Client B</span><span></span></div><h3>Diego prefers async updates on Slack</h3></div>
       </div>
     </div>
+  </div>
+
+  <h2 id="mobile">Mobile view</h2>
+  <p class="section-meta">No keyboard shortcuts on a phone: shortcuts become a bottom bar within thumb reach</p>
+  <div class="phones">
+    <figure>
+      <div class="phone a">
+        <div class="os-bar"><span>9:05</span><span>●●●</span></div>
+        <div class="m-appbar"><span class="title">Today</span><span class="mono muted">Wed 09:05</span></div>
+        <div class="m-scroll">
+          <p class="stack-label">Left on the desk from Tuesday · 2</p>
+          <div class="leftovers">
+            <div class="card leftover">
+              <div class="meta"><span class="tag"># Client A</span><span class="due">Tue 18:00</span></div>
+              <h3>Reply to Marta about the staging deploy window</h3>
+              <div class="actions"><button>Done</button><button>+1 h</button><button>9:00</button></div>
+            </div>
+            <div class="card leftover">
+              <div class="meta"><span class="tag"># Client C</span><span class="due">Tue 18:30</span></div>
+              <h3>Update the estimate for the onboarding epic</h3>
+              <div class="actions"><button>Done</button><button>+1 h</button><button>9:00</button></div>
+            </div>
+          </div>
+          <div class="card day-card">
+            <div class="meta"><span>TODAY</span><span class="due">09:05</span></div>
+            <div class="day-head"><span class="day-name">Wednesday</span></div>
+            <div class="day-row"><span class="h">09:30</span><span class="t">Standup: mention the flaky checkout e2e test</span></div>
+            <div class="day-row"><span class="h">16:00</span><span class="t">Send rate-limit numbers to the infra team</span></div>
+          </div>
+          <div class="drawer"><span>11 other cards</span><span class="mono muted">Drawer ›</span></div>
+        </div>
+        <div class="m-nav"><button>Today</button><button>Drawer</button><button class="primary">+ New card</button></div>
+      </div>
+      <figcaption>Moment 3 · Wed 09:05</figcaption>
+    </figure>
+    <figure>
+      <div class="phone a">
+        <div class="os-bar"><span>11:12</span><span>●●●</span></div>
+        <div class="m-dim">
+          <div class="card"><div class="meta"><span class="tag"># Client A</span><span class="due">18:00</span></div><h3>Reply to Marta about the staging deploy window</h3></div>
+        </div>
+        <div class="m-sheet">
+          <div class="card">
+            <div class="meta"><span>NEW CARD</span><span>14 → 15</span></div>
+            <h3>Notify Ana: move repo permissions from me to Luis</h3>
+            <div class="chips">
+              <span class="chip on">Today 17:00</span><span class="chip">+1 h</span><span class="chip">Tomorrow 9:00</span><span class="chip">Pick…</span>
+              <span class="chip on"># Client A</span>
+            </div>
+            <div class="row"><button>Discard</button><button class="primary" style="background:var(--ink);color:var(--card);border-color:var(--ink)">Save</button></div>
+          </div>
+        </div>
+        <div class="m-kb">keyboard</div>
+      </div>
+      <figcaption>Moment 1 · Tue 11:12 · presets instead of a date picker</figcaption>
+    </figure>
   </div>
 
   <h2>States</h2>

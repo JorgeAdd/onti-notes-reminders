@@ -134,6 +134,33 @@ kbd { font: 500 12px var(--font-mono); border: 1px solid var(--line); border-rad
 @media (prefers-reduced-motion: reduce) {
   .stub { transform: none; }
 }
+
+/* Mobile view: phone frames */
+.phones { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+.phones figure { margin: 0; }
+.phones figcaption { text-align: center; margin-top: 10px; font: 12px var(--font-mono); color: var(--ink-muted); }
+.phone { width: 340px; max-width: calc(100vw - 32px); height: 740px; border: 9px solid #121110; border-radius: 40px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+.os-bar { flex: none; height: 34px; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; font: 600 13px system-ui, sans-serif; }
+.m-scroll { flex: 1; overflow: hidden; padding: 12px; }
+.m-kb { flex: none; height: 210px; display: grid; place-items: center; font: 12px system-ui, sans-serif; background: rgba(128,128,128,.22); color: var(--ink-muted); }
+.m-dim { flex: 1; opacity: .35; padding: 12px; overflow: hidden; }
+
+.phone.c { background: var(--table); color: var(--ink); }
+.phone.c .os-bar { color: var(--ink); }
+.phone .m-scroll { padding: 10px 10px 0; }
+.phone .stub { margin: 0 6px -6px; padding: 12px 12px 20px; }
+.phone .page { padding: 20px 14px 16px; }
+.phone .dayname { font-size: 38px; }
+.phone .clock { font-size: 17px; }
+.phone .slot { grid-template-columns: 48px minmax(0, 1fr); gap: 8px; padding: 6px 0; }
+.phone .slot .acts, .phone .slot .tg { grid-column: 2; }
+.phone .slot .acts button { flex: 1; padding: 0 8px; }
+.phone .loose { flex-wrap: wrap; }
+.m-nav { flex: none; display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 8px; padding: 10px 12px 18px; }
+.m-nav button { width: 100%; }
+.m-nav .primary { background: var(--ink); color: var(--page); border-color: var(--ink); }
+.pill { min-height: 32px; display: inline-flex; align-items: center; }
+.pill.on { border-color: var(--ink); }
 </style>
 </head>
 <body>
@@ -229,6 +256,50 @@ kbd { font: 500 12px var(--font-mono); border: 1px solid var(--line); border-rad
       <div class="item"><span class="t">Diego prefers async updates on Slack</span><span class="mono muted">note</span></div>
     </div>
   </div></div>
+
+  <h2 id="mobile">Mobile view</h2>
+  <p class="mono muted">The pad fills the phone; the stub keeps its place on top; shortcuts become a bottom bar</p>
+  <div class="phones">
+    <figure>
+      <div class="phone c">
+        <div class="os-bar"><span>9:05</span><span>●●●</span></div>
+        <div class="m-scroll">
+          <div class="stub">
+            <div class="label">From Tuesday · 2</div>
+            <div class="slot"><span class="h">18:00</span><span class="t">Reply to Marta about the staging deploy window</span><span class="acts"><button>Done</button><button>+1 h</button><button>9:00</button></span></div>
+            <div class="slot" style="border-bottom:0"><span class="h">18:30</span><span class="t">Update the estimate for the onboarding epic</span><span class="acts"><button>Done</button><button>+1 h</button><button>9:00</button></span></div>
+          </div>
+          <div class="page">
+            <div class="dayhead"><span class="dayname">Wednesday</span><span class="clock">09:05</span></div>
+            <div class="hours">
+              <div class="slot"><span class="h">09:30</span><span class="t">Standup: mention the flaky checkout e2e test</span></div>
+              <div class="slot"><span class="h">16:00</span><span class="t">Send rate-limit numbers to the infra team</span></div>
+            </div>
+            <div class="loose"><span>11 other notes on the back</span></div>
+          </div>
+        </div>
+        <div class="m-nav"><button>Today</button><button>Pad</button><button class="primary">Write</button></div>
+      </div>
+      <figcaption>Moment 3 · Wed 09:05</figcaption>
+    </figure>
+    <figure>
+      <div class="phone c">
+        <div class="os-bar"><span>11:12</span><span>●●●</span></div>
+        <div class="m-scroll">
+          <div class="page">
+            <div class="dayhead"><span class="dayname">Tuesday</span><span class="clock">11:12</span></div>
+            <div class="capture">
+              <div class="text">Notify Ana: move repo permissions from me to Luis</div>
+              <div class="row"><span class="pill on">17:00</span><span class="pill">+1 h</span><span class="pill">Tomorrow 9:00</span><span class="pill">Pick…</span><span class="pill on">Client A</span></div>
+              <div class="row"><button style="flex:1">Discard</button><button style="flex:1;background:var(--ink);color:var(--page);border-color:var(--ink)">Save</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="m-kb">keyboard</div>
+      </div>
+      <figcaption>Moment 1 · Tue 11:12 · writing on today's page</figcaption>
+    </figure>
+  </div>
 
   <h2>States</h2>
   <p class="mono muted">Component states (illustrative, not part of a moment)</p>

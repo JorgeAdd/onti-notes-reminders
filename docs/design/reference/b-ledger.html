@@ -133,6 +133,35 @@ kbd { font: 500 12px var(--font-mono); color: var(--ink); border: 1px solid var(
   .caret { animation: blink 1.1s steps(1) infinite; }
   @keyframes blink { 50% { opacity: 0; } }
 }
+
+/* Mobile view: phone frames */
+.phones { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+.phones figure { margin: 0; }
+.phones figcaption { text-align: center; margin-top: 10px; font: 12px var(--font-mono); color: var(--ink-muted); }
+.phone { width: 340px; max-width: calc(100vw - 32px); height: 740px; border: 9px solid #121110; border-radius: 40px; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+.os-bar { flex: none; height: 34px; display: flex; justify-content: space-between; align-items: center; padding: 0 24px; font: 600 13px system-ui, sans-serif; }
+.m-scroll { flex: 1; overflow: hidden; padding: 12px; }
+.m-kb { flex: none; height: 210px; display: grid; place-items: center; font: 12px system-ui, sans-serif; background: rgba(128,128,128,.22); color: var(--ink-muted); }
+.m-dim { flex: 1; opacity: .35; padding: 12px; overflow: hidden; }
+
+.phone.b { background: var(--bg); color: var(--ink); }
+.phone.b .os-bar { background: var(--surface); }
+.phone .tabline span { padding: 10px 14px; }
+.phone .buffer { flex: 1; overflow: hidden; padding: 6px 0; }
+.phone .row { grid-template-columns: 22px 80px minmax(0, 1fr); gap: 8px; padding-right: 10px; }
+.phone .row .time { white-space: nowrap; font-size: 13px; }
+.phone .row .tag { display: none; }
+.phone .row .title { white-space: normal; line-height: 1.3; font-size: 14px; }
+.phone .now { grid-template-columns: 22px 80px minmax(0, 1fr); gap: 8px; padding-right: 10px; }
+.phone .fold { padding-left: 34px; }
+.m-actions { flex: none; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); }
+.m-actions button { border: 0; border-right: 1px solid var(--line); border-radius: 0; min-height: 52px; background: var(--surface); font-size: 12px; }
+.m-actions button:last-child { border-right: 0; }
+.m-actions kbd { display: block; margin: 0 auto 2px; width: fit-content; }
+.phone .statusline { padding-bottom: 14px; }
+.phone .cmdline .text { font-size: 15px; }
+.phone .cmdline .token { min-height: 32px; display: inline-flex; align-items: center; }
+.token.on { border-color: var(--ink); }
 </style>
 </head>
 <body>
@@ -253,6 +282,48 @@ kbd { font: 500 12px var(--font-mono); color: var(--ink); border: 1px solid var(
       <span><span class="seg mode">FILTER</span><span class="seg">Thu 14:30</span></span>
       <span><span class="seg">#client-b · 5 notes · 1 reminder</span></span>
     </div>
+  </div>
+
+  <h2 id="mobile">Mobile view</h2>
+  <p class="meta">The which-key panel becomes an action bar for the row under the cursor; the statusline stays</p>
+  <div class="phones">
+    <figure>
+      <div class="phone b">
+        <div class="os-bar"><span>9:05</span><span>●●●</span></div>
+        <div class="tabline"><span class="on">today</span><span>all</span><span>tags</span><span>/</span></div>
+        <div class="buffer">
+          <div class="fold">▾ OVERDUE · 2</div>
+          <div class="row cursor"><span class="ln">1</span><span class="time">Tue 18:00</span><span class="title">Reply to Marta about the staging deploy window</span></div>
+          <div class="row"><span class="ln">2</span><span class="time">Tue 18:30</span><span class="title">Update the estimate for the onboarding epic</span></div>
+          <div class="now"><span class="ln">—</span><span>09:05</span><span class="rule"></span></div>
+          <div class="fold">▾ TODAY · 2</div>
+          <div class="row"><span class="ln">3</span><span class="time">09:30</span><span class="title">Standup: mention the flaky checkout e2e test</span></div>
+          <div class="row"><span class="ln">4</span><span class="time">16:00</span><span class="title">Send rate-limit numbers to the infra team</span></div>
+          <div class="fold closed">▸ 11 other notes</div>
+        </div>
+        <div class="m-actions"><button><kbd>x</kbd>done</button><button><kbd>s</kbd>+1 h</button><button><kbd>S</kbd>9:00</button><button><kbd>c</kbd>capture</button></div>
+        <div class="statusline"><span><span class="seg mode">NORMAL</span><span class="seg">Wed 09:05</span></span><span><span class="seg">2 overdue · 1/4</span></span></div>
+      </div>
+      <figcaption>Moment 3 · Wed 09:05</figcaption>
+    </figure>
+    <figure>
+      <div class="phone b">
+        <div class="os-bar"><span>11:12</span><span>●●●</span></div>
+        <div class="buffer">
+          <div class="fold">▾ TODAY · 2</div>
+          <div class="row"><span class="ln">1</span><span class="time">18:00</span><span class="title">Reply to Marta about the staging deploy window</span></div>
+          <div class="row"><span class="ln">2</span><span class="time">18:30</span><span class="title">Update the estimate for the onboarding epic</span></div>
+        </div>
+        <div class="cmdline">
+          <span class="prompt">capture ›</span>
+          <span class="text">Notify Ana: move repo permissions from me to Luis <span class="caret"></span></span>
+          <span class="token on">@today 17:00</span><span class="token">@+1h</span><span class="token">@tomorrow 9:00</span><span class="token on">#client-a</span>
+        </div>
+        <div class="statusline"><span><span class="seg mode">CAPTURE</span></span><span><span class="seg">↵ save · 14 → 15</span></span></div>
+        <div class="m-kb">keyboard</div>
+      </div>
+      <figcaption>Moment 1 · Tue 11:12 · tokens are tappable presets</figcaption>
+    </figure>
   </div>
 
   <h2>States</h2>
