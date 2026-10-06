@@ -56,6 +56,8 @@ Assumption: no notes are created between Tue 11:12 and Wed 9:05.
 2. **Reminder fires — Tue 17:00.** The permissions reminder notifies Jorge
    with the note's full context. He marks it done in **1 click**.
    **2 items** remain for today, and he doesn't finish them.
+   *Note: this day misses the success target; Moment 3 shows how the app
+   recovers.*
 3. **Morning view — Wed 9:05.** The Today view shows only **4 items**:
    **2 overdue** (the 2 unfinished reminders from Tuesday, NOT the
    permissions note) and **2 due today**. The other **11 notes** stay out
