@@ -11,3 +11,4 @@ coverage/
 *.log
 .codegraph/
 .vercel
+.atl/
