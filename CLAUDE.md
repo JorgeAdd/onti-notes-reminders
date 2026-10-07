@@ -29,10 +29,13 @@ phases.
    Why: a readable history shows how the project evolved, phase by phase.
 
 6. **Ask before every push. Each approval covers only that specific
-   push.** Local commits do not need approval.
-   Why: the repository is public and part of the evaluation. Anything
-   pushed is visible immediately. Local commits stay private and can
-   still be fixed; approving one push never authorizes the next.
+   push.** Local commits do not need approval. `main` is protected: work
+   happens on a branch (`<type>/<short-name>`), reaches `main` through a
+   pull request, and is merged only when the "Verify and build" check is
+   green.
+   Why: the repository is public and part of the evaluation, and Vercel
+   deploys `main` on push. The PR + required check is what guarantees that
+   only green code reaches production.
 
 7. **Save every prompt in `prompts/`** under `antes/` (before
    implementation), `durante/` (during) or `despues/` (after), numbered
