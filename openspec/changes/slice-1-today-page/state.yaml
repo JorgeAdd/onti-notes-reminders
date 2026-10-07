@@ -1,11 +1,16 @@
 change: slice-1-today-page
 artifact_store: hybrid
-phase: design
+phase: tasks
 status: done
 completed:
   - proposal
   - spec
   - design
-next: [tasks]
+  - tasks
+next: [apply]
 delivery_strategy: ask-on-risk
+chain_strategy: feature-branch-chain
+tracker_branch: feat/slice-1-today-page
 review_budget_lines: 400
+chained_prs: 6
+decision_needed_before_apply: false
