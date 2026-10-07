@@ -19,7 +19,10 @@ export function AuthForm({ mode, busy, notice, error, onSubmit, onToggleMode }: 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    onSubmit(String(data.get('email') ?? ''), String(data.get('password') ?? ''))
+    const email = data.get('email')
+    const password = data.get('password')
+    if (typeof email !== 'string' || typeof password !== 'string') return
+    onSubmit(email, password)
   }
 
   return (
@@ -44,8 +47,16 @@ export function AuthForm({ mode, busy, notice, error, onSubmit, onToggleMode }: 
           />
         </label>
 
-        {error && <p className={styles.error} role="alert">{error}</p>}
-        {notice && <p className={styles.notice} role="status">{notice}</p>}
+        {error && (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        )}
+        {notice && (
+          <p className={styles.notice} role="status">
+            {notice}
+          </p>
+        )}
 
         <button className={styles.primary} type="submit" disabled={busy}>
           {busy ? t.working : mode === 'signIn' ? t.signIn : t.signUp}

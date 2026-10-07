@@ -75,11 +75,11 @@ To be documented once the stack is set up (Phase 5).
 
 ## Deployment
 
-| Part     | Where | URL |
-|----------|-------|-----|
-| Frontend | Vercel (`vercel.json`, built from the workspace root) | https://onti-notes-reminders.vercel.app |
-| API      | Railway (`railpack.json` + `railway.json`, healthcheck `/health`) | https://api-production-810ca.up.railway.app |
-| Database + Auth | Supabase (`supabase/migrations/`) | project `onti-notes-reminders` |
+| Part            | Where                                                             | URL                                         |
+| --------------- | ----------------------------------------------------------------- | ------------------------------------------- |
+| Frontend        | Vercel (`vercel.json`, built from the workspace root)             | https://onti-notes-reminders.vercel.app     |
+| API             | Railway (`railpack.json` + `railway.json`, healthcheck `/health`) | https://api-production-810ca.up.railway.app |
+| Database + Auth | Supabase (`supabase/migrations/`)                                 | project `onti-notes-reminders`              |
 
 ### Demo account
 

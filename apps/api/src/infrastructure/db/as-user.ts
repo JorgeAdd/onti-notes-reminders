@@ -13,7 +13,9 @@ export function asUser<T>(
 ): Promise<T> {
   return db.transaction().execute(async (trx) => {
     await sql`set local role authenticated`.execute(trx)
-    await sql`select set_config('request.jwt.claims', ${JSON.stringify(identity.claims)}, true)`.execute(trx)
+    await sql`select set_config('request.jwt.claims', ${JSON.stringify(identity.claims)}, true)`.execute(
+      trx,
+    )
     return work(trx)
   })
 }

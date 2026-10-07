@@ -7,7 +7,12 @@ const envSchema = z.object({
   CORS_ORIGINS: z
     .string()
     .min(1)
-    .transform((value) => value.split(',').map((origin) => origin.trim()).filter(Boolean)),
+    .transform((value) =>
+      value
+        .split(',')
+        .map((origin) => origin.trim())
+        .filter(Boolean),
+    ),
 })
 
 export type Config = z.infer<typeof envSchema>

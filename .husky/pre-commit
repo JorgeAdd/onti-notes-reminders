@@ -1,2 +1,3 @@
 #!/usr/bin/env sh
+npm run verify
 sh scripts/engram-sync.sh export

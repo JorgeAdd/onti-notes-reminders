@@ -38,7 +38,7 @@ send the same notification twice.
 
 - No join to read a note with its reminder; queries for the Today page hit
   one partial index (`user_id, due_at where due_at is not null and
-  done_at is null`).
+done_at is null`).
 - `original_due_at` is only reset by a manual reschedule, never by snooze.
 - Verified locally (PostgreSQL 16, Jorge's dataset): every count in the
   brief's four moments, the snooze results, the scheduler's single pick,

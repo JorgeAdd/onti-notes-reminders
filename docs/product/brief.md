@@ -11,6 +11,7 @@ someone else" was written in Apple Notes, the app was never reopened that
 day, and the change happened 3 days late.
 
 Why current tools fail:
+
 - Notes and reminders live in separate apps: the reminder lacks the
   context, and the note lacks a due time.
 - Apple Notes and Google Keep have weak reminders.
@@ -34,6 +35,7 @@ projects at once.
   chats and sticky notes, without knowing which ones have a deadline.
 
 Success for Jorge:
+
 - Capture in under 5 s (shortcut pressed → saved).
 - A morning view of only today's items, with their context.
 - Every reminder is either done or snoozed by the end of its day.
@@ -56,8 +58,8 @@ Assumption: no notes are created between Tue 11:12 and Wed 9:05.
 2. **Reminder fires — Tue 17:00.** The permissions reminder notifies Jorge
    with the note's full context. He marks it done in **1 click**.
    **2 items** remain for today, and he doesn't finish them.
-   *Note: this day misses the success target; Moment 3 shows how the app
-   recovers.*
+   _Note: this day misses the success target; Moment 3 shows how the app
+   recovers._
 3. **Morning view — Wed 9:05.** The Today view shows only **4 items**:
    **2 overdue** (the 2 unfinished reminders from Tuesday, NOT the
    permissions note) and **2 due today**. The other **11 notes** stay out
@@ -67,12 +69,14 @@ Assumption: no notes are created between Tue 11:12 and Wed 9:05.
    **15:00**.
 
 ### Definitions
+
 - **Overdue:** the due time has passed and the item is not done.
 - **Missed:** still not done 24 h after the due time (used in v2 metrics).
 
 ## 4. Anti-references and references
 
 ### Must NOT look or feel like
+
 - The purple/blue gradient "AI app" look, glassmorphism, sparkle icons.
 - Generic SaaS dashboards: sidebar + cards + charts for everything.
 - Notion: too many options before you can write a single line.
@@ -80,6 +84,7 @@ Assumption: no notes are created between Tue 11:12 and Wed 9:05.
 - Empty minimalism with no personality (white + gray + one blue button).
 
 ### Should evoke
+
 - **LazyVim / terminal:** keyboard-first, shortcuts visible on screen,
   dense but readable, instant response, monospace for times and metadata.
 - **Index card / pocket notebook:** each note is a physical object with
@@ -91,6 +96,7 @@ Assumption: no notes are created between Tue 11:12 and Wed 9:05.
   memorable visual signature reserved for a single concept.
 
 ### Tone
+
 Calm, focused, a tool for a professional. Not playful, not corporate.
 Dark mode is required. Open design tension: what "paper" looks like in
 dark mode (to resolve in Phase 3).
@@ -98,6 +104,7 @@ dark mode (to resolve in Phase 3).
 ## 5. v1 scope
 
 ### In scope
+
 - Email sign-up, login and logout (Supabase Auth).
 - Notes: create, edit, delete. Body in basic markdown (bold, italic,
   lists, links, inline code, code blocks). Rendered markdown is always
@@ -117,6 +124,7 @@ dark mode (to resolve in Phase 3).
 - Responsive layout (usable in a phone browser).
 
 ### Constraints for the ADRs and CONTRACT.md
+
 - **Notifications:** reminders need a backend scheduler and a service
   worker for Web Push. If notification permission is denied, the item
   still shows as due in the Today view. Notifications are an extra
@@ -135,6 +143,7 @@ dark mode (to resolve in Phase 3).
   - Details go in the ADRs (Phase 4).
 
 ### Out of scope
+
 - Weekly summary and "missed" metrics (v2).
 - Global OS shortcut.
 - Nested tags.

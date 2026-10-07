@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+package-lock.json
+.engram
+.husky/_
+supabase/.temp
+docs/design/chosen/*.png
+prompts

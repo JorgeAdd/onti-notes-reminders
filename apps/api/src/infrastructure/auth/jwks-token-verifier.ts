@@ -32,7 +32,7 @@ export class JwksTokenVerifier implements TokenVerifier {
       return {
         userId: payload.sub,
         email: typeof payload.email === 'string' ? payload.email : null,
-        claims: payload as Record<string, unknown>,
+        claims: payload,
       }
     } catch (error) {
       if (error instanceof UnauthorizedError) throw error

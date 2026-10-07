@@ -21,5 +21,12 @@ export function MeContainer({ session }: { session: Session }) {
     }
   }, [session.access_token])
 
-  return <DayPage me={me} error={error} now={new Date()} onSignOut={() => supabase.auth.signOut()} />
+  return (
+    <DayPage
+      me={me}
+      error={error}
+      now={new Date()}
+      onSignOut={() => void supabase.auth.signOut()}
+    />
+  )
 }

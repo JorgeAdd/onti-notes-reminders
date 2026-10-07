@@ -1,4 +1,11 @@
-import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type CryptoKey, type JWK } from 'jose'
+import {
+  createLocalJWKSet,
+  exportJWK,
+  generateKeyPair,
+  SignJWT,
+  type CryptoKey,
+  type JWK,
+} from 'jose'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { UnauthorizedError } from '../src/application/errors'
 import { JwksTokenVerifier } from '../src/infrastructure/auth/jwks-token-verifier'
@@ -18,7 +25,15 @@ beforeAll(async () => {
   verifier = new JwksTokenVerifier({ issuer: ISSUER, keys: createLocalJWKSet({ keys: [jwk] }) })
 })
 
-function token(overrides: { issuer?: string; audience?: string; expiresIn?: string | number; key?: CryptoKey; sub?: string } = {}) {
+function token(
+  overrides: {
+    issuer?: string
+    audience?: string
+    expiresIn?: string | number
+    key?: CryptoKey
+    sub?: string
+  } = {},
+) {
   return new SignJWT({ email: 'jorge@example.com', role: 'authenticated' })
     .setProtectedHeader({ alg: 'ES256', kid: 'key-1' })
     .setSubject(overrides.sub ?? JORGE)
@@ -49,8 +64,12 @@ describe('JwksTokenVerifier', () => {
 
   it('rejects a tampered token', async () => {
     const [header, , signature] = (await token()).split('.')
-    const forgedPayload = Buffer.from(JSON.stringify({ sub: 'someone-else', iss: ISSUER, aud: 'authenticated' })).toString('base64url')
-    await expect(verifier.verify(`${header}.${forgedPayload}.${signature}`)).rejects.toBeInstanceOf(UnauthorizedError)
+    const forgedPayload = Buffer.from(
+      JSON.stringify({ sub: 'someone-else', iss: ISSUER, aud: 'authenticated' }),
+    ).toString('base64url')
+    await expect(verifier.verify(`${header}.${forgedPayload}.${signature}`)).rejects.toBeInstanceOf(
+      UnauthorizedError,
+    )
   })
 
   it('rejects garbage', async () => {

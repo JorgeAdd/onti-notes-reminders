@@ -12,16 +12,16 @@ what you see; the command layer is how you act.
 
 ## Boards
 
-| File | Board |
-|------|-------|
-| `00-system-keys-and-motion.png` | Concept, palette, keymap, rules, motion table |
-| `01-moment-1-light-desktop.png` | Tue 11:12 · capture in the command bar |
-| `02-moment-2-light-desktop.png` | Tue 17:00 · notification, done in 1 click |
+| File                            | Board                                                          |
+| ------------------------------- | -------------------------------------------------------------- |
+| `00-system-keys-and-motion.png` | Concept, palette, keymap, rules, motion table                  |
+| `01-moment-1-light-desktop.png` | Tue 11:12 · capture in the command bar                         |
+| `02-moment-2-light-desktop.png` | Tue 17:00 · notification, done in 1 click                      |
 | `03-moment-3-light-desktop.png` | Wed 09:05 · Today (2 still open + 2 due) with snooze which-key |
-| `04-moment-4-light-desktop.png` | Thu 14:30 · #client-b filter |
-| `05-moment-3-light-mobile.png` | Wed 09:05 · mobile, action sheet for the focused item |
-| `06-moment-1-light-mobile.png` | Tue 11:12 · mobile capture with presets |
-| `07`–`12` | The same moments in dark mode |
+| `04-moment-4-light-desktop.png` | Thu 14:30 · #client-b filter                                   |
+| `05-moment-3-light-mobile.png`  | Wed 09:05 · mobile, action sheet for the focused item          |
+| `06-moment-1-light-mobile.png`  | Tue 11:12 · mobile capture with presets                        |
+| `07`–`12`                       | The same moments in dark mode                                  |
 
 ## Corrections applied to the exported boards
 

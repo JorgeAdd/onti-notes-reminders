@@ -1,20 +1,29 @@
-import { meResponseSchema } from '@onti/shared'
+import { meResponseSchema, type MeResponse } from '@onti/shared'
 import { describe, expect, it } from 'vitest'
 import { UnauthorizedError } from '../src/application/errors'
 import { makeGetMe } from '../src/application/get-me'
 import type { ProfileRepository, TokenVerifier } from '../src/application/ports'
 import { buildServer } from '../src/infrastructure/http/server'
 
-const JORGE = { userId: '7b0c5a2e-3f4d-4c1a-9e8b-2d6f0a1b3c4d', email: 'jorge@example.com', claims: {} }
+const JORGE = {
+  userId: '7b0c5a2e-3f4d-4c1a-9e8b-2d6f0a1b3c4d',
+  email: 'jorge@example.com',
+  claims: {},
+}
 
 const verifier: TokenVerifier = {
-  async verify(token) {
-    if (token === 'valid-token') return JORGE
-    throw new UnauthorizedError()
+  verify(token) {
+    return token === 'valid-token'
+      ? Promise.resolve(JORGE)
+      : Promise.reject(new UnauthorizedError())
   },
 }
 
-function server(profiles: ProfileRepository = { findOwn: async () => ({ timezone: 'America/Mexico_City' }) }) {
+function server(
+  profiles: ProfileRepository = {
+    findOwn: () => Promise.resolve({ timezone: 'America/Mexico_City' }),
+  },
+) {
   return buildServer({ verifier, getMe: makeGetMe(profiles), corsOrigins: ['https://app.example'] })
 }
 
@@ -42,7 +51,11 @@ describe('GET /me', () => {
   })
 
   it('returns the caller with their profile timezone', async () => {
-    const res = await server().inject({ method: 'GET', url: '/me', headers: { authorization: 'Bearer valid-token' } })
+    const res = await server().inject({
+      method: 'GET',
+      url: '/me',
+      headers: { authorization: 'Bearer valid-token' },
+    })
     expect(res.statusCode).toBe(200)
     expect(meResponseSchema.parse(res.json())).toEqual({
       userId: JORGE.userId,
@@ -52,16 +65,18 @@ describe('GET /me', () => {
   })
 
   it('falls back to UTC when the profile is missing', async () => {
-    const res = await server({ findOwn: async () => null }).inject({
+    const res = await server({ findOwn: () => Promise.resolve(null) }).inject({
       method: 'GET',
       url: '/me',
       headers: { authorization: 'Bearer valid-token' },
     })
-    expect(res.json().timezone).toBe('UTC')
+    expect(res.json<MeResponse>().timezone).toBe('UTC')
   })
 
   it('hides internal errors', async () => {
-    const res = await server({ findOwn: async () => { throw new Error('connection refused: postgres://secret') } }).inject({
+    const res = await server({
+      findOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
+    }).inject({
       method: 'GET',
       url: '/me',
       headers: { authorization: 'Bearer valid-token' },

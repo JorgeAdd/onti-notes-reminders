@@ -32,7 +32,7 @@ export function AuthContainer() {
       busy={busy}
       notice={notice}
       error={error}
-      onSubmit={submit}
+      onSubmit={(email, password) => void submit(email, password)}
       onToggleMode={() => setMode(mode === 'signIn' ? 'signUp' : 'signIn')}
     />
   )

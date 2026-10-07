@@ -89,7 +89,9 @@ Sources of truth: `docs/design/style-guide-decisions.md` (SG1–SG18),
 15. **Hexagonal layers in the API:** `domain` (pure rules, no IO, no
     framework imports) → `application` (use cases and ports) →
     `infrastructure` (Fastify, Postgres, JWKS, Web Push, clock). Imports
-    only point inward.
+    only point inward. The CONTRACT time rules live in
+    `packages/shared/src/domain` so the web (capture preview, live "late"
+    labels) and the API run the same code.
     Why: the CONTRACT rules ("today", "late", snooze) must be testable
     with an injected clock and no database.
 
@@ -130,3 +132,17 @@ Sources of truth: `docs/design/style-guide-decisions.md` (SG1–SG18),
     chunk the scan blocked.
     Why: the repo is public, and Engram also stores prompts and memories
     from other projects.
+
+## Command rules
+
+22. **`npm run verify` must pass before every commit** (format check, lint,
+    typecheck, tests). The pre-commit hook runs it; CI runs it again plus
+    the production build on every push. Never skip it with `--no-verify`
+    unless the human asks.
+    Why: the CONTRACT tests are the definition of done; a red commit means
+    the product no longer does what the brief says.
+
+23. **Change a CONTRACT rule only together with its tests**, in the same
+    commit, and update `docs/CONTRACT.md` first.
+    Why: the matrix numbers are the source of truth for design, schema and
+    tests; drifting one of them silently breaks the other two.

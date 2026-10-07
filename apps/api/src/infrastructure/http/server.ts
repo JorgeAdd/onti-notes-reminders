@@ -34,7 +34,7 @@ export function buildServer({ verifier, getMe, corsOrigins, logger = false }: Se
     return reply.code(500).send({ error: 'internal_error' })
   })
 
-  app.get('/health', async () => ({ status: 'ok' }))
+  app.get('/health', () => ({ status: 'ok' }))
 
   app.get('/me', async (request) => {
     const identity = await authenticate(request)

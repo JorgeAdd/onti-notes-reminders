@@ -36,7 +36,11 @@ export function DayPage({ me, error, now, onSignOut }: Props) {
 
         <section className={styles.content}>
           <h1 className={styles.title}>{messages.appName}</h1>
-          {error && <p className={styles.error} role="alert">{error}</p>}
+          {error && (
+            <p className={styles.error} role="alert">
+              {error}
+            </p>
+          )}
           {!me && !error && <p className={styles.metaMuted}>{t.loading}</p>}
           {me && (
             <dl className={styles.facts}>
