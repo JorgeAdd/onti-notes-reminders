@@ -1,6 +1,7 @@
 # Database schema
 
-Source of truth: `supabase/migrations/`. This document explains it.
+Source of truth: `supabase/migrations/` (applied to the Supabase project
+`onti-notes-reminders`). This document explains it.
 Decisions: `docs/adr/ADR-003-data-model-and-time.md`.
 
 ## Diagram
@@ -102,6 +103,9 @@ lets the scheduler drop endpoints that keep failing (e.g. 410 Gone).
 - `anon` has no privileges. `authenticated` has CRUD, filtered by RLS.
 - The API runs user requests as `authenticated` with the verified JWT
   claims (ADR-001), so RLS applies to the API path too.
+- Trigger functions (`handle_new_user`, `set_updated_at`) are not
+  executable by any client role (migration `20261007090000`). The Supabase
+  security advisor reports 0 findings on the deployed database.
 
 ## Verified
 
