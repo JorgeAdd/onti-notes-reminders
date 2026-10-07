@@ -1,8 +1,7 @@
 import type { MeResponse } from '@onti/shared'
 import type { Identity } from '../domain/identity'
 import type { ProfileRepository } from './ports'
-
-const FALLBACK_TIMEZONE = 'UTC'
+import { resolveTimezone } from './timezone'
 
 export function makeGetMe(profiles: ProfileRepository) {
   return async function getMe(identity: Identity): Promise<MeResponse> {
@@ -10,7 +9,7 @@ export function makeGetMe(profiles: ProfileRepository) {
     return {
       userId: identity.userId,
       email: identity.email,
-      timezone: profile?.timezone ?? FALLBACK_TIMEZONE,
+      timezone: resolveTimezone(profile),
     }
   }
 }

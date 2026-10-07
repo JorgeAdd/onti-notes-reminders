@@ -37,16 +37,16 @@ Tracker: `feat/slice-1-today-page` (draft, no-merge; only it merges to `main`, P
 
 PR body: `GET /today` end to end behind JWT, C1/C3/C4/C7 proven with fixed Clock. Out: seed, web. Next: PR2.
 
-- [ ] 1.1 RED: `packages/shared/test/today.test.ts` codec round-trip (ISO string <-> Date). Also confirm zod 4.6.x `parse` decodes (Open Question 3; fallback client-only `z.coerce.date()`). Decision 1.
-- [ ] 1.2 GREEN: `packages/shared/src/today.ts` (`todayResponseSchema`, types), export from `src/index.ts`. Decision 1.
-- [ ] 1.3 Add subpath export `./fixtures/jorge-week` in `packages/shared/package.json`; confirm shared tsconfig/eslint cover `test/`. Decision 15.
-- [ ] 1.4 RED: `apps/api/test/today.test.ts` with fixed `Clock` + fake `NoteRepository` from `jorge-week`: C4, C3, C7, timezone fallback, DST day (D1/D2). Spec "GET /today API".
-- [ ] 1.5 Create `apps/api/src/domain/note.ts` (`NoteRecord extends PageNote`) and add `Clock`, `NoteRepository` to `application/ports.ts`. Decisions 3, 4.
-- [ ] 1.6 Extract shared UTC fallback constant; update `application/get-me.ts`; GREEN `application/get-today.ts` (`makeGetToday`). Decisions 3, 5.
-- [ ] 1.7 `infrastructure/clock/system-clock.ts`; add the clock-ban lint for API in `eslint.config.js` (adapter path exempt). Decision 4, rule 16.
-- [ ] 1.8 RED: `apps/api/test/server.test.ts` for `/today`: 401 no/forged token, 200 shape, Ana never sees Jorge (R15), 500 hides internals.
-- [ ] 1.9 GREEN: `db/database.ts` types (`notes`, `tags`, `note_tags`), `db/postgres-note-repository.ts` (`asUser` + `where user_id`, two queries), `http/server.ts` route, wire `main.ts`. Decision 3 (split off if PR >400).
-- [ ] 1.10 Run `npm run verify`; open PR1 against the tracker.
+- [x] 1.1 RED: `packages/shared/test/today.test.ts` codec round-trip (ISO string <-> Date). Also confirm zod 4.6.x `parse` decodes (Open Question 3; fallback client-only `z.coerce.date()`). Decision 1.
+- [x] 1.2 GREEN: `packages/shared/src/today.ts` (`todayResponseSchema`, types), export from `src/index.ts`. Decision 1.
+- [x] 1.3 Add subpath export `./fixtures/jorge-week` in `packages/shared/package.json`; confirm shared tsconfig/eslint cover `test/`. Decision 15.
+- [x] 1.4 RED: `apps/api/test/today.test.ts` with fixed `Clock` + fake `NoteRepository` from `jorge-week`: C4, C3, C7, timezone fallback, DST day (D1/D2). Spec "GET /today API".
+- [x] 1.5 Create `apps/api/src/domain/note.ts` (`NoteRecord extends PageNote`) and add `Clock`, `NoteRepository` to `application/ports.ts`. Decisions 3, 4.
+- [x] 1.6 Extract shared UTC fallback constant; update `application/get-me.ts`; GREEN `application/get-today.ts` (`makeGetToday`). Decisions 3, 5.
+- [x] 1.7 `infrastructure/clock/system-clock.ts`; add the clock-ban lint for API in `eslint.config.js` (adapter path exempt). Decision 4, rule 16.
+- [x] 1.8 RED: `apps/api/test/server.test.ts` for `/today`: 401 no/forged token, 200 shape, Ana never sees Jorge (R15), 500 hides internals.
+- [x] 1.9 GREEN: `db/database.ts` types (`notes`, `tags`, `note_tags`), `db/postgres-note-repository.ts` (`asUser` + `where user_id`, two queries), `http/server.ts` route, wire `main.ts`. Decision 3 (split off if PR >400).
+- [ ] 1.10 Run `npm run verify` (green, done); open PR1 against the tracker (orchestrator).
 
 ## PR 2: Seed + docs (~330 lines)
 
