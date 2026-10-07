@@ -40,6 +40,14 @@
       "sessions": 0,
       "memories": 1,
       "prompts": 0
+    },
+    {
+      "id": "013e52a6",
+      "created_by": "jdd",
+      "created_at": "2026-10-07T23:54:57Z",
+      "sessions": 0,
+      "memories": 1,
+      "prompts": 0
     }
   ]
 }
