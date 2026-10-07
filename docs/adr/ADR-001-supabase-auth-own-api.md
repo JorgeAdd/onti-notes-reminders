@@ -43,6 +43,14 @@ leaves business rules (snooze, "today", notifications) in the browser.
 - Each user request costs one transaction plus two `set` statements.
 - Verified locally against the migration: another user sees 0 notes,
   updates 0 rows, and a spoofed insert is rejected by RLS.
+- **Email confirmation is off** (2026-10-07). Supabase's built-in email
+  service only delivers to project team members and a few emails per hour,
+  so reviewers could not confirm sign-ups. Trade-off: anyone can sign up
+  with an address they do not own. Re-enabling it needs a custom SMTP
+  provider (e.g. Resend).
+- A public demo account exists for reviewers (credentials in README.md).
+- Verified on the real project (2026-10-07): sign-up → ES256 token →
+  local API `GET /me` → profile read as `authenticated` through RLS.
 
 ## Alternatives considered
 
