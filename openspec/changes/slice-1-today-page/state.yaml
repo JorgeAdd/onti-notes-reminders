@@ -1,0 +1,11 @@
+change: slice-1-today-page
+artifact_store: hybrid
+phase: design
+status: done
+completed:
+  - proposal
+  - spec
+  - design
+next: [tasks]
+delivery_strategy: ask-on-risk
+review_budget_lines: 400
