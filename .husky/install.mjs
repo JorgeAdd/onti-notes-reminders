@@ -1,7 +1,7 @@
 // Install git hooks for local development only.
 // Skipped in CI, production installs and environments without husky
 // (e.g. `npm ci --omit=dev` on Vercel/Railway).
-if (process.env.CI === 'true' || process.env.NODE_ENV === 'production' || process.env.HUSKY === '0') {
+if (process.env.CI || process.env.NODE_ENV === 'production' || process.env.HUSKY === '0') {
   process.exit(0)
 }
 try {
