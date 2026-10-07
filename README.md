@@ -3,8 +3,8 @@
 A notes app where a note and its reminder are one object. Built for people
 who capture follow-ups mid-call and need to see only what matters today.
 
-> Status: Phase 4 — architecture decisions, schema and behavior contract.
-> Next: end-to-end hello world (Phase 5).
+> Status: Phase 5 — hello world deployed end to end (sign in → API verifies
+> the JWT → Postgres through RLS). Next: quality gates (Phase 6).
 
 ## Repository structure
 
@@ -75,8 +75,17 @@ To be documented once the stack is set up (Phase 5).
 
 ## Deployment
 
-| Part     | URL |
-|----------|-----|
-| Frontend | TBD |
-| API      | TBD |
-| Database | Supabase (TBD) |
+| Part     | Where | URL |
+|----------|-------|-----|
+| Frontend | Vercel (`vercel.json`, built from the workspace root) | https://onti-notes-reminders.vercel.app |
+| API      | Railway (`railpack.json` + `railway.json`, healthcheck `/health`) | https://api-production-810ca.up.railway.app |
+| Database + Auth | Supabase (`supabase/migrations/`) | project `onti-notes-reminders` |
+
+### Demo account
+
+Public on purpose, for reviewers:
+
+- Email: `demo.jorge@onti-notes.dev`
+- Password: `Demo-Notes-2026!`
+
+Sign-up is open and needs no email confirmation (see ADR-001).
