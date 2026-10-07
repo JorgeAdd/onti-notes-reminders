@@ -1,10 +1,12 @@
 # Notes & Reminders
 
+[![CI](https://github.com/JorgeAdd/onti-notes-reminders/actions/workflows/ci.yml/badge.svg)](https://github.com/JorgeAdd/onti-notes-reminders/actions/workflows/ci.yml)
+
 A notes app where a note and its reminder are one object. Built for people
 who capture follow-ups mid-call and need to see only what matters today.
 
-> Status: Phase 5 — hello world deployed end to end (sign in → API verifies
-> the JWT → Postgres through RLS). Next: quality gates (Phase 6).
+> Status: Phase 6 — quality gates in place (lint, format, typecheck,
+> CONTRACT tests, CI, auto-deploy). Next: features (Phase 7).
 
 ## Repository structure
 
@@ -72,6 +74,21 @@ To be documented once the stack is set up (Phase 5).
   user's IANA timezone; "today" is computed per local day (DST-safe).
 - **Behavior is a contract** (`docs/CONTRACT.md`): general rules proven by
   the brief's scenario with exact numbers, asserted by tests.
+
+## Quality
+
+`npm run verify` = Prettier check → ESLint (type-aware) → typecheck → tests.
+It runs in the pre-commit hook and in GitHub Actions (plus the production
+build) on every push and pull request.
+
+- **CONTRACT tests** (`packages/shared/test/contract.test.ts`): one block per
+  row of `docs/CONTRACT.md`, on the scenario dataset with an injected clock,
+  including DST cases.
+- **API tests** (`apps/api/test`): JWT verification (issuer, audience,
+  expiry, foreign key, tampering) and HTTP contract (`401`, CORS, no leaked
+  errors).
+- **Deploys:** Railway deploys `main` only after the GitHub checks pass;
+  Vercel deploys `main` on push.
 
 ## Deployment
 
