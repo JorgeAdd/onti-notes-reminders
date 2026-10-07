@@ -1,7 +1,7 @@
 # Style guide decisions
 
 Each decision has an ID used in code reviews and commits ("per SG3").
-Boards live in `chosen/`; token names refer to `tokens.css`.
+Boards live in `chosen/`; token names refer to `apps/web/src/styles/tokens.css`.
 
 | ID | Decision | Recommendation (chosen) | Alternative (rejected) | Where to see it |
 |----|----------|-------------------------|------------------------|-----------------|

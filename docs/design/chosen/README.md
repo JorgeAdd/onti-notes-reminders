@@ -7,7 +7,7 @@ what you see; the command layer is how you act.
 - Source: designed in Claude Design from the prompt in
   `prompts/antes/13-claude-design-prompt.md`.
 - Decisions: `../style-guide-decisions.md` (SG1–SG18).
-- Tokens: `../tokens.css`.
+- Tokens: `apps/web/src/styles/tokens.css`.
 - Data: every board uses `../../product/scenario-dataset.md`.
 
 ## Boards

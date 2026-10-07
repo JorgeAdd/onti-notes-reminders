@@ -1,1 +1,1 @@
-# @onti/shared — Shared types and validation. No IO allowed.
+# @onti/shared — Shared zod schemas and types. No IO allowed (CLAUDE.md rule 17).

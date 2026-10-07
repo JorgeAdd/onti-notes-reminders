@@ -16,7 +16,7 @@ packages/
   shared/         Shared types and validation. No IO.
 docs/
   product/        Product brief (source of truth for scenarios and data)
-  design/         Chosen design boards, style guide decisions, tokens.css
+  design/         Chosen design boards, style guide decisions
   adr/            Architecture Decision Records (ADR-001..003)
   db/schema.md    Database schema (ERD + table notes)
   CONTRACT.md     Behavior rules + event matrix (source of truth for tests)
@@ -41,7 +41,7 @@ the date and nothing else.
 
 - Boards: `docs/design/chosen/`
 - Decisions: `docs/design/style-guide-decisions.md`
-- Tokens: `docs/design/tokens.css` (core + semantic layers)
+- Tokens: `apps/web/src/styles/tokens.css` (core + semantic layers)
 
 ## AI memory (Engram)
 

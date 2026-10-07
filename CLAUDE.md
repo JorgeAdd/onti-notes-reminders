@@ -43,7 +43,7 @@ phases.
 ## UI rules
 
 Sources of truth: `docs/design/style-guide-decisions.md` (SG1–SG18),
-`docs/design/tokens.css` and the boards in `docs/design/chosen/`.
+`apps/web/src/styles/tokens.css` and the boards in `docs/design/chosen/`.
 
 8. **Use tokens only.** Components use the semantic layer (`--color-*`,
    `--text-*`, `--space-*`, `--motion-*`), never `--core-*` and never raw
