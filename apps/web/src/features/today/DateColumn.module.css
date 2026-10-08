@@ -8,6 +8,7 @@
 }
 
 .block {
+  composes: date from '../../styles/entrance.module.css';
   display: grid;
   padding: var(--space-md);
   background: var(--color-date);

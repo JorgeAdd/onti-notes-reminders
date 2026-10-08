@@ -45,10 +45,10 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 2: `feat(web):` entrance on sheets (~170 lines)
 
-- [ ] 2.1 RED: `apps/web/test/entrance-once.test.tsx`: attribute on first `DayPage`/`AuthForm` mount, absent on the next; fresh module resets; no replay on re-render, refetch, optimistic done/snooze, day navigation, theme click (same node); sign-in after the card gets none; All notes round trip gets none; StrictMode once; `TodayStatus` does not consume the flag; no skip control, typing and Sign out work while attribute is set; card has sheet class, fields none.
-- [ ] 2.2 GREEN: create `apps/web/src/lib/entrance.ts` (`useEntrance`, `resetEntranceForTests`).
-- [ ] 2.3 GREEN: `DayPage.tsx` and `.module.css` (`data-entrance`, `.desk` composes `sheet`), `DateColumn` date block composes `date`, `MobileBar.module.css` `.bar` composes `last`, `AuthForm.tsx` and `.module.css` (`.page` composes `sheet`).
-- [ ] 2.4 `npm run verify`; commit.
+- [x] 2.1 RED: `apps/web/test/entrance-once.test.tsx`: attribute on first `DayPage`/`AuthForm` mount, absent on the next; fresh module resets; no replay on re-render, refetch, optimistic done/snooze, day navigation, theme click (same node); sign-in after the card gets none; All notes round trip gets none; StrictMode once; `TodayStatus` does not consume the flag; no skip control, typing and Sign out work while attribute is set; card has sheet class, fields none.
+- [x] 2.2 GREEN: create `apps/web/src/lib/entrance.ts` (`useEntrance`, `resetEntranceForTests`).
+- [x] 2.3 GREEN: `DayPage.tsx` and `.module.css` (`data-entrance`, `.desk` composes `sheet`), `DateColumn` date block composes `date`, `MobileBar.module.css` `.bar` composes `last`, `AuthForm.tsx` and `.module.css` (`.page` composes `sheet`).
+- [x] 2.4 `npm run verify`; commit.
 
 ## Commit 3: `feat(web):` desk-only pending and 400 ms status (~110 lines)
 

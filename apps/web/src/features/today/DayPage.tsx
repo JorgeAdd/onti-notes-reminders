@@ -1,5 +1,6 @@
 import type { SnoozePreset, TodayItem, TodayResponse } from '@onti/shared'
 import { lazy, Suspense } from 'react'
+import { useEntrance } from '../../lib/entrance'
 import { messages } from '../../messages'
 import { ActionMessage } from './ActionMessage'
 import type { CaptureSubmit } from './capture-preview'
@@ -126,9 +127,10 @@ export function DayPage({
   const carriedCount = today.carried.reduce((sum, group) => sum + group.items.length, 0)
   // Decision 13: total notes derive from the page itself, no extra wire field.
   const totalCount = carriedCount + today.rail.length + today.otherCount
+  const entrance = useEntrance()
   const empty = carriedCount === 0 && today.rail.length === 0
   return (
-    <div className={styles.desk}>
+    <div className={styles.desk} data-entrance={entrance}>
       <div className={styles.page}>
         <DateColumn
           date={date}

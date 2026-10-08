@@ -1,4 +1,5 @@
 import type { FormEvent } from 'react'
+import { useEntrance } from '../../lib/entrance'
 import { messages } from '../../messages'
 import styles from './AuthForm.module.css'
 
@@ -17,6 +18,7 @@ interface Props {
 
 export function AuthForm({ mode, busy, expired, notice, error, onSubmit, onToggleMode }: Props) {
   const t = messages.auth
+  const entrance = useEntrance()
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -28,7 +30,7 @@ export function AuthForm({ mode, busy, expired, notice, error, onSubmit, onToggl
   }
 
   return (
-    <main className={styles.desk}>
+    <main className={styles.desk} data-entrance={entrance}>
       <form className={styles.page} onSubmit={handleSubmit}>
         <p className={styles.eyebrow}>{messages.appName}</p>
         <h1 className={styles.title}>{mode === 'signIn' ? t.signInTitle : t.signUpTitle}</h1>

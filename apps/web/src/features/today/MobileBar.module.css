@@ -1,4 +1,5 @@
 .bar {
+  composes: last from '../../styles/entrance.module.css';
   display: flex;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-lg);
