@@ -6,7 +6,7 @@ Deferred items and future enhancements, sourced from slice 1 verification and de
 
 ### Manual theme override UI
 
-Design decision 14 noted; UI deferred to future slice.
+Design decision 14 noted; UI deferred to future slice. Now assigned to Slice 4 (`docs/roadmap.md`).
 _Source: slice 1 verify report_
 
 ### Automated proof for themes and mobile layouts
