@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { at, TZ } from '@onti/shared/fixtures/jorge-week'
-import { clockTime, dayLabel, relativeLabel } from '../src/features/today/format'
+import { clockTime, dateBlock, dayLabel, relativeLabel } from '../src/features/today/format'
 import { messages } from '../src/messages'
 
 describe('relativeLabel (R2, R6)', () => {
@@ -49,5 +49,24 @@ describe('messages.today header (R4)', () => {
     expect(messages.today.carriedFrom('Tue 6')).toBe('Still open from Tue 6')
     expect(messages.today.otherNotes(11)).toBe('11 other notes on the back of the pad')
     expect(messages.today.otherNotes(1)).toBe('1 other note on the back of the pad')
+  })
+})
+
+describe('dateBlock', () => {
+  it('splits the day into numeral, weekday and month in the profile timezone', () => {
+    expect(dateBlock(new Date('2026-10-07T15:05:00Z'), 'America/Mexico_City')).toEqual({
+      day: '7',
+      weekday: 'Wednesday',
+      month: 'October 2026',
+    })
+  })
+
+  it('follows the timezone across the date line', () => {
+    const instant = new Date('2026-10-07T23:30:00Z')
+    expect(dateBlock(instant, 'Pacific/Auckland')).toEqual({
+      day: '8',
+      weekday: 'Thursday',
+      month: 'October 2026',
+    })
   })
 })

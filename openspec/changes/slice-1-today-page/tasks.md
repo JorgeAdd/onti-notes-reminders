@@ -76,12 +76,12 @@ PR body: web test runner, clock ban, pure helpers, `fetchToday`. No UI change. P
 
 PR body: TodayContainer replaces hello-world; loading, error/retry, session-expired. Out: items, rail. Prior: PR3.
 
-- [ ] 4.1 RED: `AuthForm` shows `messages.auth.sessionExpired` (`role="status"`); clears on next attempt. Decision 12.
-- [ ] 4.2 RED: `TodayContainer` loading, 5xx error + retry, focus refetch, rollover refetch at `window.end`, 401 -> `onSessionExpired` once with no error state. Spec "Empty, loading and error", "Live labels".
-- [ ] 4.3 GREEN: `TodayContainer` (TanStack `useQuery`, retry off for `UnauthorizedError`), `DayPage` frame, `DateColumn` (vermilion only here, sign-out >= 44 px), `PageHeader` (single `h1`, count copy). SG2, SG13; Decisions 6, 14; landmarks.
-- [ ] 4.4 Wire `QueryClientProvider` in `main.tsx`; `App.tsx` `onSessionExpired` -> `signOut()` + `expired` flag -> `AuthContainer` -> `AuthForm`; `messages.auth.sessionExpired`.
-- [ ] 4.5 CSS Modules (tokens only, named-areas grid, mobile 640 px); delete `features/me/*`, `fetchMe`, `messages.me`.
-- [ ] 4.6 `npm run verify`; manual dev run, check light/dark.
+- [x] 4.1 RED: `AuthForm` shows `messages.auth.sessionExpired` (`role="status"`); clears on next attempt. Decision 12.
+- [x] 4.2 RED: `TodayContainer` loading, 5xx error + retry, focus refetch, rollover refetch at `window.end`, 401 -> `onSessionExpired` once with no error state. Spec "Empty, loading and error", "Live labels".
+- [x] 4.3 GREEN: `TodayContainer` (TanStack `useQuery`, retry off for `UnauthorizedError`), `DayPage` frame, `DateColumn` (vermilion only here, sign-out >= 44 px), `PageHeader` (single `h1`, count copy). SG2, SG13; Decisions 6, 14; landmarks.
+- [x] 4.4 Wire `QueryClientProvider` in `main.tsx`; `App.tsx` `onSessionExpired` -> `signOut()` + `expired` flag -> `AuthContainer` -> `AuthForm`; `messages.auth.sessionExpired`.
+- [x] 4.5 CSS Modules (tokens only, named-areas grid, mobile 640 px); delete `features/me/*`, `fetchMe`, `messages.me`.
+- [x] 4.6 `npm run verify`; manual dev run, check light/dark.
 
 ## PR 5: Items + Statusline + EmptyState (~380 lines)
 
