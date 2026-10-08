@@ -46,7 +46,7 @@ PR body: `GET /today` end to end behind JWT, C1/C3/C4/C7 proven with fixed Clock
 - [x] 1.7 `infrastructure/clock/system-clock.ts`; add the clock-ban lint for API in `eslint.config.js` (adapter path exempt). Decision 4, rule 16.
 - [x] 1.8 RED: `apps/api/test/server.test.ts` for `/today`: 401 no/forged token, 200 shape, Ana never sees Jorge (R15), 500 hides internals.
 - [x] 1.9 GREEN: `db/database.ts` types (`notes`, `tags`, `note_tags`), `db/postgres-note-repository.ts` (`asUser` + `where user_id`, two queries), `http/server.ts` route, wire `main.ts`. Decision 3 (split off if PR >400).
-- [ ] 1.10 Run `npm run verify` (green, done); open PR1 against the tracker (orchestrator).
+- [x] 1.10 Run `npm run verify` (green, done); open PR1 against the tracker (orchestrator).
 
 ## PR 2: Seed + docs (~330 lines)
 
