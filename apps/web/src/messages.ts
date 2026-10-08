@@ -49,6 +49,7 @@ export const messages = {
   },
   capture: {
     label: 'Capture a note',
+    close: 'Cancel capture',
     placeholder: 'Call back #client-a 17:00',
     titleRequired: 'Add a title to save this note.',
     titleTooLong: (max: number) => `Keep the title to ${max} characters or fewer.`,

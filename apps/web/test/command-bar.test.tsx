@@ -148,3 +148,40 @@ describe('CommandBar presets (mobile, SG14)', () => {
     expect(css).toMatch(/\.preset\s*\{[^}]*min-height:\s*var\(--size-target\)/)
   })
 })
+
+describe('CommandBar touch cancel', () => {
+  it('the close button closes without saving', async () => {
+    const { user, onSubmit, onClose, input } = setup()
+    await user.type(input, C1)
+
+    await user.click(screen.getByRole('button', { name: messages.capture.close }))
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('a pointer down outside the bar closes it without saving', async () => {
+    const { user, onSubmit, onClose } = setup()
+
+    await user.pointer({ keys: '[MouseLeft>]', target: document.body })
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
+
+  it('a pointer down inside the bar (input, preset chips) does not close it', async () => {
+    const { user, onClose, input } = setup({ mobile: true })
+
+    await user.click(input)
+    await user.click(screen.getByRole('button', { name: messages.capture.presets.hour }))
+
+    expect(onClose).not.toHaveBeenCalled()
+  })
+
+  it('esc still closes it', async () => {
+    const { user, onClose, input } = setup()
+    await user.click(input)
+    await user.keyboard('{Escape}')
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+})

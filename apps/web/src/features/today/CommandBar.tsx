@@ -38,7 +38,21 @@ export function CommandBar({
   const [text, setText] = useState(draft)
   const [blocked, setBlocked] = useState(false)
   const input = useRef<HTMLInputElement>(null)
+  const bar = useRef<HTMLFormElement>(null)
   useEffect(() => input.current?.focus(), [])
+
+  // Touch has no esc: a pointer down anywhere outside the bar closes it, nothing saved.
+  const closeRef = useRef(onClose)
+  useEffect(() => {
+    closeRef.current = onClose
+  })
+  useEffect(() => {
+    const outside = (event: PointerEvent) => {
+      if (!bar.current?.contains(event.target as Node)) closeRef.current()
+    }
+    document.addEventListener('pointerdown', outside)
+    return () => document.removeEventListener('pointerdown', outside)
+  }, [])
 
   const preview = previewCapture(text, now, timezone)
 
@@ -64,7 +78,7 @@ export function CommandBar({
       : messages.capture.titleRequired
 
   return (
-    <form className={styles.bar} onSubmit={submit} onKeyDown={onKeyDown}>
+    <form ref={bar} className={styles.bar} onSubmit={submit} onKeyDown={onKeyDown}>
       <input
         ref={input}
         className={styles.input}
@@ -92,6 +106,9 @@ export function CommandBar({
           ))}
         </div>
       ) : null}
+      <button type="button" className={styles.close} onClick={onClose}>
+        {messages.capture.close}
+      </button>
       {preview.kind === 'ok' ? <p className={styles.preview}>{preview.text}</p> : null}
       {blocked && preview.kind !== 'ok' ? <p className={styles.hint}>{hint}</p> : null}
       {notice === null ? null : (

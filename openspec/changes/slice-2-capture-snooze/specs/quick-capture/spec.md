@@ -8,7 +8,7 @@ Create a note from one line (desktop) or from presets (mobile). Parsing, title l
 
 ### Requirement: Command bar
 
-Pressing `c` outside a text field MUST open a one-line command bar with focus in its input. While typing, an italic preview of the parse MUST show (R11) in the C1 format, and nothing is saved until ↵ (R11). `esc` MUST close the bar and discard input. The preview MUST come from the shared parser, with the display clock. While the bar is open, page keys MUST NOT fire. The preview MUST fade in with a reduced-motion fallback (SG15, SG16).
+Pressing `c` outside a text field MUST open a one-line command bar with focus in its input. While typing, an italic preview of the parse MUST show (R11) in the C1 format, and nothing is saved until ↵ (R11). `esc` MUST close the bar and discard input. The bar MUST also close without saving from a visible cancel control or a tap outside it, so touch users are never trapped. The preview MUST come from the shared parser, with the display clock. While the bar is open, page keys MUST NOT fire. The preview MUST fade in with a reduced-motion fallback (SG15, SG16).
 
 #### Scenario: Preview (C1)
 
@@ -21,6 +21,14 @@ Pressing `c` outside a text field MUST open a one-line command bar with focus in
 - GIVEN the bar has text
 - WHEN `esc` is pressed
 - THEN the bar closes, the text is discarded and nothing is created
+
+#### Scenario: Cancel on touch
+
+- GIVEN the bar has text, on a touch device with no keyboard
+- WHEN the cancel control is tapped, or a pointer goes down outside the bar
+- THEN the bar closes, the text is discarded and nothing is created
+- AND the control MUST be at least `--size-target` with a visible `--focus-ring` and a name from the messages module
+- AND a pointer down inside the bar (input, preset chips, tag chips) MUST NOT close it, and `esc` MUST still close it
 
 #### Scenario: Keys while typing
 
