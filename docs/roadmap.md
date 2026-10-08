@@ -57,6 +57,20 @@ note lifecycle.
 - Edit and delete notes.
 - Manual reschedule and reminder removal (R8).
 - Basic markdown body, always sanitized; raw HTML is never rendered (R14).
+- "Without a reminder" list in the date column (R19, matrix C13 and C14):
+  - Desktop: below Sign out, header "Without a reminder · {n}" in the
+    carried-group label style, up to 8 rows (title on one line with an
+    ellipsis, tags below in meta text), then "+ {n − 8} more" when
+    `n > 8`. Nothing when `n = 0`.
+  - A row opens All notes on that note (editing comes later in this
+    slice); "+ {n − 8} more" opens All notes as `/` does.
+  - Mobile (≤ 640 px): no list, only the link "{n} without a reminder".
+  - Data: `GET /today` gains `undated: { count, items }` (at most 8 items:
+    id, title, tags, `created_at`). No extra request; the list follows the
+    page's refetch and optimistic updates (capture without a time adds the
+    note at the top).
+  - Tokens only, copy in the messages module, 44 px targets, no internal
+    IDs (CLAUDE.md rules 8, 11, 12, 13).
 
 ## Slice 5 — All notes and search
 
