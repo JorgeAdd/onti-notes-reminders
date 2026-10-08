@@ -2,6 +2,7 @@ import type { MeResponse } from '@onti/shared'
 import type { Session } from '@supabase/supabase-js'
 import { useEffect, useState } from 'react'
 import { fetchMe } from '../../lib/api'
+import { timeWithSkew } from '../../lib/clock'
 import { supabase } from '../../lib/supabase'
 import { messages } from '../../messages'
 import { DayPage } from './DayPage'
@@ -25,7 +26,7 @@ export function MeContainer({ session }: { session: Session }) {
     <DayPage
       me={me}
       error={error}
-      now={new Date()}
+      now={timeWithSkew(0)}
       onSignOut={() => void supabase.auth.signOut()}
     />
   )

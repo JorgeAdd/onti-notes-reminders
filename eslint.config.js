@@ -50,6 +50,24 @@ export default tseslint.config(
     },
   },
   {
+    // Same rule in the web: time comes from lib/clock.ts (server now + skew).
+    files: ['apps/web/src/**/*.{ts,tsx}'],
+    ignores: ['apps/web/src/lib/clock.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "NewExpression[callee.name='Date'][arguments.length=0]",
+          message: 'Use lib/clock.ts (rule 16).',
+        },
+        {
+          selector: "CallExpression[callee.object.name='Date'][callee.property.name='now']",
+          message: 'Use lib/clock.ts (rule 16).',
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.js', '**/*.mjs'],
     ...tseslint.configs.disableTypeChecked,
     languageOptions: { globals: globals.node },

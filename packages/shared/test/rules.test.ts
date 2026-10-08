@@ -5,6 +5,7 @@ import {
   markDone,
   NO_REMINDER,
   parseCapture,
+  relativeTo,
   reschedule,
   snoozeOneHour,
 } from '../src'
@@ -23,6 +24,17 @@ describe('R6 · durations', () => {
     [-905 * MIN, '15h05'],
   ])('%i ms → %s', (ms, expected) => {
     expect(formatDuration(ms)).toBe(expected)
+  })
+})
+
+describe('R2/R6 · at exactly the due time', () => {
+  it('is not late yet (R2 is strict) and reads "in 0 min"', () => {
+    const due = at('2026-10-07 09:30')
+    expect(relativeTo(due, due)).toEqual({ kind: 'in', duration: '0 min' })
+    expect(relativeTo(due, new Date(due.getTime() + 60_000))).toEqual({
+      kind: 'late',
+      duration: '1 min',
+    })
   })
 })
 

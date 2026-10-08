@@ -22,6 +22,14 @@ export const messages = {
     signOut: 'Sign out',
     modeNormal: 'NORMAL',
   },
+  today: {
+    header: (open: number, anyDone: boolean) =>
+      anyDone ? `${open} left today` : `${open} ${open === 1 ? 'thing' : 'things'} today`,
+    carriedFrom: (day: string) => `Still open from ${day}`,
+    otherNotes: (n: number) => `${n} other ${n === 1 ? 'note' : 'notes'} on the back of the pad`,
+    late: (duration: string) => `late ${duration}`,
+    upcoming: (duration: string) => `in ${duration}`,
+  },
   errors: {
     generic: 'Something went wrong. Please try again.',
     api: 'The API could not verify your session.',

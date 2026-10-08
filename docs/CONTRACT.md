@@ -31,7 +31,8 @@ timezone; `start(d)` is local midnight of day `d`.
   some have reminders on other days.
 - **R6 · Durations.** Under 1 h → "{m} min"; whole hours → "{h} h";
   otherwise "{h}h{mm}" (e.g. "15h05", "5h48"). Upcoming: "in {duration}";
-  overdue: "late {duration}". Minutes are truncated, never rounded up.
+  overdue: "late {duration}". Minutes are truncated, never rounded up. At exactly the due time an item is not late yet (R2 is strict) and
+  reads "in 0 min".
 
 ### Reminder lifecycle
 
