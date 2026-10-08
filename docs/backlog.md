@@ -31,6 +31,21 @@ _Source: slice 1 verify report_
 The theme override is stored per device in `localStorage`. Syncing it through the profile (a new column, an API field and a merge rule against the local value) is future work.
 _Source: `docs/design/landing-brief.md`, decision 23_
 
+### Real-action tests for the entrance no-replay scenarios
+
+The optimistic-update and theme-change scenarios re-render the sheet instead of running the real action on a mounted `DayPage`. Add a real-action test for each.
+_Source: slice 8 verify report_
+
+### Entrance clearing without `getAnimations`
+
+The entrance attribute clears on `animationend` through `getAnimations({ subtree: true })`, which is stubbed in jsdom only. Browsers without `getAnimations` clear on the first `animationend`. Confirm in a real browser.
+_Source: slice 8 verify report_
+
+### Keyboard focus ring on the segmented theme control: browser check
+
+The headless screenshots at 1280 and 375 px did not show the keyboard focus ring on the segmented theme control. Check Tab focus in a real browser, light and dark.
+_Source: slice 8 archive report_
+
 ## Suggestions
 
 ### Bundle size optimization

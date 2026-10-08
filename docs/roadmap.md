@@ -16,7 +16,7 @@ yet specified), **Proposed** (inferred from the v1 scope, not yet agreed).
 | 5     | All notes and search                    | Proposed |
 | 6     | Web Push notifications                  | Proposed |
 | 7     | Merged into slice 2                     | —        |
-| 8     | Page entrance and theme override        | Named    |
+| 8     | Page entrance and theme override        | Done     |
 
 ## Slice 1 — Read-only Today page
 
@@ -80,13 +80,4 @@ the start of slice 2 because capture and snooze depend on it.
 
 ## Slice 8 — Page entrance and theme override
 
-Brief: `docs/design/landing-brief.md` (binding). Style guide: SG19, SG18.
-
-- A quiet sheet entrance of about 240 ms (300 ms on mobile) on every full page load (Today
-  and the sign-in card), CSS-only, with a reduced-motion fallback (SG16).
-- Only the desk renders while the session or Today's data is pending;
-  `TodayStatus` appears only on error or after about 400 ms.
-- Manual theme override (moved from slice 4): System / Light / Dark,
-  stored in `localStorage` and applied before first paint by an inline
-  script in `index.html`.
-- Budget: ≤ 3 kB gzipped of added CSS and JS, no new dependency.
+Done 2026-10-08. Archived at `openspec/changes/archive/2026-10-08-slice-8-page-entrance-theme/`. Deferred items in `docs/backlog.md`.

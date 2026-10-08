@@ -76,11 +76,11 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 ## Commit 6: `docs:` size check and verify report (~40 lines)
 
 - [x] 6.1 Build `main` (`9403f16`) and the branch with `npm run build -w @onti/web`; for `dist/assets/*.css`, `dist/assets/*.js`, `dist/index.html` run `gzip -c <file> | wc -c`; compare by name. Added gzip CSS+JS (incl. inline script) must be <= 3072 B; record both tables in the PR.
-- [ ] 6.2 Manual smoke (theme x motion x width, no flash, no layout shift, no shadow pop); write the results to `openspec/changes/slice-8-page-entrance-theme/verify-report.md`.
-- [ ] 6.3 `docs/roadmap.md` and `docs/backlog.md`: mark Slice 8 and keep cross-device sync in backlog.
-- [ ] 6.4 `npm run verify` and `npm run build`; commit.
+- [x] 6.2 Manual smoke (theme x motion x width, no flash, no layout shift, no shadow pop); write the results to `openspec/changes/slice-8-page-entrance-theme/verify-report.md`.
+- [x] 6.3 `docs/roadmap.md` and `docs/backlog.md`: mark Slice 8 and keep cross-device sync in backlog.
+- [x] 6.4 `npm run verify` and `npm run build`; commit.
 
 ## PR
 
-- [ ] 7.1 Save session prompts in `prompts/durante/` (rule 7).
-- [ ] 7.2 ASK the human before pushing (rule 6). Open the PR to `main`; add `size:exception` if the diff exceeds 800 lines.
+- [x] 7.1 Save session prompts in `prompts/durante/` (rule 7).
+- [x] 7.2 ASK the human before pushing (rule 6). Open the PR to `main`; add `size:exception` if the diff exceeds 800 lines.
