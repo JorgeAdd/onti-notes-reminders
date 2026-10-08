@@ -61,6 +61,7 @@ export function TodayContainer({
   const now = useNow(skew)
   const [viewMessage, setViewMessage] = useState<string | null>(null)
   const [bar, setBar] = useState<Pick<CaptureBar, 'draft' | 'notice'> | null>(null)
+  const [tagBarOpen, setTagBarOpen] = useState(false)
   const actions = useReminderActions({
     api: reminders,
     now,
@@ -81,12 +82,16 @@ export function TodayContainer({
       if (next) setView({ date: next.date })
     },
     onToday: () => setView({ date: null }),
+    filterActive: view.tag !== null,
+    hasTags: (data?.tags.length ?? 0) > 0,
+    onTags: () => setTagBarOpen(true),
+    onClearFilter: () => setView({ tag: null }),
   }
   const { rows, armed, hints, sheet } = useTodayRows(
     data,
     actions,
     {
-      open: bar !== null,
+      open: bar !== null || tagBarOpen,
       onOpen: openBar,
       mobile,
       // The page on screen is not the page of the key yet: no row action until it lands.
@@ -179,6 +184,18 @@ export function TodayContainer({
           sheet={sheet}
           loading={loading}
           nav={days}
+          tagBar={
+            tagBarOpen
+              ? {
+                  active: view.tag,
+                  onApply: (slug) => {
+                    setView({ tag: slug })
+                    setTagBarOpen(false)
+                  },
+                  onClose: () => setTagBarOpen(false),
+                }
+              : null
+          }
         />
         {/* The one live region of the page: the viewed day and its count, on every change. */}
         <p className={styles.live} aria-live="polite">

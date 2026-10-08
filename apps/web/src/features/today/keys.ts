@@ -11,6 +11,8 @@ export type KeyCommand =
   | { type: 'capture' }
   | { type: 'day'; delta: 1 | -1 }
   | { type: 'today' }
+  | { type: 'tags' }
+  | { type: 'clearFilter' }
 export type KeyHint =
   | 'move'
   | 'done'
@@ -22,11 +24,15 @@ export type KeyHint =
   | 'capture'
   | 'days'
   | 'today'
+  | 'tags'
+  | 'clear'
 
 /** What the page around the keys says: slice 3 keys depend on the viewed day. */
 export interface KeyContext {
   filterActive: boolean
   offToday: boolean
+  /** The account has tags: `#` has something to open. */
+  hasTags?: boolean
 }
 const NO_CONTEXT: KeyContext = { filterActive: false, offToday: false }
 
@@ -57,6 +63,12 @@ export function reduceKey(
   }
   // Inside the snooze menu `t` is Tomorrow; here it goes back to today, only off today.
   if (key === 't' && context.offToday) return { state: idle, command: { type: 'today' } }
+  if (key === '#' && context.hasTags) return { state: idle, command: { type: 'tags' } }
+  // Esc order: the armed menu took its esc above and the tag bar closes on its own esc, so an
+  // idle esc is the filter's.
+  if (key === 'Escape' && context.filterActive) {
+    return { state: idle, command: { type: 'clearFilter' } }
+  }
   if (key === 'c') return { state: idle, command: { type: 'capture' } }
   if (key === 'x' && target === 'open') return { state: idle, command: { type: 'done' } }
   if (key === 'z' && target === 'done') return { state: idle, command: { type: 'undo' } }
@@ -72,11 +84,17 @@ export function availableKeys(context: {
   /** The day keys work (a page is on screen); `today` adds `t` when the view is another day. */
   days?: boolean
   offToday?: boolean
+  /** `#` works (the account has tags); `filterActive` adds the esc that clears it. */
+  tags?: boolean
+  filterActive?: boolean
 }): KeyHint[] {
   if (context.armed && context.hasRows) return ['hour', 'tomorrow', 'cancel']
-  const days: KeyHint[] = context.days
-    ? ['days', ...(context.offToday ? (['today'] as const) : [])]
-    : []
+  const days: KeyHint[] = [
+    ...(context.days ? (['days'] as const) : []),
+    ...(context.days && context.offToday ? (['today'] as const) : []),
+    ...(context.tags ? (['tags'] as const) : []),
+    ...(context.tags && context.filterActive ? (['clear'] as const) : []),
+  ]
   if (!context.hasRows) return ['capture', ...days]
   if (context.target === 'open') return ['move', 'done', 'snooze', 'capture', ...days]
   if (context.target === 'done') return ['move', 'undo', 'capture', ...days]

@@ -153,3 +153,47 @@ describe('[ ] t · day keys (D5)', () => {
     ])
   })
 })
+
+describe('# and esc · the tag filter keys (R12)', () => {
+  const tagged = { filterActive: false, offToday: false, hasTags: true }
+  const filtered = { filterActive: true, offToday: false, hasTags: true }
+
+  it('# opens the tag bar only when the account has tags', () => {
+    expect(reduceKey(idle, '#', null, tagged)).toEqual({ state: idle, command: { type: 'tags' } })
+    expect(reduceKey(idle, '#', 'open', { ...tagged, hasTags: false })).toEqual({
+      state: idle,
+      command: null,
+    })
+    expect(reduceKey(idle, '#', 'open')).toEqual({ state: idle, command: null })
+  })
+
+  it('esc clears the filter from idle, and only while one is applied', () => {
+    expect(reduceKey(idle, 'Escape', null, filtered)).toEqual({
+      state: idle,
+      command: { type: 'clearFilter' },
+    })
+    expect(reduceKey(idle, 'Escape', null, tagged)).toEqual({ state: idle, command: null })
+  })
+
+  it('esc order: with the snooze menu armed, esc only disarms and the filter stays', () => {
+    expect(reduceKey(armed, 'Escape', 'open', filtered)).toEqual({ state: idle, command: null })
+  })
+
+  it('hints # when tags exist and "esc clear" only while filtered', () => {
+    expect(availableKeys({ hasRows: true, target: null, armed: false, tags: true })).toEqual([
+      'move',
+      'capture',
+      'tags',
+    ])
+    expect(
+      availableKeys({ hasRows: true, target: null, armed: false, tags: true, filterActive: true }),
+    ).toEqual(['move', 'capture', 'tags', 'clear'])
+    expect(availableKeys({ hasRows: true, target: null, armed: false })).toEqual([
+      'move',
+      'capture',
+    ])
+    expect(
+      availableKeys({ hasRows: true, target: 'open', armed: true, tags: true, filterActive: true }),
+    ).toEqual(['hour', 'tomorrow', 'cancel'])
+  })
+})

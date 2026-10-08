@@ -19,7 +19,15 @@ export function useTodayRows(
   today: TodayResponse | undefined,
   actions: Actions,
   bar: { open: boolean; onOpen: () => void; mobile: boolean; blocked: boolean },
-  days: { offToday: boolean; onStep: (delta: 1 | -1) => void; onToday: () => void },
+  days: {
+    offToday: boolean
+    filterActive: boolean
+    hasTags: boolean
+    onStep: (delta: 1 | -1) => void
+    onToday: () => void
+    onTags: () => void
+    onClearFilter: () => void
+  },
 ) {
   const ids = useMemo(() => (today ? orderedIds(today) : NO_IDS), [today])
   const { focusedId, tabStopId, setFocusedId } = useFocus(ids, today?.date)
@@ -45,7 +53,10 @@ export function useTodayRows(
 
   /** One path for keys and sheet buttons: same callbacks, same row animation. */
   const run = (
-    command: Exclude<KeyCommand, { type: 'move' | 'capture' | 'day' | 'today' }>,
+    command: Exclude<
+      KeyCommand,
+      { type: 'move' | 'capture' | 'day' | 'today' | 'tags' | 'clearFilter' }
+    >,
     id: string,
   ) => {
     if (command.type === 'done') {
@@ -61,13 +72,19 @@ export function useTodayRows(
   }
 
   const handle = (key: string): boolean => {
-    const next = reduceKey(keyState, key, target, { filterActive: false, offToday: days.offToday })
+    const next = reduceKey(keyState, key, target, {
+      filterActive: days.filterActive,
+      offToday: days.offToday,
+      hasTags: days.hasTags,
+    })
     setKeyState(next.state)
     const { command } = next
     if (command?.type === 'capture') bar.onOpen()
     else if (command?.type === 'move') setFocusedId(step(ids, focusedId, command.delta))
     else if (command?.type === 'day') days.onStep(command.delta)
     else if (command?.type === 'today') days.onToday()
+    else if (command?.type === 'tags') days.onTags()
+    else if (command?.type === 'clearFilter') days.onClearFilter()
     else if (command !== null && focusedId !== null) run(command, focusedId)
     return command !== null || next.state.pending !== keyState.pending
   }
@@ -110,6 +127,8 @@ export function useTodayRows(
       armed,
       days: today !== undefined,
       offToday: days.offToday,
+      tags: days.hasTags,
+      filterActive: days.filterActive,
     }),
   }
 }

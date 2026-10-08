@@ -23,12 +23,21 @@ const noop = () => undefined
 
 // Decision 20: the bar and its preview code load on the first `c`, not with the page.
 const CommandBar = lazy(() => import('./CommandBar').then((m) => ({ default: m.CommandBar })))
+// The tag bar loads the same way, on the first `#`.
+const TagBar = lazy(() => import('./TagBar').then((m) => ({ default: m.TagBar })))
 
 /** The open command bar: what it starts with and what it reports back. */
 export interface CaptureBar {
   draft: string
   notice: string | null
   onSubmit: (submit: CaptureSubmit) => void
+  onClose: () => void
+}
+
+/** The open tag bar (`#`): the applied tag and what it reports back. */
+export interface TagBarState {
+  active: string | null
+  onApply: (slug: string) => void
   onClose: () => void
 }
 
@@ -72,6 +81,8 @@ interface Props {
   loading?: { date: string; isToday: boolean } | null
   /** Day navigation: `[` `]` `t` handlers and the viewed day's state. */
   nav?: DayNavState | undefined
+  /** The tag bar, when open (`#`). */
+  tagBar?: TagBarState | null
 }
 
 /** The page frame: date column, header and the area the day's items fill. */
@@ -90,6 +101,7 @@ export function DayPage({
   sheet = null,
   loading = null,
   nav,
+  tagBar = null,
 }: Props) {
   const date = loading?.date ?? today.date
   const isToday = loading?.isToday ?? today.isToday
@@ -149,6 +161,11 @@ export function DayPage({
               tags={tagSlugs(today)}
               {...capture}
             />
+          </Suspense>
+        )}
+        {tagBar === null ? null : (
+          <Suspense fallback={null}>
+            <TagBar tags={today.tags} {...tagBar} />
           </Suspense>
         )}
         {sheet === null ? null : <ActionSheet now={now} timezone={today.timezone} {...sheet} />}

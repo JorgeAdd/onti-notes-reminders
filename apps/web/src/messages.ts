@@ -45,6 +45,11 @@ export const messages = {
     next: 'Next day',
     today: 'Today',
   },
+  filter: {
+    label: 'Filter by tag',
+    hint: 'tab next · ↵ apply · esc close',
+    chip: (slug: string) => `#${slug}`,
+  },
   mobile: { capture: '+ Capture' },
   actionSheet: {
     label: (title: string) => `Actions for ${title}`,
@@ -86,6 +91,8 @@ export const messages = {
       capture: 'c capture',
       days: '[ ] day',
       today: 't today',
+      tags: '# tag',
+      clear: 'esc clear filter',
     },
   },
   errors: {

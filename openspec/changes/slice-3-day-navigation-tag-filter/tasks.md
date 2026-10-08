@@ -101,9 +101,9 @@ Ownership gate (slice 5): the branch MUST NOT modify `apps/api/src/application/p
 
 ## Commit 7a: `feat(web):` tag filter control (~350 lines)
 
-- [ ] 7a.1 RED: `#` opens bar only when tags exist; Tab/Shift+Tab cycle from active tag; ↵ applies via `setView({tag})` push; esc order (armed snooze, bar, filter); filter persists across `[`; `aria-pressed`/`aria-current`; no hint when no tags; layer disabled while bar open.
-- [ ] 7a.2 GREEN: lazy `TagBar.tsx` + CSS in dock, `keys.ts` (`tags`, `clearFilter`), `?tag=` wiring, `messages.filter`, `statusline.keys` hints.
-- [ ] 7a.3 Bundle size recorded (main and lazy chunk). `npm run verify`; commit.
+- [x] 7a.1 RED: `#` opens bar only when tags exist; Tab/Shift+Tab cycle from active tag; ↵ applies via `setView({tag})` push; esc order (armed snooze, bar, filter); filter persists across `[`; `aria-pressed`/`aria-current`; no hint when no tags; layer disabled while bar open.
+- [x] 7a.2 GREEN: lazy `TagBar.tsx` + CSS in dock, `keys.ts` (`tags`, `clearFilter`), `?tag=` wiring, `messages.filter`, `statusline.keys` hints.
+- [x] 7a.3 Bundle size recorded (main and lazy chunk). `npm run verify`; commit.
 
 ## Commit 7b: `feat(web):` filtered page (~290 lines)
 
