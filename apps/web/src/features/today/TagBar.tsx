@@ -9,6 +9,9 @@ interface Props {
   active: string | null
   onApply: (slug: string) => void
   onClose: () => void
+  /** Phone width: a Clear chip when filtered, and a backdrop that swallows the outside tap. */
+  mobile?: boolean
+  onClear?: () => void
 }
 
 /**
@@ -16,7 +19,7 @@ interface Props {
  * cycle the highlighted tag (starting at the applied one), ↵ applies it, esc closes and keeps the
  * filter. `aria-pressed` marks the applied tag, `aria-current` the highlighted one.
  */
-export function TagBar({ tags, active, onApply, onClose }: Props) {
+export function TagBar({ tags, active, onApply, onClose, mobile = false, onClear }: Props) {
   const ref = useRef<HTMLDivElement>(null)
   const [index, setIndex] = useState(() =>
     Math.max(
@@ -36,30 +39,42 @@ export function TagBar({ tags, active, onApply, onClose }: Props) {
   }
 
   return (
-    <div
-      ref={ref}
-      role="group"
-      aria-label={messages.filter.label}
-      tabIndex={-1}
-      className={styles.bar}
-      onKeyDown={onKeyDown}
-    >
-      <div className={styles.chips}>
-        {tags.map((tag, i) => (
-          <button
-            key={tag.slug}
-            type="button"
-            tabIndex={-1}
-            className={styles.chip}
-            aria-pressed={tag.slug === active}
-            aria-current={i === index ? 'true' : undefined}
-            onClick={() => onApply(tag.slug)}
-          >
-            {messages.filter.chip(tag.slug)}
-          </button>
-        ))}
+    <>
+      {mobile ? (
+        // Q3 · transparent and above the page: the outside tap closes the dock, keeps the filter
+        // and never reaches a row (so no row sheet opens).
+        <div data-testid="tag-backdrop" className={styles.backdrop} onClick={onClose} />
+      ) : null}
+      <div
+        ref={ref}
+        role="group"
+        aria-label={messages.filter.label}
+        tabIndex={-1}
+        className={styles.bar}
+        onKeyDown={onKeyDown}
+      >
+        <div className={styles.chips}>
+          {tags.map((tag, i) => (
+            <button
+              key={tag.slug}
+              type="button"
+              tabIndex={-1}
+              className={styles.chip}
+              aria-pressed={tag.slug === active}
+              aria-current={i === index ? 'true' : undefined}
+              onClick={() => onApply(tag.slug)}
+            >
+              {messages.filter.chip(tag.slug)}
+            </button>
+          ))}
+          {mobile && active !== null && onClear ? (
+            <button type="button" tabIndex={-1} className={styles.chip} onClick={onClear}>
+              {messages.filter.clear(active)}
+            </button>
+          ) : null}
+        </div>
+        {mobile ? null : <p className={styles.hint}>{messages.filter.hint}</p>}
       </div>
-      <p className={styles.hint}>{messages.filter.hint}</p>
-    </div>
+    </>
   )
 }

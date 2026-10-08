@@ -20,6 +20,7 @@
 
 .chip {
   min-height: var(--size-target);
+  min-width: var(--size-target);
   padding: 0 var(--space-lg);
   background: var(--color-page);
   color: var(--color-ink);
@@ -44,6 +45,13 @@
   outline: var(--focus-ring);
 }
 
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: transparent;
+}
+
 .hint {
   margin: 0;
   font: var(--text-meta);
@@ -53,5 +61,11 @@
 @keyframes reveal {
   from {
     opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation-duration: var(--motion-fade);
   }
 }

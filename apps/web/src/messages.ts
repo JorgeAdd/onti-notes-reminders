@@ -49,6 +49,7 @@ export const messages = {
     label: 'Filter by tag',
     hint: 'tab next · ↵ apply · esc close',
     chip: (slug: string) => `#${slug}`,
+    clear: (slug: string) => `Clear #${slug}`,
     header: (n: number) => `${n} ${n === 1 ? 'note' : 'notes'}`,
     hidden: (n: number) => `${n} ${n === 1 ? 'note' : 'notes'} hidden`,
     hiddenNamed: (n: number, slug: string) =>
@@ -58,7 +59,7 @@ export const messages = {
       when === null ? title : `${title}, ${when}`,
     hiddenNotice: (slug: string) => `Saved. It does not carry #${slug}, so the filter hides it.`,
   },
-  mobile: { capture: '+ Capture' },
+  mobile: { capture: '+ Capture', tags: 'Tags' },
   actionSheet: {
     label: (title: string) => `Actions for ${title}`,
     done: 'Done',

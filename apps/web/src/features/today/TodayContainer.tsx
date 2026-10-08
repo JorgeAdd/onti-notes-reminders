@@ -189,6 +189,7 @@ export function TodayContainer({
           sheet={sheet}
           loading={loading}
           nav={days}
+          onOpenTags={days.hasTags ? days.onTags : undefined}
           tagBar={
             tagBarOpen
               ? {
@@ -198,6 +199,10 @@ export function TodayContainer({
                     setTagBarOpen(false)
                   },
                   onClose: () => setTagBarOpen(false),
+                  onClear: () => {
+                    setView({ tag: null })
+                    setTagBarOpen(false)
+                  },
                 }
               : null
           }

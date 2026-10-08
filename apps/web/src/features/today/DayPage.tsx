@@ -40,6 +40,7 @@ export interface TagBarState {
   active: string | null
   onApply: (slug: string) => void
   onClose: () => void
+  onClear?: () => void
 }
 
 /** The row-tap sheet on a phone: the item and the same actions the keys run. */
@@ -84,6 +85,8 @@ interface Props {
   nav?: DayNavState | undefined
   /** The tag bar, when open (`#`). */
   tagBar?: TagBarState | null
+  /** Phone width: the bottom bar's Tags button; omitted when the account has no tags. */
+  onOpenTags?: (() => void) | undefined
 }
 
 /** The page frame: date column, header and the area the day's items fill. */
@@ -103,6 +106,7 @@ export function DayPage({
   loading = null,
   nav,
   tagBar = null,
+  onOpenTags,
 }: Props) {
   const date = loading?.date ?? today.date
   const isToday = loading?.isToday ?? today.isToday
@@ -178,12 +182,12 @@ export function DayPage({
         )}
         {tagBar === null ? null : (
           <Suspense fallback={null}>
-            <TagBar tags={today.tags} {...tagBar} />
+            <TagBar tags={today.tags} mobile={mobile} {...tagBar} />
           </Suspense>
         )}
         {sheet === null ? null : <ActionSheet now={now} timezone={today.timezone} {...sheet} />}
-        {mobile && capture === null && sheet === null ? (
-          <MobileBar onCapture={onOpenCapture} />
+        {mobile && capture === null && sheet === null && tagBar === null ? (
+          <MobileBar onCapture={onOpenCapture} onTags={onOpenTags} />
         ) : null}
         <Statusline
           now={now}
