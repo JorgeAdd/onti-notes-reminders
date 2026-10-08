@@ -60,7 +60,7 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 - [x] 1c.5 GREEN: `postgres-profile-repository.ts` single-statement conditional update; wire `main.ts`.
 - [x] 1c.6 RED then GREEN: `apps/web/src/lib/api.ts` `request/patch` (401 typed, `Content-Type` only with body); `lib/browser-timezone.ts`.
 - [x] 1c.7 RED then GREEN: `TodayContainer` tz sync (only from UTC, once per mount, silent failure, 401 -> `onSessionExpired`, invalidate `['today']`).
-- [ ] 1c.8 Manual checklist (record in PR): conditional timezone update on local Supabase (UTC -> zone; second call is a no-op).
+- [x] 1c.8 Manual checklist (record in PR): conditional timezone update on local Supabase (UTC -> zone; second call is a no-op).
 
 ## Commit 2: Reminder actions API (~340 lines)
 
@@ -69,7 +69,7 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 - [x] 2.3 GREEN: `ports.ts` `mutateReminder`; `snooze-note.ts`, `mark-done.ts`, `undo-done.ts` (state checks before domain calls).
 - [x] 2.4 RED then GREEN: `server.test.ts` routes `POST /notes/:id/{snooze,done,undo}`: 401, 400, 404 (incl. non-UUID), 409, 200 round-trips schema.
 - [x] 2.5 GREEN: `postgres-note-repository.ts` `mutateReminder` (`for update`, update only if changed); `database.ts` update shapes; wire `main.ts`.
-- [ ] 2.6 Manual checklist (record in PR): two parallel snoozes end at `snooze_count = 2`; other user's id -> 404.
+- [x] 2.6 Manual checklist (record in PR): two parallel snoozes end at `snooze_count = 2`; other user's id -> 404.
 
 ## Commit 3: Capture API (~340 lines)
 
@@ -77,7 +77,7 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 - [x] 3.2 RED: `apps/api/test/capture-note.test.ts` (names via `tagNameFromSlug`, dedupe, `due_at = original_due_at`, null due, C1 preview equals save); GREEN `capture-note.ts`, `ports.ts` `createOwn`.
 - [x] 3.3 RED then GREEN: `server.test.ts` `POST /notes`: 401, 400 (bad slug, empty/oversize title), 201 shape; route.
 - [x] 3.4 GREEN: `createOwn` adapter (one `asUser` transaction: tag upsert `do update set slug = tags.slug`, note, `note_tags`); `Database` insert shapes (`ColumnType`); wire `main.ts`.
-- [ ] 3.5 Manual checklist (record in PR): `#client-a` reuses existing tag and keeps "Client A"; failed insert leaves no tag.
+- [x] 3.5 Manual checklist (record in PR): `#client-a` reuses existing tag and keeps "Client A"; failed insert leaves no tag.
 
 ## Commit 4: Mutation layer (~360 lines, High)
 

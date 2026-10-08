@@ -152,6 +152,14 @@
       "sessions": 0,
       "memories": 1,
       "prompts": 1
+    },
+    {
+      "id": "f15f7ba0",
+      "created_by": "jdd",
+      "created_at": "2026-10-08T15:40:04Z",
+      "sessions": 1,
+      "memories": 1,
+      "prompts": 1
     }
   ]
 }
