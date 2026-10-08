@@ -52,10 +52,10 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 3: `feat(web):` desk-only pending and 400 ms status (~110 lines)
 
-- [ ] 3.1 RED: `apps/web/test/pending-states.test.tsx` (fake timers): `App` empty while `getSession` pending; `TodayStatus` absent at 399 ms, present at 400 ms; never for a fast load; immediate on error; timer cleared on unmount.
-- [ ] 3.2 RED (same commit): update `apps/web/test/today-container.test.tsx` lines 56-61 to await the delayed status.
-- [ ] 3.3 GREEN: create `apps/web/src/features/today/use-after-delay.ts` (`useAfterDelay`, `STATUS_DELAY_MS = 400`); gate `TodayStatus` in `TodayContainer.tsx` (error or elapsed, else `null`). Keep `App.tsx` `return null`.
-- [ ] 3.4 `npm run verify`; commit.
+- [x] 3.1 RED: `apps/web/test/pending-states.test.tsx` (fake timers): `App` empty while `getSession` pending; `TodayStatus` absent at 399 ms, present at 400 ms; never for a fast load; immediate on error; timer cleared on unmount.
+- [x] 3.2 RED (same commit): update `apps/web/test/today-container.test.tsx` lines 56-61 to await the delayed status.
+- [x] 3.3 GREEN: create `apps/web/src/features/today/use-after-delay.ts` (`useAfterDelay`, `STATUS_DELAY_MS = 400`); gate `TodayStatus` in `TodayContainer.tsx` (error or elapsed, else `null`). Keep `App.tsx` `return null`.
+- [x] 3.4 `npm run verify`; commit.
 
 ## Commit 4: `feat(web):` theme module and inline script (~130 lines)
 

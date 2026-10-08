@@ -54,8 +54,11 @@ function renderContainer(
 }
 
 it('shows a loading state, then the page', async () => {
-  renderContainer(() => Promise.resolve(c4Response()))
-  expect(screen.getByRole('status')).toHaveTextContent(messages.today.loading)
+  let release: (today: TodayResponse) => void = () => undefined
+  renderContainer(() => new Promise<TodayResponse>((resolve) => (release = resolve)))
+  // The status card waits about 400 ms before it appears (Slice 8).
+  expect(await screen.findByRole('status')).toHaveTextContent(messages.today.loading)
+  release(c4Response())
   expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('4 things today')
   expect(screen.queryByText(messages.today.loading)).not.toBeInTheDocument()
 })
