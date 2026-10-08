@@ -1,9 +1,4 @@
-import {
-  meResponseSchema,
-  todayResponseSchema,
-  type MeResponse,
-  type TodayResponse,
-} from '@onti/shared'
+import { todayResponseSchema, type TodayResponse } from '@onti/shared'
 import { env } from './env'
 
 /** The API rejected the token: the session is over (Decision 12). Other failures stay generic. */
@@ -21,10 +16,6 @@ async function get(path: string, accessToken: string): Promise<unknown> {
   if (response.status === 401) throw new UnauthorizedError()
   if (!response.ok) throw new Error(`GET ${path} failed with ${response.status}`)
   return response.json()
-}
-
-export async function fetchMe(accessToken: string): Promise<MeResponse> {
-  return meResponseSchema.parse(await get('/me', accessToken))
 }
 
 export async function fetchToday(accessToken: string): Promise<TodayResponse> {

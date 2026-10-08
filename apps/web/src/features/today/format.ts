@@ -37,3 +37,14 @@ export function clockTime(instant: Date, timeZone: string): string {
 export function localHour(instant: Date, timeZone: string): number {
   return Number(parts(instant, timeZone, { hour: 'numeric', hourCycle: 'h23' }).hour)
 }
+
+/** Date block parts in the profile timezone: "7", "Wednesday", "October 2026". */
+export function dateBlock(instant: Date, timeZone: string) {
+  const p = parts(instant, timeZone, {
+    day: 'numeric',
+    weekday: 'long',
+    month: 'long',
+    year: 'numeric',
+  })
+  return { day: p.day!, weekday: p.weekday!, month: `${p.month} ${p.year}` }
+}

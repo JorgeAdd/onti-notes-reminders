@@ -7,13 +7,15 @@ export type AuthMode = 'signIn' | 'signUp'
 interface Props {
   mode: AuthMode
   busy: boolean
+  /** The session ended (the API said 401): explain why the form is back. */
+  expired: boolean
   notice: string | null
   error: string | null
   onSubmit: (email: string, password: string) => void
   onToggleMode: () => void
 }
 
-export function AuthForm({ mode, busy, notice, error, onSubmit, onToggleMode }: Props) {
+export function AuthForm({ mode, busy, expired, notice, error, onSubmit, onToggleMode }: Props) {
   const t = messages.auth
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -47,6 +49,11 @@ export function AuthForm({ mode, busy, notice, error, onSubmit, onToggleMode }: 
           />
         </label>
 
+        {expired && (
+          <p className={styles.notice} role="status">
+            {t.sessionExpired}
+          </p>
+        )}
         {error && (
           <p className={styles.error} role="alert">
             {error}

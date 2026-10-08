@@ -12,15 +12,7 @@ export const messages = {
     switchToSignIn: 'Already have an account? Sign in',
     checkEmail: 'Check your email to confirm your account, then sign in.',
     working: 'Working…',
-  },
-  me: {
-    signedInAs: 'Signed in as',
-    timezone: 'Timezone',
-    apiCheck: 'API check',
-    apiOk: 'GET /me verified your token',
-    loading: 'Checking your session with the API…',
-    signOut: 'Sign out',
-    modeNormal: 'NORMAL',
+    sessionExpired: 'Your session expired. Sign in again.',
   },
   today: {
     header: (open: number, anyDone: boolean) =>
@@ -29,9 +21,12 @@ export const messages = {
     otherNotes: (n: number) => `${n} other ${n === 1 ? 'note' : 'notes'} on the back of the pad`,
     late: (duration: string) => `late ${duration}`,
     upcoming: (duration: string) => `in ${duration}`,
+    loading: 'Opening your day…',
+    loadError: 'Your day could not be loaded.',
+    retry: 'Try again',
+    signOut: 'Sign out',
   },
   errors: {
     generic: 'Something went wrong. Please try again.',
-    api: 'The API could not verify your session.',
   },
 } as const

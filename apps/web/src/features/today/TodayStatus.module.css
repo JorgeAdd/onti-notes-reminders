@@ -1,0 +1,32 @@
+.desk {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: var(--space-lg);
+}
+
+.page {
+  width: min(100%, 420px);
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  background: var(--color-page);
+  box-shadow: var(--shadow-page);
+}
+
+.message {
+  margin: 0;
+  font: var(--text-meta);
+}
+
+.retry {
+  justify-self: start;
+  min-height: var(--size-target);
+  padding: 0 var(--space-lg);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-control);
+  background: var(--color-page);
+  color: var(--color-ink);
+  font: var(--text-meta-strong);
+  cursor: pointer;
+}
