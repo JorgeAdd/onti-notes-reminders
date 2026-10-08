@@ -169,6 +169,15 @@
   --motion-fade: var(--core-duration-80);
   --motion-crossfade: var(--core-duration-150);
   --ease-paper: var(--core-ease-paper);
+
+  /* Page entrance (SG19): one quiet rise of the sheet, on a full page load only */
+  --motion-entrance: var(--core-duration-240);
+  --motion-entrance-detail: var(--core-duration-150);
+  --entrance-rise: var(--space-md);
+  --entrance-rise-detail: var(--space-xs);
+  --entrance-clip-start: inset(0 0 100% 0);
+  --entrance-delay-date: var(--core-duration-80);
+  --entrance-delay-bar: var(--core-duration-150);
 }
 
 /* Dark theme: follows the system unless the user forced light (SG18) */
@@ -207,6 +216,13 @@
   --shadow-page: 0 1px 0 #000, 0 16px 32px rgba(0, 0, 0, 0.5);
 }
 
+/* Entrance rise on mobile; before the reduced-motion block so that one wins */
+@media (max-width: 640px) {
+  :root {
+    --entrance-rise: var(--space-sm);
+  }
+}
+
 /* Reduced motion (SG16): nothing travels; only opacity, ≤ 150 ms */
 @media (prefers-reduced-motion: reduce) {
   :root {
@@ -216,5 +232,12 @@
     --motion-fade: var(--core-duration-instant);
     --motion-crossfade: var(--core-duration-150);
     --ease-paper: var(--core-ease-linear);
+    --entrance-rise: 0;
+    --entrance-rise-detail: 0;
+    --entrance-clip-start: inset(0);
+    --motion-entrance: var(--core-duration-150);
+    --motion-entrance-detail: var(--core-duration-instant);
+    --entrance-delay-date: var(--core-duration-instant);
+    --entrance-delay-bar: var(--core-duration-instant);
   }
 }

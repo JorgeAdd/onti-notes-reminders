@@ -33,15 +33,15 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 0: Branch
 
-- [ ] 0.1 Work on `feat/slice-8-page-entrance-theme`; confirm the brief and SG15/SG16/SG18/SG19 docs already landed in their own commits (rule 14).
+- [x] 0.1 Work on `feat/slice-8-page-entrance-theme`; confirm the brief and SG15/SG16/SG18/SG19 docs already landed in their own commits (rule 14).
 
 ## Commit 1: `feat(web):` entrance tokens and CSS module (~180 lines)
 
-- [ ] 1.1 RED: create `apps/web/test/css-tokens.ts` (parse `:root`, overlay mobile and reduced blocks, resolve `var()`, read `from` keyframes and `animation` order).
-- [ ] 1.2 RED: `apps/web/test/entrance-tokens.test.ts`: seven roles with exact values; no `--entrance-rule-*`, `--ease-enter/exit`, overshoot; mobile block precedes reduced block; reduced remaps (incl. `--entrance-delay-bar`); first frame equals rest (alone and with mobile); delays 0 ms; totals <= 500 ms; capture bar opacity only; only `--motion-*`/`--ease-*`/`--entrance-*`; no `transition` in `src/**/*.css`; no component entrance media queries; no row or field stagger.
-- [ ] 1.3 GREEN: `apps/web/src/styles/tokens.css`: seven roles after the motion roles, `max-width: 640px` remap of `--entrance-rise`, reduced-motion remaps.
-- [ ] 1.4 GREEN: create `apps/web/src/styles/entrance.module.css` (`sheet-in`, `date-in`, `last-in`; `.sheet`, `.date`, `.last` under `[data-entrance]`, `backwards`).
-- [ ] 1.5 `npm run verify`; commit.
+- [x] 1.1 RED: create `apps/web/test/css-tokens.ts` (parse `:root`, overlay mobile and reduced blocks, resolve `var()`, read `from` keyframes and `animation` order).
+- [x] 1.2 RED: `apps/web/test/entrance-tokens.test.ts`: seven roles with exact values; no `--entrance-rule-*`, `--ease-enter/exit`, overshoot; mobile block precedes reduced block; reduced remaps (incl. `--entrance-delay-bar`); first frame equals rest (alone and with mobile); delays 0 ms; totals <= 500 ms; capture bar opacity only; only `--motion-*`/`--ease-*`/`--entrance-*`; no `transition` in `src/**/*.css`; no component entrance media queries; no row or field stagger.
+- [x] 1.3 GREEN: `apps/web/src/styles/tokens.css`: seven roles after the motion roles, `max-width: 640px` remap of `--entrance-rise`, reduced-motion remaps.
+- [x] 1.4 GREEN: create `apps/web/src/styles/entrance.module.css` (`sheet-in`, `date-in`, `last-in`; `.sheet`, `.date`, `.last` under `[data-entrance]`, `backwards`).
+- [x] 1.5 `npm run verify`; commit.
 
 ## Commit 2: `feat(web):` entrance on sheets (~170 lines)
 
