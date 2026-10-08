@@ -1,0 +1,96 @@
+.rail,
+.compact {
+  margin: var(--space-lg) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Hour label and its decorative rule (SG4: the line is never text). */
+.hour,
+.emptyHour,
+.gap,
+.now {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  list-style: none;
+}
+
+.hour,
+.emptyHour {
+  min-height: var(--space-xl);
+}
+
+.hourLabel,
+.gapLabel {
+  inline-size: var(--size-time-col);
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+}
+
+.hour .hourLabel {
+  font: var(--text-meta-strong);
+  color: var(--color-ink);
+}
+
+.hour::after,
+.emptyHour::after {
+  content: '';
+  flex: 1;
+  border-block-start: 1px solid var(--color-rail);
+}
+
+.emptyHour::after {
+  border-block-start-color: var(--color-rule);
+}
+
+.gap {
+  display: none;
+}
+
+.gap::after {
+  content: '';
+  flex: 1;
+  border-block-start: 1px dotted var(--color-rail);
+}
+
+/* The now line is ink, never vermilion; it jumps once a minute, it never transitions. */
+.now {
+  min-height: var(--space-xl);
+  padding-inline-start: calc(var(--size-time-col) + var(--space-lg));
+}
+
+.now::before {
+  content: '';
+  flex: 1;
+  border-block-start: 2px solid var(--color-ink);
+}
+
+.nowLabel {
+  font: var(--text-meta-strong);
+  color: var(--color-ink);
+}
+
+.compact .now {
+  margin-block: var(--space-xs);
+}
+
+@media (max-width: 640px) {
+  .emptyHour {
+    display: none;
+  }
+
+  .now {
+    padding-inline-start: 0;
+  }
+
+  .gap {
+    display: flex;
+    min-height: var(--space-xl);
+  }
+
+  .hourLabel,
+  .gapLabel {
+    inline-size: auto;
+  }
+}

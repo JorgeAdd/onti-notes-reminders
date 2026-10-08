@@ -97,7 +97,7 @@ PR body: carried group, item rows, statusline, empty state. Out: HourRail. Prior
 
 PR body: rail with NOW line, gaps, compact mode; marks C1/C3/C4/C7 verified. Prior: PR5.
 
-- [ ] 6.1 RED then GREEN: `HourRail` from `rail-model` (per-hour desktop, one "10-15" gap row mobile via CSS, NOW line steps per minute, compact >6, N4 "in 25 min"->"in 24 min"). Board 03/05, SG7, SG15; no animation.
-- [ ] 6.2 CSS Module: `--focus-ring`, >= `--size-target`, reduced-motion needs only token remap. Decision 14, rules 8-11.
-- [ ] 6.3 Docs: `docs/CONTRACT.md` verification status for C1/C3/C4/C7 (no rule numbers changed; rule 23).
+- [x] 6.1 RED then GREEN: `HourRail` from `rail-model` (per-hour desktop, one "10-15" gap row mobile via CSS, NOW line steps per minute, compact >6, N4 "in 25 min"->"in 24 min"). Board 03/05, SG7, SG15; no animation.
+- [x] 6.2 CSS Module: `--focus-ring`, >= `--size-target`, reduced-motion needs only token remap. Decision 14, rules 8-11.
+- [x] 6.3 Docs: `docs/CONTRACT.md` verification status for C1/C3/C4/C7 (no rule numbers changed; rule 23).
 - [ ] 6.4 Final `npm run verify`; manual boards 03/05/09/11 check, no horizontal scroll; promote tracker PR from draft.

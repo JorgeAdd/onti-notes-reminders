@@ -3,7 +3,7 @@ import { CarriedGroup } from './CarriedGroup'
 import { DateColumn } from './DateColumn'
 import styles from './DayPage.module.css'
 import { EmptyState } from './EmptyState'
-import { ItemRow } from './ItemRow'
+import { HourRail } from './HourRail'
 import { PageHeader } from './PageHeader'
 import { Statusline } from './Statusline'
 
@@ -43,12 +43,7 @@ export function DayPage({ today, now, onSignOut }: Props) {
                   timezone={today.timezone}
                 />
               ))}
-              {/* PR 6 replaces this plain list with the HourRail. */}
-              <ul className={styles.items}>
-                {today.rail.map((item) => (
-                  <ItemRow key={item.id} item={item} now={now} timezone={today.timezone} />
-                ))}
-              </ul>
+              <HourRail items={today.rail} now={now} timezone={today.timezone} />
             </>
           )}
         </main>

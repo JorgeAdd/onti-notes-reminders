@@ -21,6 +21,7 @@ export const messages = {
     otherNotes: (n: number) => `${n} other ${n === 1 ? 'note' : 'notes'} on the back of the pad`,
     late: (duration: string) => `late ${duration}`,
     upcoming: (duration: string) => `in ${duration}`,
+    nowAt: (time: string) => `now ${time}`,
     loading: 'Opening your day…',
     loadError: 'Your day could not be loaded.',
     retry: 'Try again',

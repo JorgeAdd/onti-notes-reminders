@@ -22,11 +22,6 @@
   padding: 0 var(--space-xl) var(--space-xl);
 }
 
-.items {
-  margin: var(--space-lg) 0 0;
-  padding: 0;
-}
-
 @media (max-width: 640px) {
   .page {
     width: 100%;
