@@ -94,10 +94,10 @@ Ownership gate (slice 5): the branch MUST NOT modify `apps/api/src/application/p
 
 ## Commit 6: `feat(web):` day navigation UI (~425 lines)
 
-- [ ] 6.1 RED: `keys.test.ts`: `[ ] t` with `ctx`, `t` no-op on today, `s` then `t` still Tomorrow, `availableKeys` days/today hints only when working.
-- [ ] 6.2 RED: component tests: `[` types `'[['`; viewed-day date block, header "{n} things on Wed 7", statusline day and counts; time-only rows (`showRelative` false); focus resets to first row; placeholder shows `view.date` with loading indicator; single `aria-live="polite"` region; `aria-current=date` on today; ‹ › Today `aria-label`s from messages; empty state per day.
-- [ ] 6.3 GREEN: modify `keys.ts` (4th param defaulted), `TodayContainer`, `DayPage`, `DateColumn`, `PageHeader`, `Statusline`, `EmptyState`, `ItemRow` (`showRelative`), `use-today-rows.ts`; create `DayNav.tsx` (desktop text) + CSS Module; append `messages.day`.
-- [ ] 6.4 `npm run build -w @onti/web`; record bundle size. `npm run verify`; commit.
+- [x] 6.1 RED: `keys.test.ts`: `[ ] t` with `ctx`, `t` no-op on today, `s` then `t` still Tomorrow, `availableKeys` days/today hints only when working.
+- [x] 6.2 RED: component tests: `[` types `'[['`; viewed-day date block, header "{n} things on Wed 7", statusline day and counts; time-only rows (`showRelative` false); focus resets to first row; placeholder shows `view.date` with loading indicator; single `aria-live="polite"` region; `aria-current=date` on today; ‹ › Today `aria-label`s from messages; empty state per day.
+- [x] 6.3 GREEN: modify `keys.ts` (4th param defaulted), `TodayContainer`, `DayPage`, `DateColumn`, `PageHeader`, `Statusline`, `EmptyState`, `ItemRow` (`showRelative`), `use-today-rows.ts`; create `DayNav.tsx` (desktop text) + CSS Module; append `messages.day`.
+- [x] 6.4 `npm run build -w @onti/web`; record bundle size. `npm run verify`; commit.
 
 ## Commit 7a: `feat(web):` tag filter control (~350 lines)
 

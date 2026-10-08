@@ -13,6 +13,8 @@ interface Props {
   timezone: string
   /** Focus and animation, owned by the container; idle by default. */
   rows?: RowsState | undefined
+  /** "late"/"in" labels; off for another day's page, where a row shows its time only (R18). */
+  showRelative?: boolean
 }
 
 /**
@@ -21,7 +23,7 @@ interface Props {
  * its relative label. The row is the focus target of the keys (roving tabindex, SG13) and its
  * accessible name states title, time and state.
  */
-export function ItemRow({ item, now, timezone, rows = IDLE_ROWS }: Props) {
+export function ItemRow({ item, now, timezone, rows = IDLE_ROWS, showRelative = true }: Props) {
   const ref = useRef<HTMLLIElement>(null)
   const focused = rows.focusedId === item.id
   useEffect(() => {
@@ -31,7 +33,7 @@ export function ItemRow({ item, now, timezone, rows = IDLE_ROWS }: Props) {
   const done = item.doneAt !== null
   const pending = isPendingId(item.id)
   const snoozed = item.snoozeCount > 0
-  const late = relativeTo(item.dueAt, now).kind === 'late'
+  const late = showRelative && relativeTo(item.dueAt, now).kind === 'late'
   const changed = rows.changed?.id === item.id ? rows.changed.kind : undefined
   const time = clockTime(item.dueAt, timezone)
   const states = done
@@ -72,7 +74,7 @@ export function ItemRow({ item, now, timezone, rows = IDLE_ROWS }: Props) {
             <span>{messages.today.snoozeCount(item.snoozeCount)}</span>
           </>
         ) : null}
-        {done ? null : <span>{relativeLabel(item.dueAt, now)}</span>}
+        {done || !showRelative ? null : <span>{relativeLabel(item.dueAt, now)}</span>}
       </span>
     </li>
   )

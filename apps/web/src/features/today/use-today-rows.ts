@@ -19,9 +19,10 @@ export function useTodayRows(
   today: TodayResponse | undefined,
   actions: Actions,
   bar: { open: boolean; onOpen: () => void; mobile: boolean; blocked: boolean },
+  days: { offToday: boolean; onStep: (delta: 1 | -1) => void; onToday: () => void },
 ) {
   const ids = useMemo(() => (today ? orderedIds(today) : NO_IDS), [today])
-  const { focusedId, tabStopId, setFocusedId } = useFocus(ids)
+  const { focusedId, tabStopId, setFocusedId } = useFocus(ids, today?.date)
   const [keyState, setKeyState] = useState<KeyState>({ pending: null })
   const [changed, setChanged] = useState<RowsState['changed']>(null)
 
@@ -43,7 +44,10 @@ export function useTodayRows(
   const sheetItem = items.find((item) => item.id === sheetId)
 
   /** One path for keys and sheet buttons: same callbacks, same row animation. */
-  const run = (command: Exclude<KeyCommand, { type: 'move' | 'capture' }>, id: string) => {
+  const run = (
+    command: Exclude<KeyCommand, { type: 'move' | 'capture' | 'day' | 'today' }>,
+    id: string,
+  ) => {
     if (command.type === 'done') {
       setChanged({ id, kind: 'done' })
       actions.done(id)
@@ -57,11 +61,13 @@ export function useTodayRows(
   }
 
   const handle = (key: string): boolean => {
-    const next = reduceKey(keyState, key, target)
+    const next = reduceKey(keyState, key, target, { filterActive: false, offToday: days.offToday })
     setKeyState(next.state)
     const { command } = next
     if (command?.type === 'capture') bar.onOpen()
     else if (command?.type === 'move') setFocusedId(step(ids, focusedId, command.delta))
+    else if (command?.type === 'day') days.onStep(command.delta)
+    else if (command?.type === 'today') days.onToday()
     else if (command !== null && focusedId !== null) run(command, focusedId)
     return command !== null || next.state.pending !== keyState.pending
   }
@@ -94,5 +100,16 @@ export function useTodayRows(
     if (sheetId !== null) run(command, sheetId)
     setSheetId(null)
   }
-  return { rows, armed, sheet, hints: availableKeys({ hasRows: ids.length > 0, target, armed }) }
+  return {
+    rows,
+    armed,
+    sheet,
+    hints: availableKeys({
+      hasRows: ids.length > 0,
+      target,
+      armed,
+      days: today !== undefined,
+      offToday: days.offToday,
+    }),
+  }
 }

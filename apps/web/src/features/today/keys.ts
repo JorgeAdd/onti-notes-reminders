@@ -9,8 +9,26 @@ export type KeyCommand =
   | { type: 'undo' }
   | { type: 'snooze'; preset: SnoozePreset }
   | { type: 'capture' }
+  | { type: 'day'; delta: 1 | -1 }
+  | { type: 'today' }
 export type KeyHint =
-  'move' | 'done' | 'undo' | 'snooze' | 'hour' | 'tomorrow' | 'cancel' | 'capture'
+  | 'move'
+  | 'done'
+  | 'undo'
+  | 'snooze'
+  | 'hour'
+  | 'tomorrow'
+  | 'cancel'
+  | 'capture'
+  | 'days'
+  | 'today'
+
+/** What the page around the keys says: slice 3 keys depend on the viewed day. */
+export interface KeyContext {
+  filterActive: boolean
+  offToday: boolean
+}
+const NO_CONTEXT: KeyContext = { filterActive: false, offToday: false }
 
 export const SNOOZE_KEYS = { hour: 'h', tomorrow: 't' } as const
 
@@ -22,6 +40,7 @@ export function reduceKey(
   state: KeyState,
   key: string,
   target: Target,
+  context: KeyContext = NO_CONTEXT,
 ): { state: KeyState; command: KeyCommand | null } {
   const idle: KeyState = { pending: null }
   if (state.pending === 's') {
@@ -33,6 +52,11 @@ export function reduceKey(
   if (key === 'j' || key === 'k') {
     return { state: idle, command: { type: 'move', delta: key === 'j' ? 1 : -1 } }
   }
+  if (key === '[' || key === ']') {
+    return { state: idle, command: { type: 'day', delta: key === ']' ? 1 : -1 } }
+  }
+  // Inside the snooze menu `t` is Tomorrow; here it goes back to today, only off today.
+  if (key === 't' && context.offToday) return { state: idle, command: { type: 'today' } }
   if (key === 'c') return { state: idle, command: { type: 'capture' } }
   if (key === 'x' && target === 'open') return { state: idle, command: { type: 'done' } }
   if (key === 'z' && target === 'done') return { state: idle, command: { type: 'undo' } }
@@ -45,10 +69,16 @@ export function availableKeys(context: {
   hasRows: boolean
   target: Target
   armed: boolean
+  /** The day keys work (a page is on screen); `today` adds `t` when the view is another day. */
+  days?: boolean
+  offToday?: boolean
 }): KeyHint[] {
-  if (!context.hasRows) return ['capture']
-  if (context.armed) return ['hour', 'tomorrow', 'cancel']
-  if (context.target === 'open') return ['move', 'done', 'snooze', 'capture']
-  if (context.target === 'done') return ['move', 'undo', 'capture']
-  return ['move', 'capture']
+  if (context.armed && context.hasRows) return ['hour', 'tomorrow', 'cancel']
+  const days: KeyHint[] = context.days
+    ? ['days', ...(context.offToday ? (['today'] as const) : [])]
+    : []
+  if (!context.hasRows) return ['capture', ...days]
+  if (context.target === 'open') return ['move', 'done', 'snooze', 'capture', ...days]
+  if (context.target === 'done') return ['move', 'undo', 'capture', ...days]
+  return ['move', 'capture', ...days]
 }

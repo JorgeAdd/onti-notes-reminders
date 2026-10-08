@@ -26,10 +26,12 @@ export interface RailModel {
  * repeated hour holds both of its items. Empty hours are emitted twice on purpose: one line per
  * hour (desktop, board 03) and one `gap` row per run (mobile, board 05); CSS shows one of them.
  */
-export function buildRail(items: TodayItem[], now: Date, timeZone: string): RailModel {
+export function buildRail(items: TodayItem[], now: Date | null, timeZone: string): RailModel {
   if (items.length === 0) return { compact: false, rows: [] }
   const sorted = [...items].sort((a, b) => a.dueAt.getTime() - b.dueAt.getTime())
-  const nowMs = now.getTime()
+  // R18 · another day has no NOW line: every item is "upcoming" and nothing is inserted.
+  const nowMs = now === null ? -Infinity : now.getTime()
+  const nowRows: RailRow[] = now === null ? [] : [{ kind: 'now' }]
   const split = sorted.findIndex((item) => item.dueAt.getTime() >= nowMs)
   const after = split === -1 ? sorted.length : split
 
@@ -38,7 +40,7 @@ export function buildRail(items: TodayItem[], now: Date, timeZone: string): Rail
       compact: true,
       rows: [
         ...sorted.slice(0, after).map((item): RailRow => ({ kind: 'item', item })),
-        { kind: 'now' },
+        ...nowRows,
         ...sorted.slice(after).map((item): RailRow => ({ kind: 'item', item })),
       ],
     }
@@ -51,7 +53,7 @@ export function buildRail(items: TodayItem[], now: Date, timeZone: string): Rail
   })
   const entries: Entry[] = [
     ...sorted.slice(0, after).map(itemEntry),
-    { hour: localHour(now, timeZone), row: { kind: 'now' } },
+    ...(now === null ? [] : [{ hour: localHour(now, timeZone), row: { kind: 'now' } as RailRow }]),
     ...sorted.slice(after).map(itemEntry),
   ]
 

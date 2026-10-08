@@ -105,3 +105,51 @@ describe('c opens the command bar', () => {
     expect(reduceKey(armed, 'c', 'open')).toEqual({ state: idle, command: null })
   })
 })
+
+describe('[ ] t · day keys (D5)', () => {
+  const ctx = { filterActive: false, offToday: true }
+
+  it.each([
+    ['[', { type: 'day', delta: -1 }],
+    [']', { type: 'day', delta: 1 }],
+  ] as const)('%s steps the day from idle, with any target', (key, command) => {
+    expect(reduceKey(idle, key, null, ctx)).toEqual({ state: idle, command })
+    expect(reduceKey(idle, key, 'open')).toEqual({ state: idle, command })
+  })
+
+  it('t goes back to today only off today', () => {
+    expect(reduceKey(idle, 't', null, ctx)).toEqual({ state: idle, command: { type: 'today' } })
+    expect(reduceKey(idle, 't', 'open')).toEqual({ state: idle, command: null })
+    expect(reduceKey(idle, 't', 'open', { filterActive: false, offToday: false })).toEqual({
+      state: idle,
+      command: null,
+    })
+  })
+
+  it('after s, t is still Tomorrow even off today', () => {
+    expect(reduceKey(armed, 't', 'open', ctx)).toEqual({
+      state: idle,
+      command: { type: 'snooze', preset: 'tomorrow' },
+    })
+  })
+
+  it('after s, [ and ] only disarm', () => {
+    expect(reduceKey(armed, '[', 'open', ctx)).toEqual({ state: idle, command: null })
+  })
+
+  it('hints days always and today only off today', () => {
+    expect(availableKeys({ hasRows: true, target: null, armed: false, days: true })).toEqual([
+      'move',
+      'capture',
+      'days',
+    ])
+    expect(
+      availableKeys({ hasRows: false, target: null, armed: false, days: true, offToday: true }),
+    ).toEqual(['capture', 'days', 'today'])
+    expect(availableKeys({ hasRows: true, target: 'open', armed: true, days: true })).toEqual([
+      'hour',
+      'tomorrow',
+      'cancel',
+    ])
+  })
+})

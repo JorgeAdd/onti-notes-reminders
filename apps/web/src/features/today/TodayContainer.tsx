@@ -1,4 +1,4 @@
-import { isValidTimeZone, todayWindow, type TodayResponse } from '@onti/shared'
+import { isValidTimeZone, localCalendarDate, todayWindow, type TodayResponse } from '@onti/shared'
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ApiError, UnauthorizedError } from '../../lib/api'
@@ -6,7 +6,10 @@ import { browserTimeZone as readBrowserTimeZone } from '../../lib/browser-timezo
 import { skewOf } from '../../lib/clock'
 import { messages } from '../../messages'
 import type { CaptureSubmit } from './capture-preview'
-import { DAY_KEYS, dayKey, type DayView } from './day-view'
+import { DAY_KEYS, dayKey, stepView, type DayView } from './day-view'
+import { calendarDayLabel } from './format'
+import { pageTitle } from './page-title'
+import styles from './TodayContainer.module.css'
 import { DayPage, type CaptureBar } from './DayPage'
 import { useReminderActions, type ReminderApi } from './mutations/use-reminder-actions'
 import { useTodayRows } from './use-today-rows'
@@ -68,13 +71,29 @@ export function TodayContainer({
   })
   const openBar = useCallback(() => setBar({ draft: '', notice: null }), [])
   const mobile = useNarrow()
-  const { rows, armed, hints, sheet } = useTodayRows(data, actions, {
-    open: bar !== null,
-    onOpen: openBar,
-    mobile,
-    // The page on screen is not the page of the key yet: no row action until it lands.
-    blocked: isPlaceholderData,
-  })
+  // D5 · `[` and `]` step from the requested date (so fast presses do not skip while a page
+  // loads); a date equal to today's becomes the no-date view, which follows midnight.
+  const todayDate = data ? localCalendarDate(now, data.timezone) : null
+  const days = {
+    offToday: view.date !== null,
+    onStep: (delta: 1 | -1) => {
+      const next = todayDate === null ? null : stepView(view, delta, todayDate)
+      if (next) setView({ date: next.date })
+    },
+    onToday: () => setView({ date: null }),
+  }
+  const { rows, armed, hints, sheet } = useTodayRows(
+    data,
+    actions,
+    {
+      open: bar !== null,
+      onOpen: openBar,
+      mobile,
+      // The page on screen is not the page of the key yet: no row action until it lands.
+      blocked: isPlaceholderData,
+    },
+    days,
+  )
   const captureBar: CaptureBar | null =
     bar === null
       ? null
@@ -133,24 +152,39 @@ export function TodayContainer({
   }, [dateIsToday, setView])
 
   if (data) {
+    // While the viewed page loads, the screen names the requested day, never the previous one.
+    const shownDate = isPlaceholderData ? (view.date ?? todayDate) : data.date
+    const loading =
+      isPlaceholderData && shownDate !== null
+        ? { date: shownDate, isToday: shownDate === todayDate }
+        : null
+    const day = calendarDayLabel(shownDate ?? data.date, data.timezone)
     return (
-      <DayPage
-        today={data}
-        now={now}
-        onSignOut={onSignOut}
-        message={viewMessage ?? actions.message}
-        onDismissMessage={() => {
-          setViewMessage(null)
-          actions.dismiss()
-        }}
-        rows={rows}
-        snoozeMenu={armed}
-        hints={hints}
-        capture={captureBar}
-        mobile={mobile}
-        onOpenCapture={openBar}
-        sheet={sheet}
-      />
+      <>
+        <DayPage
+          today={data}
+          now={now}
+          onSignOut={onSignOut}
+          message={viewMessage ?? actions.message}
+          onDismissMessage={() => {
+            setViewMessage(null)
+            actions.dismiss()
+          }}
+          rows={rows}
+          snoozeMenu={armed}
+          hints={hints}
+          capture={captureBar}
+          mobile={mobile}
+          onOpenCapture={openBar}
+          sheet={sheet}
+          loading={loading}
+          nav={days}
+        />
+        {/* The one live region of the page: the viewed day and its count, on every change. */}
+        <p className={styles.live} aria-live="polite">
+          {loading ? messages.day.loading(day) : messages.day.announce(day, pageTitle(data))}
+        </p>
+      </>
     )
   }
   if (expired) return null

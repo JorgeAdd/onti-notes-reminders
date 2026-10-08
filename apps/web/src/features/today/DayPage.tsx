@@ -1,10 +1,14 @@
 import type { SnoozePreset, TodayItem, TodayResponse } from '@onti/shared'
 import { lazy, Suspense } from 'react'
+import { messages } from '../../messages'
 import { ActionMessage } from './ActionMessage'
 import type { CaptureSubmit } from './capture-preview'
 import { ActionSheet } from './ActionSheet'
 import { CarriedGroup } from './CarriedGroup'
 import { DateColumn } from './DateColumn'
+import type { DayNavState } from './DayNav'
+import { calendarDayLabel } from './format'
+import { pageTitle } from './page-title'
 import styles from './DayPage.module.css'
 import { EmptyState } from './EmptyState'
 import { HourRail } from './HourRail'
@@ -64,6 +68,10 @@ interface Props {
   mobile?: boolean
   onOpenCapture?: () => void
   sheet?: SheetState | null
+  /** D5 · set while the viewed day loads: the day to show instead of the previous page's. */
+  loading?: { date: string; isToday: boolean } | null
+  /** Day navigation: `[` `]` `t` handlers and the viewed day's state. */
+  nav?: DayNavState | undefined
 }
 
 /** The page frame: date column, header and the area the day's items fill. */
@@ -80,7 +88,12 @@ export function DayPage({
   mobile = false,
   onOpenCapture = noop,
   sheet = null,
+  loading = null,
+  nav,
 }: Props) {
+  const date = loading?.date ?? today.date
+  const isToday = loading?.isToday ?? today.isToday
+  const dayText = calendarDayLabel(date, today.timezone)
   const carriedCount = today.carried.reduce((sum, group) => sum + group.items.length, 0)
   // Decision 13: total notes derive from the page itself, no extra wire field.
   const totalCount = carriedCount + today.rail.length + today.otherCount
@@ -89,15 +102,17 @@ export function DayPage({
     <div className={styles.desk}>
       <div className={styles.page}>
         <DateColumn
-          now={now}
+          date={date}
+          isToday={isToday}
           timezone={today.timezone}
-          otherCount={today.otherCount}
+          otherCount={loading ? null : today.otherCount}
           onSignOut={onSignOut}
+          nav={nav ? { ...nav, mobile } : undefined}
         />
-        <PageHeader openCount={today.openCount} anyDone={today.anyDoneToday} />
-        <main className={styles.main}>
+        <PageHeader title={loading ? messages.day.loading(dayText) : pageTitle(today)} />
+        <main className={styles.main} aria-busy={loading ? 'true' : undefined}>
           {empty ? (
-            <EmptyState hasNotes={totalCount > 0} />
+            <EmptyState hasNotes={totalCount > 0} day={today.isToday ? undefined : dayText} />
           ) : (
             <>
               {today.carried.map((group) => (
@@ -109,7 +124,13 @@ export function DayPage({
                   rows={rows}
                 />
               ))}
-              <HourRail items={today.rail} now={now} timezone={today.timezone} rows={rows} />
+              <HourRail
+                items={today.rail}
+                now={now}
+                timezone={today.timezone}
+                rows={rows}
+                isToday={today.isToday}
+              />
             </>
           )}
         </main>
@@ -141,6 +162,9 @@ export function DayPage({
           carriedCount={carriedCount}
           totalCount={totalCount}
           hints={hints}
+          date={date}
+          isToday={isToday}
+          loading={loading !== null}
         />
       </div>
     </div>

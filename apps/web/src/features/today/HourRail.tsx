@@ -12,6 +12,8 @@ interface Props {
   now: Date
   timezone: string
   rows?: RowsState | undefined
+  /** R18 · another day has no now line and its rows show the time only. */
+  isToday?: boolean
 }
 
 const hourText = (hour: number) => String(hour).padStart(2, '0')
@@ -22,8 +24,8 @@ const hourText = (hour: number) => String(hour).padStart(2, '0')
  * rail-model; empty-hour runs render as per-hour lines (desktop) and one gap row (mobile), CSS
  * shows one of them. Above the compact threshold it is a plain time list with the now line.
  */
-export function HourRail({ items, now, timezone, rows: rowState }: Props) {
-  const { compact, rows } = buildRail(items, now, timezone)
+export function HourRail({ items, now, timezone, rows: rowState, isToday = true }: Props) {
+  const { compact, rows } = buildRail(items, isToday ? now : null, timezone)
   if (rows.length === 0) return null
   return (
     <ol className={compact ? styles.compact : styles.rail}>
@@ -64,6 +66,7 @@ export function HourRail({ items, now, timezone, rows: rowState }: Props) {
                 now={now}
                 timezone={timezone}
                 rows={rowState}
+                showRelative={isToday}
               />
             )
         }

@@ -52,16 +52,19 @@ export function localCalendarDate(instant: Date, timeZone: string): string {
   return format({ year: local.getFullYear(), month: local.getMonth() + 1, day: local.getDate() })
 }
 
-function localMidnight(date: string, timeZone: string): Date {
-  const parts = parseCalendarDate(date)
-  if (!parts) throw new Error(`Not a calendar date: ${date}`)
-  return new Date(new TZDate(parts.year, parts.month - 1, parts.day, timeZone).getTime())
+function localMidnight({ year, month, day }: CalendarDateParts, timeZone: string): Date {
+  return new Date(new TZDate(year, month - 1, day, timeZone).getTime())
+}
+
+/** The day after `parts`, by calendar arithmetic; the last navigable day ends in 2100. */
+function nextDay({ year, month, day }: CalendarDateParts): CalendarDateParts {
+  const moved = new Date(Date.UTC(year, month - 1, day + 1))
+  return { year: moved.getUTCFullYear(), month: moved.getUTCMonth() + 1, day: moved.getUTCDate() }
 }
 
 /** R1 · [local midnight of `date`, local midnight of the next date). 23 h or 25 h on DST days. */
 export function dayWindow(date: string, timeZone: string): Window {
-  return {
-    start: localMidnight(date, timeZone),
-    end: localMidnight(addCalendarDays(date, 1), timeZone),
-  }
+  const parts = parseCalendarDate(date)
+  if (!parts) throw new Error(`Not a calendar date: ${date}`)
+  return { start: localMidnight(parts, timeZone), end: localMidnight(nextDay(parts), timeZone) }
 }

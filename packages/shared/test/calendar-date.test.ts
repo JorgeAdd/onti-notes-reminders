@@ -81,6 +81,12 @@ describe('dayWindow (R1, D5, D6)', () => {
     expect(w.end.toISOString()).toBe('2026-10-09T06:00:00.000Z')
   })
 
+  it('the last navigable day, 2099-12-31, has a window ending at the start of 2100', () => {
+    const w = dayWindow('2099-12-31', 'America/Mexico_City')
+    expect(w.start.toISOString()).toBe('2099-12-31T06:00:00.000Z')
+    expect(w.end.toISOString()).toBe('2100-01-01T06:00:00.000Z')
+  })
+
   it('Sun 8 Mar 2026 in New York is 23 h (D5)', () => {
     const w = dayWindow('2026-03-08', NY)
     expect(w.start.toISOString()).toBe('2026-03-08T05:00:00.000Z')

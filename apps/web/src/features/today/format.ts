@@ -1,4 +1,4 @@
-import { relativeTo, startOfLocalDay } from '@onti/shared'
+import { dayWindow, relativeTo, startOfLocalDay } from '@onti/shared'
 import { messages } from '../../messages'
 
 const LOCALE = 'en'
@@ -60,3 +60,11 @@ export function originalLabel(original: Date, dueAt: Date, timeZone: string): st
     startOfLocalDay(original, timeZone).getTime() === startOfLocalDay(dueAt, timeZone).getTime()
   return sameDay ? clockTime(original, timeZone) : weekdayTime(original, timeZone)
 }
+
+/** "Thu 8" for a viewed calendar date ("2026-10-08"): its first instant stands for the day. */
+export const calendarDayLabel = (date: string, timeZone: string): string =>
+  dayLabel(dayWindow(date, timeZone).start, timeZone)
+
+/** The date block of a viewed calendar date. */
+export const calendarDateBlock = (date: string, timeZone: string) =>
+  dateBlock(dayWindow(date, timeZone).start, timeZone)

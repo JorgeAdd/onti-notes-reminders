@@ -35,6 +35,16 @@ export const messages = {
     stateDone: 'done',
     stateSnoozed: (count: number) => `snoozed ${count}×`,
   },
+  day: {
+    header: (open: number, day: string) => `${open} ${open === 1 ? 'thing' : 'things'} on ${day}`,
+    loading: (day: string) => `Opening ${day}…`,
+    nothing: (day: string) => `Nothing on ${day}`,
+    announce: (day: string, title: string) => `${day}, ${title}`,
+    hint: '[ ] prev / next day',
+    prev: 'Previous day',
+    next: 'Next day',
+    today: 'Today',
+  },
   mobile: { capture: '+ Capture' },
   actionSheet: {
     label: (title: string) => `Actions for ${title}`,
@@ -63,6 +73,8 @@ export const messages = {
     mode: 'NORMAL',
     counts: (today: number, carried: number, total: number) =>
       `${today} today · ${carried} carried · ${total} ${total === 1 ? 'note' : 'notes'}`,
+    dayCounts: (open: number, total: number) =>
+      `${open} open · ${total} ${total === 1 ? 'note' : 'notes'}`,
     keys: {
       move: 'j/k move',
       done: 'x done',
@@ -72,6 +84,8 @@ export const messages = {
       tomorrow: 't tomorrow',
       cancel: 'esc cancel',
       capture: 'c capture',
+      days: '[ ] day',
+      today: 't today',
     },
   },
   errors: {
