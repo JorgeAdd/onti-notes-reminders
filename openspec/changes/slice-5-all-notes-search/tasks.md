@@ -136,7 +136,7 @@ Global checks for every commit:
 
 ## PR
 
-- [ ] 10.1 Save the session prompts in `prompts/durante/` (rule 7), numbered with an intent header.
+- [x] 10.1 Save the session prompts in `prompts/durante/` (rule 7), numbered with an intent header.
 - [x] 10.2 Manual smoke again at 1280x720 and 375x667 including the tag filter; paste the Postgres output and bundle sizes.
   - Post-rebase smoke 2026-10-08 (a2ad9d2, Playwright, real keys and taps, mocked data): 10/10 scenarios pass — `/` from Today and from Fri 9 with Esc returning to the same day; `staging` 2 of 15; `#` tag filter in All notes with Esc clearing the tag then leaving; `/` inert while Today's tag bar is open; mobile bar Search · Tags · + Capture at 44 px; All-notes chips and Clear; slice 3 backdrop keeps the filter with 0 dialogs; dark and reduced motion; 0 POSTs from x/s/z. Found: `/` hint shown while the notes tag bar is open (fixed in aa0566e) and the tag truncated to `#c…` in the 375 px statusline (cosmetic, follow-up).
 - [ ] 10.3 ASK the human before pushing (rule 6; approval covers that one push). Then open the PR to `main`, label `size:exception`.
