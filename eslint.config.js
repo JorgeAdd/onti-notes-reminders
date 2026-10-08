@@ -33,7 +33,7 @@ export default tseslint.config(
   },
   {
     // Time comes from the Clock port (CLAUDE.md rule 16).
-    files: ['apps/api/src/**/*.ts', 'packages/shared/src/**/*.ts'],
+    files: ['apps/api/src/**/*.ts', 'apps/api/scripts/**/*.ts', 'packages/shared/src/**/*.ts'],
     ignores: ['apps/api/src/infrastructure/clock/**'],
     rules: {
       'no-restricted-syntax': [
@@ -45,6 +45,24 @@ export default tseslint.config(
         {
           selector: "CallExpression[callee.object.name='Date'][callee.property.name='now']",
           message: 'Use the Clock port (rule 16).',
+        },
+      ],
+    },
+  },
+  {
+    // Same rule in the web: time comes from lib/clock.ts (server now + skew).
+    files: ['apps/web/src/**/*.{ts,tsx}'],
+    ignores: ['apps/web/src/lib/clock.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "NewExpression[callee.name='Date'][arguments.length=0]",
+          message: 'Use lib/clock.ts (rule 16).',
+        },
+        {
+          selector: "CallExpression[callee.object.name='Date'][callee.property.name='now']",
+          message: 'Use lib/clock.ts (rule 16).',
         },
       ],
     },

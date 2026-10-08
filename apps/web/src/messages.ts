@@ -12,18 +12,29 @@ export const messages = {
     switchToSignIn: 'Already have an account? Sign in',
     checkEmail: 'Check your email to confirm your account, then sign in.',
     working: 'Working…',
+    sessionExpired: 'Your session expired. Sign in again.',
   },
-  me: {
-    signedInAs: 'Signed in as',
-    timezone: 'Timezone',
-    apiCheck: 'API check',
-    apiOk: 'GET /me verified your token',
-    loading: 'Checking your session with the API…',
+  today: {
+    header: (open: number, anyDone: boolean) =>
+      anyDone ? `${open} left today` : `${open} ${open === 1 ? 'thing' : 'things'} today`,
+    carriedFrom: (day: string) => `Still open from ${day}`,
+    otherNotes: (n: number) => `${n} other ${n === 1 ? 'note' : 'notes'} on the back of the pad`,
+    late: (duration: string) => `late ${duration}`,
+    upcoming: (duration: string) => `in ${duration}`,
+    nowAt: (time: string) => `now ${time}`,
+    loading: 'Opening your day…',
+    loadError: 'Your day could not be loaded.',
+    retry: 'Try again',
     signOut: 'Sign out',
-    modeNormal: 'NORMAL',
+    nothingToday: 'Nothing today',
+    noNotes: 'No notes yet',
+  },
+  statusline: {
+    mode: 'NORMAL',
+    counts: (today: number, carried: number, total: number) =>
+      `${today} today · ${carried} carried · ${total} ${total === 1 ? 'note' : 'notes'}`,
   },
   errors: {
     generic: 'Something went wrong. Please try again.',
-    api: 'The API could not verify your session.',
   },
 } as const

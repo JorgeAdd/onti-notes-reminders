@@ -82,6 +82,11 @@
   --core-size-target: 44px; /* minimum touch/click target (SG13) */
   --core-size-row: 48px;
   --core-size-focus: 2px;
+  --core-size-time-col: 4.5rem;
+  --core-size-date-col: 200px;
+  --core-size-page-max: 1040px;
+  --core-size-card-max: 420px;
+  --core-tracking-label: 0.08em;
 
   /* Motion (SG15) */
   --core-duration-instant: 0ms;
@@ -150,6 +155,11 @@
   --size-target: var(--core-size-target);
   --size-row: var(--core-size-row);
   --focus-ring: var(--core-size-focus) solid var(--color-ink);
+  --size-time-col: var(--core-size-time-col);
+  --size-date-col: var(--core-size-date-col);
+  --size-page-max: var(--core-size-page-max);
+  --size-card-max: var(--core-size-card-max);
+  --tracking-label: var(--core-tracking-label);
 
   /* Motion roles (SG15) */
   --motion-tear: var(--core-duration-360);

@@ -1,0 +1,67 @@
+schema: spec-driven
+
+context: |
+  Stack: npm workspaces monorepo (Node >=22, TypeScript ~6). apps/web = React 19 + Vite + CSS Modules + tokens; apps/api = Fastify + Kysely + jose; packages/shared = zod schemas + pure CONTRACT rules (no IO).
+  Architecture: API is hexagonal (domain / application / infrastructure, imports point inward). Time only via the Clock port. Auth = Supabase JWT verified by the API; user queries run as `authenticated` (RLS).
+  Testing: Vitest in apps/api and packages/shared (no tests in apps/web yet). CONTRACT tests: packages/shared/test/contract.test.ts, one describe per matrix row of docs/CONTRACT.md.
+  Quality: prettier --check, eslint (type-aware), tsc --noEmit. `npm run verify` runs all four; CI "Verify and build" runs verify + build; the pre-commit hook runs verify.
+  Sources of truth (cite, never restate): docs/product/brief.md, docs/product/scenario-dataset.md, docs/CONTRACT.md (R1-R17, C1-C12, D1-D4), docs/adr/ADR-001..003, docs/db/schema.md, supabase/migrations/, docs/design/style-guide-decisions.md (SG1-SG18), docs/design/chosen/*.png, apps/web/src/styles/tokens.css, CLAUDE.md (rules 1-23).
+
+strict_tdd: true
+
+testing:
+  strict_tdd: true
+  runner:
+    framework: vitest
+    command: npm run test
+    per_workspace: 'npm run test -w <workspace>' # e.g. @onti/shared, @onti/api
+    file_glob: 'test/**/*.test.ts'
+  layers:
+    unit: { available: true, tool: vitest }
+    integration: { available: true, tool: 'vitest + Fastify inject (apps/api/test/server.test.ts)' }
+    e2e: { available: false, tool: null }
+    component: { available: false, tool: 'none installed in apps/web (no testing-library / jsdom)' }
+  coverage: { available: false, command: null }
+  quality:
+    linter: 'npm run lint'
+    type_checker: 'npm run typecheck'
+    formatter: 'npm run format:check'
+    all: 'npm run verify'
+
+rules:
+  proposal:
+    - Include a rollback plan for risky changes.
+    - Cite the brief / scenario dataset / CONTRACT rules the change serves; do not restate their numbers.
+    - Work reaches main only through a PR with green "Verify and build"; conventional commits.
+  specs:
+    - Use Given/When/Then and RFC 2119 keywords (MUST, SHALL, SHOULD, MAY).
+    - Cite CONTRACT rule IDs (R#) and matrix rows (C#/D#) as acceptance criteria; never restate CONTRACT numbers.
+    - Add only what CONTRACT does not cover: UI behavior, keyboard/mobile flows, empty/loading/error states, accessibility.
+    - Never show internal IDs (N1-N15) in UI behavior; refer to scenario data via docs/product/scenario-dataset.md.
+    - All user-facing copy lives in apps/web/src/messages.ts.
+  design:
+    - UI uses semantic tokens only (--color-*, --text-*, --space-*, --motion-*), never --core-* or raw values.
+    - Vermilion (--color-date) is for the date block only.
+    - Every animation has a reduced-motion fallback; interactive targets are >= 44 px.
+    - Hexagonal API: imports point inward; time only via the Clock port (no new Date()/Date.now() outside the clock adapter).
+    - packages/shared has no IO. API verifies the JWT and runs user queries as `authenticated` (RLS); another user's resource -> 404, missing/invalid token -> 401.
+    - Schema changes only via a new migration plus docs/db/schema.md in the same commit.
+    - Document decisions with rationale; reference ADR-001..003 instead of repeating them.
+  tasks:
+    - Group by phase, hierarchical numbering; keep tasks completable in one session.
+    - Review budget is 400 changed lines per PR (delivery strategy ask-on-risk); forecast and split into chained PRs when exceeded.
+    - A change to a CONTRACT rule ships together with its tests and docs/CONTRACT.md.
+    - Save prompts under prompts/antes|durante|despues (CLAUDE.md rule 7).
+  apply:
+    guidelines:
+      - Follow existing patterns; work on a branch (<type>/<short-name>), never directly on main.
+      - Do not commit or push without the orchestrator/user (push needs per-push approval).
+    tdd: true
+    test_command: 'npm run test'
+  verify:
+    test_command: 'npm run verify'
+    build_command: 'npm run build'
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas.
+    - Archive only after `npm run verify` and the CI check "Verify and build" are green.

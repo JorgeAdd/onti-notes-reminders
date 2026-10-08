@@ -1,0 +1,15 @@
+.header {
+  grid-area: header;
+  padding: var(--space-xl) var(--space-xl) var(--space-lg);
+}
+
+.title {
+  margin: 0;
+  font: var(--text-page-title);
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+  }
+}

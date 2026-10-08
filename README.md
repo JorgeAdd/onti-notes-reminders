@@ -63,6 +63,29 @@ Engram is not installed or in CI (`HUSKY=0`).
 
 To be documented once the stack is set up (Phase 5).
 
+## Seeding demo data
+
+`npm run seed:demo -w @onti/api -- --email <email>` loads the 15-note scenario
+of `docs/product/scenario-dataset.md` into one existing account, anchored so
+that the account's current local day plays Wed 7 (2 carried, 2 due today,
+1 due tomorrow, 11 other notes).
+
+- Prerequisite: `DATABASE_URL` in the environment or `apps/api/.env`. The
+  account must already exist (sign up first); the script never creates users.
+- Target: exactly one of `--email <email>` or `--user-id <uuid>`. It refuses,
+  writing nothing, unless exactly one user matches.
+- Dry run by default: prints the plan (created / updated / unchanged, anchor
+  date, timezone, target). Add `--yes` to write.
+- `--timezone <IANA>` also sets the account's timezone (for example
+  `America/Mexico_City`). Without it the profile timezone is used, and a `UTC`
+  profile makes "today" the UTC day, so the page can look shifted. Pass it on
+  the first run.
+- Re-running is safe: ids are deterministic, so a repeat the same day changes
+  nothing and a later day re-anchors the dates.
+- `--remove --yes` deletes exactly the seeded notes (and seeded tags nothing
+  else uses). Other rows are never touched; every write runs as that user, so
+  row level security applies.
+
 ## Key decisions
 
 - **Supabase Auth issues the JWT; our own API does everything else**

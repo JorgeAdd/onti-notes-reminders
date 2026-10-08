@@ -1,21 +1,30 @@
 import cors from '@fastify/cors'
-import { meResponseSchema } from '@onti/shared'
+import { meResponseSchema, todayResponseSchema } from '@onti/shared'
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify'
+import { z } from 'zod'
 import { UnauthorizedError } from '../../application/errors'
 import type { GetMe } from '../../application/get-me'
+import type { GetToday } from '../../application/get-today'
 import type { TokenVerifier } from '../../application/ports'
 import type { Identity } from '../../domain/identity'
 
 export interface ServerDeps {
   verifier: TokenVerifier
   getMe: GetMe
+  getToday: GetToday
   corsOrigins: string[]
   logger?: boolean
 }
 
 const BEARER = /^Bearer\s+(\S+)$/i
 
-export function buildServer({ verifier, getMe, corsOrigins, logger = false }: ServerDeps) {
+export function buildServer({
+  verifier,
+  getMe,
+  getToday,
+  corsOrigins,
+  logger = false,
+}: ServerDeps) {
   const app = Fastify({ logger })
 
   app.register(cors, { origin: corsOrigins, methods: ['GET', 'POST', 'PATCH', 'DELETE'] })
@@ -39,6 +48,11 @@ export function buildServer({ verifier, getMe, corsOrigins, logger = false }: Se
   app.get('/me', async (request) => {
     const identity = await authenticate(request)
     return meResponseSchema.parse(await getMe(identity))
+  })
+
+  app.get('/today', async (request) => {
+    const identity = await authenticate(request)
+    return z.encode(todayResponseSchema, await getToday(identity))
   })
 
   return app

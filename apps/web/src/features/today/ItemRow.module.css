@@ -1,0 +1,66 @@
+.row {
+  display: grid;
+  grid-template-columns: var(--size-time-col) minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--space-lg);
+  padding: var(--space-md) var(--space-row-x);
+  list-style: none;
+}
+
+.time {
+  font: var(--text-time);
+}
+
+.title {
+  font: var(--text-item-title);
+}
+
+.done {
+  text-decoration-line: line-through;
+  text-decoration-color: var(--color-ink);
+  color: var(--color-ink-muted);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+}
+
+.meta > span + span::before {
+  content: '·';
+  margin-right: var(--space-sm);
+}
+
+/* Board 05: "18:00 · #tag · late 15h05" on the first line, the title under it. */
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--space-sm);
+    row-gap: var(--space-xs);
+  }
+
+  .time {
+    grid-row: 1;
+    grid-column: 1;
+  }
+
+  .meta {
+    grid-row: 1;
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+
+  .meta::before {
+    content: '·';
+  }
+
+  .title,
+  .done {
+    grid-row: 2;
+    grid-column: 1 / -1;
+  }
+}

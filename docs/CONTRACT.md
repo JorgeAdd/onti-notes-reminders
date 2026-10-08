@@ -31,7 +31,8 @@ timezone; `start(d)` is local midnight of day `d`.
   some have reminders on other days.
 - **R6 · Durations.** Under 1 h → "{m} min"; whole hours → "{h} h";
   otherwise "{h}h{mm}" (e.g. "15h05", "5h48"). Upcoming: "in {duration}";
-  overdue: "late {duration}". Minutes are truncated, never rounded up.
+  overdue: "late {duration}". Minutes are truncated, never rounded up. At exactly the due time an item is not late yet (R2 is strict) and
+  reads "in 0 min".
 
 ### Reminder lifecycle
 
@@ -118,6 +119,14 @@ Automated in `packages/shared/test/contract.test.ts` (one `describe` per
 row, injected clock, dataset fixture in `test/fixtures/jorge-week.ts`):
 C1–C8, C12 and D1–D4. Edge cases of the rules are in `rules.test.ts`.
 Both run in `npm run verify` (pre-commit hook and CI).
+
+Page-level proof (slice 1, the Today page):
+
+| Rows            | Proven by                                                                                                                                                                                                                                                                                                       |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1, C3, C4, C7  | `apps/api/test/today.test.ts`: `getToday` with an injected `Clock` and a fake repository built from the dataset (membership, counts, N1 absent, 09:31 still on the page).                                                                                                                                       |
+| C3, C4, C7      | `apps/web/test/day-page.test.tsx`, `hour-rail.test.tsx`, `rail-model.test.ts`: the page at Wed 09:05 (header, carried group, rail with the now line between the 09 hour and the 09:30 item, statusline counts), the done strike, and the minute tick (`in 25 min` to `in 24 min`, now line `09:05` to `09:06`). |
+| C4 on real data | The demo seed plus `GET /today` returns the C4 page for Jorge's account; the seed plan is unit-tested in `apps/api/test/seed-plan.test.ts` and `seed-demo.test.ts`.                                                                                                                                             |
 
 Still `todo` in that suite, asserted elsewhere when the feature lands:
 C9 (search, API + Postgres), C10 (markdown rendering, web), C11 (`404`

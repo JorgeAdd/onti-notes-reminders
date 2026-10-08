@@ -1,0 +1,72 @@
+.column {
+  grid-area: date;
+  padding: var(--space-xl);
+  border-right: 1px solid var(--color-rule);
+  display: grid;
+  align-content: start;
+  gap: var(--space-xs);
+}
+
+.block {
+  display: grid;
+  padding: var(--space-md);
+  background: var(--color-date);
+  color: var(--color-date-ink);
+}
+
+.numeral {
+  font: var(--text-date-numeral);
+}
+
+.weekday {
+  font: var(--text-meta-strong);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+.month,
+.muted {
+  margin: 0;
+  font: var(--text-meta);
+}
+
+.month {
+  font: var(--text-meta-strong);
+}
+
+.muted {
+  color: var(--color-ink-muted);
+}
+
+.signOut {
+  justify-self: start;
+  min-height: var(--size-target);
+  margin-top: var(--space-md);
+  padding: 0 var(--space-lg);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-control);
+  background: var(--color-page);
+  color: var(--color-ink);
+  font: var(--text-meta-strong);
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  /* Board 05: the date block on the left, its details beside it. */
+  .column {
+    border-right: 0;
+    border-bottom: 1px solid var(--color-rule);
+    padding: var(--space-lg);
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--space-md);
+  }
+
+  .block {
+    grid-row: span 4;
+    align-self: start;
+  }
+
+  .numeral {
+    font: var(--text-date-numeral-mobile);
+  }
+}

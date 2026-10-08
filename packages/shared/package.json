@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./fixtures/jorge-week": "./test/fixtures/jorge-week.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
