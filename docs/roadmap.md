@@ -82,7 +82,7 @@ the start of slice 2 because capture and snooze depend on it.
 
 Brief: `docs/design/landing-brief.md` (binding). Style guide: SG19, SG18.
 
-- A quiet sheet entrance of about 300 ms on every full page load (Today
+- A quiet sheet entrance of about 240 ms (300 ms on mobile) on every full page load (Today
   and the sign-in card), CSS-only, with a reduced-motion fallback (SG16).
 - Only the desk renders while the session or Today's data is pending;
   `TodayStatus` appears only on error or after about 400 ms.

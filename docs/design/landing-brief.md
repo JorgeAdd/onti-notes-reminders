@@ -73,10 +73,13 @@ yet. The source updates listed at the end come first
    3. The date block (vermilion, `--color-date`) rises
       `--entrance-rise-detail` (4 px) over `--motion-entrance-detail`
       (150 ms), starting after `--entrance-delay-date` (80 ms).
-   4. The header rule draws left to right, from `--entrance-rule-start`
-      to `scaleX(1)`, over `--motion-entrance-detail` (150 ms), starting
-      after `--entrance-delay-rule` (150 ms). The whole entrance ends at
-      about 300 ms.
+   4. On mobile, the bottom capture bar fades in over
+      `--motion-entrance-detail` (150 ms), starting after
+      `--entrance-delay-bar` (150 ms). The entrance ends at about 240 ms on
+      desktop and about 300 ms on mobile.
+   5. There is no header rule animation: the page has no header rule
+      (board 03), and the entrance does not add one (decided 2026-10-08,
+      prompt 20 follow-up).
 9. **No row stagger.** SG15 rejects animated lists, and the reveal already
    gives the sense of order. SG15 is not amended.
 10. The sign-in card uses the same sheet entrance and reveal. Its fields
@@ -89,7 +92,7 @@ yet. The source updates listed at the end come first
 
 ### Timing and interactivity
 
-13. The whole entrance finishes within **≤ 500 ms** (about 300 ms with
+13. The whole entrance finishes within **≤ 500 ms** (about 240–300 ms with
     the chosen variant).
 
 ### Chosen prototype
@@ -110,22 +113,20 @@ yet. The source updates listed at the end come first
     existing core values, and no new core values:
     - `--motion-entrance: var(--core-duration-240)` (the sheet)
     - `--motion-entrance-detail: var(--core-duration-150)` (the date block
-      and the header rule)
+      and the mobile capture bar)
     - `--entrance-rise: var(--space-md)` (12 px; the sheet's travel)
     - `--entrance-rise-detail: var(--space-xs)` (4 px; the date block's
       travel. There is no 6 px space token, so the earlier 6 px became
       4 px instead of adding a core value)
     - `--entrance-clip-start: inset(0 0 100% 0)` (the sheet starts fully
       clipped from the bottom)
-    - `--entrance-rule-start: scaleX(0)` (the header rule starts with no
-      width)
     - `--entrance-delay-date: var(--core-duration-80)` (when the date
       block starts)
-    - `--entrance-delay-rule: var(--core-duration-150)` (when the header
-      rule starts)
+    - `--entrance-delay-bar: var(--core-duration-150)` (when the mobile
+      capture bar starts)
 
     Components animate _from_ these tokens _to_ the resting state
-    (`translateY(0)`, `inset(0)`, `scaleX(1)`), so the tokens fully
+    (`translateY(0)`, `inset(0)`), so the tokens fully
     describe the travel.
 
     The entrance uses the existing **`--ease-paper`**. `--ease-enter` and
@@ -149,12 +150,12 @@ yet. The source updates listed at the end come first
     remapping tokens in the global reduced-motion block of `tokens.css`,
     with no component-level media queries (CLAUDE.md rule 10):
     - travel: `--entrance-rise: 0`, `--entrance-rise-detail: 0`,
-      `--entrance-clip-start: inset(0)`, `--entrance-rule-start: scaleX(1)`,
+      `--entrance-clip-start: inset(0)`,
       so the first frame equals the resting state;
     - timing: `--motion-entrance: var(--core-duration-150)` (the page
       fade), and `--motion-entrance-detail`, `--entrance-delay-date` and
-      `--entrance-delay-rule` all `var(--core-duration-instant)`, so the
-      date block and the rule have no animation of their own;
+      `--entrance-delay-bar` all `var(--core-duration-instant)`, so the
+      date block and the capture bar have no animation of their own;
     - easing: `--ease-paper` is already linear there.
 
 ### Technology and budget
@@ -229,8 +230,7 @@ place before the entrance's first frame.
   the session or data is pending; `TodayStatus` appears only on error or
   after the ~400 ms threshold; input works during the entrance; the
   reduced-motion path is applied; under reduced motion, the computed
-  `transform` and `clip-path` of the sheet, the date block and the header
-  rule at the first frame equal their final state (only opacity changes),
+  `transform` and `clip-path` of the sheet and the date block at the first frame equal their final state (only opacity changes),
   and the entrance delays resolve to 0 ms; components use only semantic
   tokens (`--motion-*`, `--ease-*`, `--entrance-*`) and no raw px,
   durations, delays or transforms.

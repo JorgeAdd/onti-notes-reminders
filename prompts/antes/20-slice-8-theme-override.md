@@ -35,3 +35,13 @@ stopping before any push.
 > 4. SDD: run the change slice-8-page-entrance-theme from proposal through tasks, using landing-brief.md as binding input. Set the changed-line budget to include tests (strict TDD roughly doubles lines).
 > 5. Apply with strict TDD, then run sdd-verify. npm run verify must pass on every commit; never use --no-verify.
 > 6. Open nothing yet: push and PR need my approval. Show me the commit list, the verify report summary, the added CSS/JS size in gzip vs the 3 kB budget, and the manual smoke checklist I must run (light, dark, system, reduced motion; desktop and mobile; no flash on reload with each stored theme).
+
+## Follow-up: header rule
+
+The design phase found that brief decision 8.4 animates a header rule that
+does not exist (no rule in `PageHeader`, none on board 03). Recommendation:
+drop the rule animation and its two tokens instead of adding a new visible
+element; keep the mobile capture bar's "fades in last" delay as
+`--entrance-delay-bar`.
+
+> Yes go with it
