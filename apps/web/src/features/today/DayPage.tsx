@@ -1,4 +1,5 @@
 import type { TodayResponse } from '@onti/shared'
+import { ActionMessage } from './ActionMessage'
 import { CarriedGroup } from './CarriedGroup'
 import { DateColumn } from './DateColumn'
 import styles from './DayPage.module.css'
@@ -7,15 +8,20 @@ import { HourRail } from './HourRail'
 import { PageHeader } from './PageHeader'
 import { Statusline } from './Statusline'
 
+const noop = () => undefined
+
 interface Props {
   today: TodayResponse
   /** Ticking display time (use-now), never the device clock directly. */
   now: Date
   onSignOut: () => void
+  /** A failed action, in one line above the statusline (Decision 11). */
+  message?: string | null
+  onDismissMessage?: () => void
 }
 
 /** The page frame: date column, header and the area the day's items fill. */
-export function DayPage({ today, now, onSignOut }: Props) {
+export function DayPage({ today, now, onSignOut, message = null, onDismissMessage }: Props) {
   const carriedCount = today.carried.reduce((sum, group) => sum + group.items.length, 0)
   // Decision 13: total notes derive from the page itself, no extra wire field.
   const totalCount = carriedCount + today.rail.length + today.otherCount
@@ -48,6 +54,9 @@ export function DayPage({ today, now, onSignOut }: Props) {
           )}
         </main>
       </div>
+      {message === null ? null : (
+        <ActionMessage message={message} onDismiss={onDismissMessage ?? noop} />
+      )}
       <Statusline
         now={now}
         timezone={today.timezone}

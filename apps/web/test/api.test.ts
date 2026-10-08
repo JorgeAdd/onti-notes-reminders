@@ -1,5 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { ApiError, fetchToday, patchTimezone, request, UnauthorizedError } from '../src/lib/api'
+import {
+  ApiError,
+  fetchToday,
+  markNoteDone,
+  patchTimezone,
+  post,
+  request,
+  snoozeNote,
+  undoNoteDone,
+  UnauthorizedError,
+} from '../src/lib/api'
 
 const ID = '11111111-1111-4111-8111-111111111111'
 const body = {
@@ -120,5 +130,67 @@ describe('patchTimezone', () => {
   it('rejects a body that is not {timezone}', async () => {
     respond(200, { timezone: 7 })
     await expect(patchTimezone('t', 'UTC')).rejects.toThrow()
+  })
+})
+
+describe('post and the reminder calls (Decision 10)', () => {
+  const note = {
+    id: ID,
+    title: 'Standup',
+    tags: [{ name: 'Client A', slug: 'client-a' }],
+    dueAt: '2026-10-07T16:05:00.000Z',
+    originalDueAt: '2026-10-07T15:30:00.000Z',
+    snoozeCount: 1,
+    doneAt: null,
+  }
+
+  it('post sends no Content-Type without a body', async () => {
+    const fetchMock = respond(200, {})
+    await post('/notes/x/done', 'token-1')
+
+    const [, init] = fetchMock.mock.calls[0]!
+    expect(init?.method).toBe('POST')
+    expect(init?.headers).toEqual({ Authorization: 'Bearer token-1' })
+    expect(init?.body).toBeUndefined()
+  })
+
+  it('post sends the JSON body with its Content-Type when there is one', async () => {
+    const fetchMock = respond(200, {})
+    await post('/notes/x/snooze', 'token-1', { preset: 'hour' })
+
+    const [, init] = fetchMock.mock.calls[0]!
+    expect(init?.headers).toEqual({
+      Authorization: 'Bearer token-1',
+      'Content-Type': 'application/json',
+    })
+    expect(init?.body).toBe('{"preset":"hour"}')
+  })
+
+  it('snoozeNote posts the preset and decodes the note', async () => {
+    const fetchMock = respond(200, note)
+    const result = await snoozeNote('token-1', ID, 'hour')
+
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect((url as URL).href).toBe(`http://localhost:3000/notes/${ID}/snooze`)
+    expect(init?.body).toBe('{"preset":"hour"}')
+    expect(result.dueAt).toBeInstanceOf(Date)
+    expect(result.snoozeCount).toBe(1)
+  })
+
+  it.each([
+    ['done', markNoteDone],
+    ['undo', undoNoteDone],
+  ])('%s posts with no body', async (action, call) => {
+    const fetchMock = respond(200, note)
+    await call('token-1', ID)
+
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect((url as URL).href).toBe(`http://localhost:3000/notes/${ID}/${action}`)
+    expect(init?.body).toBeUndefined()
+  })
+
+  it('rejects a note that does not match the shared schema', async () => {
+    respond(200, { ...note, snoozeCount: 'twice' })
+    await expect(snoozeNote('t', ID, 'hour')).rejects.toThrow()
   })
 })

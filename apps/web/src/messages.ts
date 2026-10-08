@@ -36,5 +36,11 @@ export const messages = {
   },
   errors: {
     generic: 'Something went wrong. Please try again.',
+    dismiss: 'Dismiss',
+    actionFailed: (action: 'snooze' | 'done' | 'undo', title: string) =>
+      `Could not ${{ snooze: 'snooze', done: 'mark as done', undo: 'undo' }[action]} “${title}”. It is back where it was.`,
+    actionConflict: (title: string) =>
+      `“${title}” changed on another device. It is back where it was.`,
+    actionMissing: (title: string) => `“${title}” no longer exists. It is back where it was.`,
   },
 } as const

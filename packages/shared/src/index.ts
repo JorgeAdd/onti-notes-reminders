@@ -15,6 +15,7 @@ export {
   type SnoozePreset,
   type SnoozeRequest,
 } from './notes'
+export { applyReminderChange, type ReminderChange } from './today-patch'
 export { todayResponseSchema, type TodayItem, type TodayResponse } from './today'
 export * from './domain/capture'
 export * from './domain/day-page'

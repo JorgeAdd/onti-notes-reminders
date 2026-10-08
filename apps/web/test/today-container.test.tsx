@@ -10,6 +10,12 @@ import { c4Response } from './today-fixture'
 
 afterEach(() => vi.useRealTimers())
 
+const noReminders = {
+  snooze: () => Promise.reject(new Error('unexpected')),
+  done: () => Promise.reject(new Error('unexpected')),
+  undo: () => Promise.reject(new Error('unexpected')),
+}
+
 const noRetry = () => new QueryClient({ defaultOptions: { queries: { retry: false } } })
 
 interface ContainerOptions {
@@ -35,6 +41,7 @@ function renderContainer(
         onSessionExpired={onSessionExpired}
         onSignOut={() => undefined}
         syncTimezone={syncTimezone}
+        reminders={noReminders}
         browserTimeZone={browserZone}
       />
     </QueryClientProvider>,

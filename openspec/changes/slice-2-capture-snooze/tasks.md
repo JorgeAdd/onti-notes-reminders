@@ -81,11 +81,11 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 4: Mutation layer (~360 lines, High)
 
-- [ ] 4.1 Add `@testing-library/user-event` ^14 to `apps/web/package.json`.
-- [ ] 4.2 RED: `packages/shared/test/today-patch.test.ts`: each change type, `otherCount` math, parity with `getToday` over `jorge-week`; GREEN `today-patch.ts` `applyReminderChange`.
-- [ ] 4.3 RED: web tests for `post`, hooks (optimistic, `onSuccess` patch, rollback + message + refetch on 500/409/404, two queued writes where the first fails, mutation 401 -> `onSessionExpired` once without error line, invalidate only when last in flight).
-- [ ] 4.4 GREEN: `lib/api.ts` `post`; `features/today/mutations/*` (`scope: {id:'today'}`, `retry: 0`); `ActionMessage.tsx`; `messages.errors`.
-- [ ] 4.5 Run `npm run build -w @onti/web`; record bundle size in the PR.
+- [x] 4.1 Add `@testing-library/user-event` ^14 to `apps/web/package.json`.
+- [x] 4.2 RED: `packages/shared/test/today-patch.test.ts`: each change type, `otherCount` math, parity with `getToday` over `jorge-week`; GREEN `today-patch.ts` `applyReminderChange`.
+- [x] 4.3 RED: web tests for `post`, hooks (optimistic, `onSuccess` patch, rollback + message + refetch on 500/409/404, two queued writes where the first fails, mutation 401 -> `onSessionExpired` once without error line, invalidate only when last in flight).
+- [x] 4.4 GREEN: `lib/api.ts` `post`; `features/today/mutations/*` (`scope: {id:'today'}`, `retry: 0`); `ActionMessage.tsx`; `messages.errors`.
+- [x] 4.5 Run `npm run build -w @onti/web`; record bundle size in the PR.
 
 ## Commit 5: Keyboard and row actions (~400 lines, High)
 

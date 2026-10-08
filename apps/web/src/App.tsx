@@ -1,8 +1,9 @@
+import type { SnoozePreset } from '@onti/shared'
 import type { Session } from '@supabase/supabase-js'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AuthContainer } from './features/auth/AuthContainer'
 import { TodayContainer } from './features/today/TodayContainer'
-import { fetchToday, patchTimezone } from './lib/api'
+import { fetchToday, markNoteDone, patchTimezone, snoozeNote, undoNoteDone } from './lib/api'
 import { supabase } from './lib/supabase'
 
 export function App() {
@@ -29,6 +30,14 @@ export function App() {
     (timezone: string) => patchTimezone(accessToken ?? '', timezone),
     [accessToken],
   )
+  const reminders = useMemo(
+    () => ({
+      snooze: (id: string, preset: SnoozePreset) => snoozeNote(accessToken ?? '', id, preset),
+      done: (id: string) => markNoteDone(accessToken ?? '', id),
+      undo: (id: string) => undoNoteDone(accessToken ?? '', id),
+    }),
+    [accessToken],
+  )
   // The screen never waits on the network: the local session is cleared first,
   // and a failed sign-out call is ignored (the token is unusable anyway).
   const signOut = useCallback(() => {
@@ -47,6 +56,7 @@ export function App() {
       onSessionExpired={onSessionExpired}
       onSignOut={signOut}
       syncTimezone={syncTimezone}
+      reminders={reminders}
     />
   ) : (
     <AuthContainer expired={expired} />

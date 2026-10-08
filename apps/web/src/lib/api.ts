@@ -1,4 +1,11 @@
-import { timezoneResponseSchema, todayResponseSchema, type TodayResponse } from '@onti/shared'
+import {
+  noteResponseSchema,
+  timezoneResponseSchema,
+  todayResponseSchema,
+  type NoteResponse,
+  type SnoozePreset,
+  type TodayResponse,
+} from '@onti/shared'
 import { env } from './env'
 
 /** The API rejected the token: the session is over (Decision 12). Other failures stay generic. */
@@ -42,6 +49,9 @@ export async function request(
   return response.json()
 }
 
+export const post = (path: string, accessToken: string, body?: unknown) =>
+  request('POST', path, accessToken, body)
+
 export async function fetchToday(accessToken: string): Promise<TodayResponse> {
   return todayResponseSchema.parse(await request('GET', '/today', accessToken))
 }
@@ -50,4 +60,21 @@ export async function fetchToday(accessToken: string): Promise<TodayResponse> {
 export async function patchTimezone(accessToken: string, timezone: string): Promise<string> {
   const stored = await request('PATCH', '/me', accessToken, { timezone })
   return timezoneResponseSchema.parse(stored).timezone
+}
+
+/** R7 · the server stamps the time; the client sends only the preset. */
+export async function snoozeNote(
+  accessToken: string,
+  id: string,
+  preset: SnoozePreset,
+): Promise<NoteResponse> {
+  return noteResponseSchema.parse(await post(`/notes/${id}/snooze`, accessToken, { preset }))
+}
+
+export async function markNoteDone(accessToken: string, id: string): Promise<NoteResponse> {
+  return noteResponseSchema.parse(await post(`/notes/${id}/done`, accessToken))
+}
+
+export async function undoNoteDone(accessToken: string, id: string): Promise<NoteResponse> {
+  return noteResponseSchema.parse(await post(`/notes/${id}/undo`, accessToken))
 }
