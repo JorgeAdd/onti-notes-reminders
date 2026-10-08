@@ -75,7 +75,7 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 6: `docs:` size check and verify report (~40 lines)
 
-- [ ] 6.1 Build `main` (`9403f16`) and the branch with `npm run build -w @onti/web`; for `dist/assets/*.css`, `dist/assets/*.js`, `dist/index.html` run `gzip -c <file> | wc -c`; compare by name. Added gzip CSS+JS (incl. inline script) must be <= 3072 B; record both tables in the PR.
+- [x] 6.1 Build `main` (`9403f16`) and the branch with `npm run build -w @onti/web`; for `dist/assets/*.css`, `dist/assets/*.js`, `dist/index.html` run `gzip -c <file> | wc -c`; compare by name. Added gzip CSS+JS (incl. inline script) must be <= 3072 B; record both tables in the PR.
 - [ ] 6.2 Manual smoke (theme x motion x width, no flash, no layout shift, no shadow pop); write the results to `openspec/changes/slice-8-page-entrance-theme/verify-report.md`.
 - [ ] 6.3 `docs/roadmap.md` and `docs/backlog.md`: mark Slice 8 and keep cross-device sync in backlog.
 - [ ] 6.4 `npm run verify` and `npm run build`; commit.
