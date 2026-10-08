@@ -57,6 +57,12 @@ it('renders a hint for each working key, from messages, and nothing else', () =>
   expect(footer).not.toHaveTextContent(messages.statusline.keys.undo)
 })
 
+it('hints c for capture from messages', () => {
+  hinted(['move', 'capture'])
+  expect(screen.getByRole('contentinfo')).toHaveTextContent(messages.statusline.keys.capture)
+  expect(messages.statusline.keys.capture).toBe('c capture')
+})
+
 it('shows the menu keys while a snooze is armed', () => {
   hinted(['hour', 'tomorrow', 'cancel'])
   expect(screen.getByRole('contentinfo')).toHaveTextContent(messages.statusline.keys.cancel)

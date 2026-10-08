@@ -40,6 +40,16 @@ export const messages = {
     hour: (time: string) => `+1 h → ${time}`,
     tomorrow: (time: string) => `Tomorrow → ${time}`,
   },
+  capture: {
+    label: 'Capture a note',
+    placeholder: 'Call back #client-a 17:00',
+    titleRequired: 'Add a title to save this note.',
+    titleTooLong: (max: number) => `Keep the title to ${max} characters or fewer.`,
+    noReminder: 'note, no reminder',
+    today: (time: string) => `today ${time}`,
+    tomorrow: (time: string) => `tomorrow ${time}`,
+    preview: (summary: string) => `→ ${summary}`,
+  },
   statusline: {
     mode: 'NORMAL',
     counts: (today: number, carried: number, total: number) =>
@@ -52,6 +62,7 @@ export const messages = {
       hour: 'h +1 h',
       tomorrow: 't tomorrow',
       cancel: 'esc cancel',
+      capture: 'c capture',
     },
   },
   errors: {
@@ -61,6 +72,7 @@ export const messages = {
       `Could not ${{ snooze: 'snooze', done: 'mark as done', undo: 'undo' }[action]} “${title}”. It is back where it was.`,
     actionConflict: (title: string) =>
       `“${title}” changed on another device. It is back where it was.`,
+    captureFailed: (title: string) => `Could not save “${title}”. Your text is back in the bar.`,
     actionMissing: (title: string) => `“${title}” no longer exists. It is back where it was.`,
   },
 } as const

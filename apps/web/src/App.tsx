@@ -1,9 +1,16 @@
-import type { SnoozePreset } from '@onti/shared'
+import type { CaptureRequest, SnoozePreset } from '@onti/shared'
 import type { Session } from '@supabase/supabase-js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AuthContainer } from './features/auth/AuthContainer'
 import { TodayContainer } from './features/today/TodayContainer'
-import { fetchToday, markNoteDone, patchTimezone, snoozeNote, undoNoteDone } from './lib/api'
+import {
+  captureNote,
+  fetchToday,
+  markNoteDone,
+  patchTimezone,
+  snoozeNote,
+  undoNoteDone,
+} from './lib/api'
 import { supabase } from './lib/supabase'
 
 export function App() {
@@ -35,6 +42,7 @@ export function App() {
       snooze: (id: string, preset: SnoozePreset) => snoozeNote(accessToken ?? '', id, preset),
       done: (id: string) => markNoteDone(accessToken ?? '', id),
       undo: (id: string) => undoNoteDone(accessToken ?? '', id),
+      capture: (payload: CaptureRequest) => captureNote(accessToken ?? '', payload),
     }),
     [accessToken],
   )

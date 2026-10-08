@@ -97,11 +97,11 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 6: Command bar (~360 lines)
 
-- [ ] 6.1 RED then GREEN: `capture-preview.ts` `previewCapture` (C1 text "→ Client A · today 17:00 · in 5h48"; "→ note, no reminder"; invalid cases).
-- [ ] 6.2 RED: `CommandBar` tests: ↵ blocked when invalid; empty/201-char title keeps bar open with hint; esc closes; fade uses `--motion-fade` only; lazy chunk renders.
-- [ ] 6.3 GREEN: `CommandBar` (`React.lazy`), `messages.capture.*`, CSS.
-- [ ] 6.4 RED then GREEN: optimistic insert with temp id, `data-pending`/`aria-busy` dashed rail then solid via `replacesId`, rollback removes row, failed capture reopens typed text; `c` key.
-- [ ] 6.5 `npm run build -w @onti/web`; record main and lazy chunk sizes in the PR.
+- [x] 6.1 RED then GREEN: `capture-preview.ts` `previewCapture` (C1 text "→ Client A · today 17:00 · in 5h48"; "→ note, no reminder"; invalid cases).
+- [x] 6.2 RED: `CommandBar` tests: ↵ blocked when invalid; empty/201-char title keeps bar open with hint; esc closes; fade uses `--motion-fade` only; lazy chunk renders.
+- [x] 6.3 GREEN: `CommandBar` (`React.lazy`), `messages.capture.*`, CSS.
+- [x] 6.4 RED then GREEN: optimistic insert with temp id, `data-pending`/`aria-busy` dashed rail then solid via `replacesId`, rollback removes row, failed capture reopens typed text; `c` key.
+- [x] 6.5 `npm run build -w @onti/web`; record main and lazy chunk sizes in the PR.
 
 ## Commit 7: Mobile + CONTRACT status (~320 lines)
 

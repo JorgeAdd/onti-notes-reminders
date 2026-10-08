@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   ApiError,
+  captureNote,
   fetchToday,
   markNoteDone,
   patchTimezone,
@@ -192,5 +193,50 @@ describe('post and the reminder calls (Decision 10)', () => {
   it('rejects a note that does not match the shared schema', async () => {
     respond(200, { ...note, snoozeCount: 'twice' })
     await expect(snoozeNote('t', ID, 'hour')).rejects.toThrow()
+  })
+})
+
+describe('captureNote (R11)', () => {
+  const saved = {
+    id: ID,
+    title: 'Call back',
+    tags: [{ name: 'Client A', slug: 'client-a' }],
+    dueAt: '2026-10-06T23:00:00.000Z',
+    originalDueAt: '2026-10-06T23:00:00.000Z',
+    snoozeCount: 0,
+    doneAt: null,
+  }
+
+  it('POSTs the structured payload with slugs and an ISO instant, and decodes the note', async () => {
+    const fetchMock = respond(201, saved)
+
+    const note = await captureNote('token-1', {
+      title: 'Call back',
+      tags: ['client-a'],
+      dueAt: new Date('2026-10-06T23:00:00.000Z'),
+    })
+
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect((url as URL).href).toBe('http://localhost:3000/notes')
+    expect(init?.method).toBe('POST')
+    expect(JSON.parse(init?.body as string)).toEqual({
+      title: 'Call back',
+      tags: ['client-a'],
+      dueAt: '2026-10-06T23:00:00.000Z',
+    })
+    expect(note.dueAt).toBeInstanceOf(Date)
+    expect(note.tags).toEqual([{ name: 'Client A', slug: 'client-a' }])
+  })
+
+  it('sends null for a plain note and surfaces a 400 as ApiError', async () => {
+    const fetchMock = respond(201, { ...saved, dueAt: null, originalDueAt: null })
+    const note = await captureNote('t', { title: 'Call back', tags: [], dueAt: null })
+    expect(JSON.parse(fetchMock.mock.calls[0]![1]?.body as string)).toMatchObject({ dueAt: null })
+    expect(note.dueAt).toBeNull()
+
+    respond(400)
+    await expect(captureNote('t', { title: 'x', tags: [], dueAt: null })).rejects.toMatchObject({
+      status: 400,
+    })
   })
 })

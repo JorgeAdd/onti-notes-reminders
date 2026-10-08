@@ -1,5 +1,7 @@
 import type { TodayResponse } from '@onti/shared'
+import { lazy, Suspense } from 'react'
 import { ActionMessage } from './ActionMessage'
+import type { CaptureSubmit } from './capture-preview'
 import { CarriedGroup } from './CarriedGroup'
 import { DateColumn } from './DateColumn'
 import styles from './DayPage.module.css'
@@ -12,6 +14,17 @@ import { Statusline } from './Statusline'
 import { WhichKey } from './WhichKey'
 
 const noop = () => undefined
+
+// Decision 20: the bar and its preview code load on the first `c`, not with the page.
+const CommandBar = lazy(() => import('./CommandBar').then((m) => ({ default: m.CommandBar })))
+
+/** The open command bar: what it starts with and what it reports back. */
+export interface CaptureBar {
+  draft: string
+  notice: string | null
+  onSubmit: (submit: CaptureSubmit) => void
+  onClose: () => void
+}
 
 interface Props {
   today: TodayResponse
@@ -26,6 +39,8 @@ interface Props {
   /** `s` was pressed on an open item: show the which-key menu. */
   snoozeMenu?: boolean
   hints?: KeyHint[] | undefined
+  /** The command bar, when open (`c`). */
+  capture?: CaptureBar | null
 }
 
 /** The page frame: date column, header and the area the day's items fill. */
@@ -38,6 +53,7 @@ export function DayPage({
   rows,
   snoozeMenu = false,
   hints,
+  capture = null,
 }: Props) {
   const carriedCount = today.carried.reduce((sum, group) => sum + group.items.length, 0)
   // Decision 13: total notes derive from the page itself, no extra wire field.
@@ -75,6 +91,11 @@ export function DayPage({
       {snoozeMenu ? <WhichKey now={now} timezone={today.timezone} /> : null}
       {message === null ? null : (
         <ActionMessage message={message} onDismiss={onDismissMessage ?? noop} />
+      )}
+      {capture === null ? null : (
+        <Suspense fallback={null}>
+          <CommandBar now={now} timezone={today.timezone} {...capture} />
+        </Suspense>
       )}
       <Statusline
         now={now}

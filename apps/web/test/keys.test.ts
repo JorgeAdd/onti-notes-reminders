@@ -60,7 +60,10 @@ describe('reduceKey · after s', () => {
 
 describe('availableKeys · only keys that work now', () => {
   it('nothing focused: move only', () => {
-    expect(availableKeys({ hasRows: true, target: null, armed: false })).toEqual(['move'])
+    expect(availableKeys({ hasRows: true, target: null, armed: false })).toEqual([
+      'move',
+      'capture',
+    ])
   })
 
   it('an open item adds x and s', () => {
@@ -68,11 +71,16 @@ describe('availableKeys · only keys that work now', () => {
       'move',
       'done',
       'snooze',
+      'capture',
     ])
   })
 
   it('a done item adds z only', () => {
-    expect(availableKeys({ hasRows: true, target: 'done', armed: false })).toEqual(['move', 'undo'])
+    expect(availableKeys({ hasRows: true, target: 'done', armed: false })).toEqual([
+      'move',
+      'undo',
+      'capture',
+    ])
   })
 
   it('after s: the menu keys and esc', () => {
@@ -83,7 +91,17 @@ describe('availableKeys · only keys that work now', () => {
     ])
   })
 
-  it('an empty page has no hints', () => {
-    expect(availableKeys({ hasRows: false, target: null, armed: false })).toEqual([])
+  it('an empty page can still capture, so c is its only hint', () => {
+    expect(availableKeys({ hasRows: false, target: null, armed: false })).toEqual(['capture'])
+  })
+})
+
+describe('c opens the command bar', () => {
+  it.each([null, 'open', 'done'] as const)('from idle with target %s', (target) => {
+    expect(reduceKey(idle, 'c', target)).toEqual({ state: idle, command: { type: 'capture' } })
+  })
+
+  it('while the snooze menu is armed it only disarms', () => {
+    expect(reduceKey(armed, 'c', 'open')).toEqual({ state: idle, command: null })
   })
 })

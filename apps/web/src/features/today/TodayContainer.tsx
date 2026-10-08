@@ -1,10 +1,11 @@
 import { isValidTimeZone, type TodayResponse } from '@onti/shared'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { UnauthorizedError } from '../../lib/api'
 import { browserTimeZone as readBrowserTimeZone } from '../../lib/browser-timezone'
 import { skewOf } from '../../lib/clock'
-import { DayPage } from './DayPage'
+import type { CaptureSubmit } from './capture-preview'
+import { DayPage, type CaptureBar } from './DayPage'
 import { useReminderActions, type ReminderApi } from './mutations/use-reminder-actions'
 import { useTodayRows } from './use-today-rows'
 import { TodayStatus } from './TodayStatus'
@@ -40,8 +41,30 @@ export function TodayContainer({
   const query = useQuery({ queryKey: ['today'], queryFn: load })
   const { data, dataUpdatedAt, refetch } = query
   const now = useNow(data ? skewOf(data.now, dataUpdatedAt) : 0)
-  const actions = useReminderActions({ api: reminders, now, onSessionExpired })
-  const { rows, armed, hints } = useTodayRows(data, actions)
+  const [bar, setBar] = useState<Pick<CaptureBar, 'draft' | 'notice'> | null>(null)
+  const actions = useReminderActions({
+    api: reminders,
+    now,
+    onSessionExpired,
+    // A failed capture gives the typed text back, with the one-line reason.
+    onCaptureFailed: (text, message) => setBar({ draft: text, notice: message }),
+  })
+  const openBar = useCallback(() => setBar({ draft: '', notice: null }), [])
+  const { rows, armed, hints } = useTodayRows(data, actions, {
+    open: bar !== null,
+    onOpen: openBar,
+  })
+  const captureBar: CaptureBar | null =
+    bar === null
+      ? null
+      : {
+          ...bar,
+          onSubmit: (submit: CaptureSubmit) => {
+            setBar(null)
+            actions.capture(submit)
+          },
+          onClose: () => setBar(null),
+        }
   const windowEnd = data?.window.end.getTime()
   const expired = query.error instanceof UnauthorizedError
 
@@ -79,6 +102,7 @@ export function TodayContainer({
         rows={rows}
         snoozeMenu={armed}
         hints={hints}
+        capture={captureBar}
       />
     )
   }

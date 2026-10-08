@@ -5,6 +5,7 @@ import { at } from '@onti/shared/fixtures/jorge-week'
 import type { ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import {
+  isPendingId,
   useReminderActions,
   type ReminderApi,
 } from '../src/features/today/mutations/use-reminder-actions'
@@ -13,6 +14,14 @@ import { messages } from '../src/messages'
 import { c4Response } from './today-fixture'
 
 const NOW = at('2026-10-07 09:05')
+const CAPTURED = {
+  text: 'Call back #client-a 17:00',
+  capture: {
+    title: 'Call back',
+    tags: [{ slug: 'client-a', name: 'Client A' }],
+    dueAt: at('2026-10-07 17:00'),
+  },
+}
 
 function deferred<T>() {
   let resolve!: (value: T) => void
@@ -37,13 +46,18 @@ const toNote = (item: TodayItem, patch: Partial<NoteResponse> = {}): NoteRespons
   ...patch,
 })
 
-function setup(api: Partial<ReminderApi>, load: () => Promise<TodayResponse>) {
+function setup(
+  api: Partial<ReminderApi>,
+  load: () => Promise<TodayResponse>,
+  onCaptureFailed?: (text: string, message: string) => void,
+) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   const onSessionExpired = vi.fn()
   const fullApi: ReminderApi = {
     snooze: vi.fn(() => Promise.reject(new Error('unexpected snooze'))),
     done: vi.fn(() => Promise.reject(new Error('unexpected done'))),
     undo: vi.fn(() => Promise.reject(new Error('unexpected undo'))),
+    capture: vi.fn(() => Promise.reject(new Error('unexpected capture'))),
     ...api,
   }
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -52,7 +66,7 @@ function setup(api: Partial<ReminderApi>, load: () => Promise<TodayResponse>) {
   const view = renderHook(
     () => ({
       today: useQuery({ queryKey: ['today'], queryFn: load }).data,
-      ...useReminderActions({ api: fullApi, now: NOW, onSessionExpired }),
+      ...useReminderActions({ api: fullApi, now: NOW, onSessionExpired, onCaptureFailed }),
     }),
     { wrapper },
   )
@@ -114,6 +128,73 @@ describe('optimistic write', () => {
     act(() => result.current.undo(standup(result.current.today).id))
 
     await waitFor(() => expect(standup(result.current.today).doneAt).toBeNull())
+  })
+})
+
+describe('capture (SG9, R11)', () => {
+  const rows = (today: TodayResponse | undefined) =>
+    [...today!.carried.flatMap((g) => g.items), ...today!.rail].filter(
+      (i) => i.title === 'Call back',
+    )
+
+  it('inserts a pending row under a temporary id, sends the structured payload, then swaps it for the server note', async () => {
+    const truth = c4Response()
+    const request = deferred<NoteResponse>()
+    const load = vi.fn(() => Promise.resolve(truth))
+    const { result, api } = setup({ capture: vi.fn(() => request.promise) }, load)
+    await waitFor(() => expect(result.current.today).toBeDefined())
+
+    act(() => result.current.capture(CAPTURED))
+
+    await waitFor(() => expect(rows(result.current.today)).toHaveLength(1))
+    const [temp] = rows(result.current.today)
+    expect(isPendingId(temp!.id)).toBe(true)
+    expect(result.current.today!.openCount).toBe(truth.openCount + 1)
+    expect(api.capture).toHaveBeenCalledWith({
+      title: 'Call back',
+      tags: ['client-a'],
+      dueAt: at('2026-10-07 17:00'),
+    })
+
+    const serverId = '99999999-9999-4999-8999-999999999999'
+    load.mockImplementationOnce(() => new Promise(() => undefined))
+    await act(() =>
+      Promise.resolve(
+        request.resolve({
+          id: serverId,
+          title: 'Call back',
+          tags: [{ name: 'Client A', slug: 'client-a' }],
+          dueAt: at('2026-10-07 17:00'),
+          originalDueAt: at('2026-10-07 17:00'),
+          snoozeCount: 0,
+          doneAt: null,
+        }),
+      ),
+    )
+    await waitFor(() => expect(rows(result.current.today).map((i) => i.id)).toEqual([serverId]))
+    expect(result.current.today!.openCount).toBe(truth.openCount + 1)
+  })
+
+  it('a failure removes the row, hands the typed text back and leaves the action line empty', async () => {
+    const truth = c4Response()
+    const request = deferred<NoteResponse>()
+    const load = vi.fn(() => Promise.resolve(truth))
+    const onCaptureFailed = vi.fn()
+    const { result } = setup({ capture: vi.fn(() => request.promise) }, load, onCaptureFailed)
+    await waitFor(() => expect(result.current.today).toBeDefined())
+    act(() => result.current.capture(CAPTURED))
+    await waitFor(() => expect(rows(result.current.today)).toHaveLength(1))
+
+    load.mockImplementationOnce(() => new Promise(() => undefined))
+    await act(() => Promise.resolve(request.reject(new ApiError(400, 'POST /notes'))))
+
+    await waitFor(() => expect(rows(result.current.today)).toHaveLength(0))
+    expect(result.current.today!.openCount).toBe(truth.openCount)
+    expect(onCaptureFailed).toHaveBeenCalledWith(
+      CAPTURED.text,
+      messages.errors.captureFailed('Call back'),
+    )
+    expect(result.current.message).toBeNull()
   })
 })
 

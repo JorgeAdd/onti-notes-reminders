@@ -14,6 +14,7 @@ const noReminders = {
   snooze: () => Promise.reject(new Error('unexpected')),
   done: () => Promise.reject(new Error('unexpected')),
   undo: () => Promise.reject(new Error('unexpected')),
+  capture: () => Promise.reject(new Error('unexpected')),
 }
 
 const noRetry = () => new QueryClient({ defaultOptions: { queries: { retry: false } } })

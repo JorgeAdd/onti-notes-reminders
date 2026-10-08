@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react'
 import { messages } from '../../messages'
 import { clockTime, originalLabel, relativeLabel } from './format'
 import styles from './ItemRow.module.css'
+import { isPendingId } from './mutations/use-reminder-actions'
 import { IDLE_ROWS, type RowsState } from './rows'
 
 interface Props {
@@ -28,6 +29,7 @@ export function ItemRow({ item, now, timezone, rows = IDLE_ROWS }: Props) {
   }, [focused])
 
   const done = item.doneAt !== null
+  const pending = isPendingId(item.id)
   const snoozed = item.snoozeCount > 0
   const late = relativeTo(item.dueAt, now).kind === 'late'
   const changed = rows.changed?.id === item.id ? rows.changed.kind : undefined
@@ -49,6 +51,8 @@ export function ItemRow({ item, now, timezone, rows = IDLE_ROWS }: Props) {
         states.join(', ') || messages.today.stateOpen,
       )}
       tabIndex={rows.tabStopId === item.id ? 0 : -1}
+      aria-busy={pending ? 'true' : undefined}
+      data-pending={pending ? 'true' : undefined}
       data-focused={focused ? 'true' : undefined}
       data-changed={changed}
       onClick={() => rows.onFocusRow(item.id)}

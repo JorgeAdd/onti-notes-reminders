@@ -8,7 +8,9 @@ export type KeyCommand =
   | { type: 'done' }
   | { type: 'undo' }
   | { type: 'snooze'; preset: SnoozePreset }
-export type KeyHint = 'move' | 'done' | 'undo' | 'snooze' | 'hour' | 'tomorrow' | 'cancel'
+  | { type: 'capture' }
+export type KeyHint =
+  'move' | 'done' | 'undo' | 'snooze' | 'hour' | 'tomorrow' | 'cancel' | 'capture'
 
 export const SNOOZE_KEYS = { hour: 'h', tomorrow: 't' } as const
 
@@ -31,6 +33,7 @@ export function reduceKey(
   if (key === 'j' || key === 'k') {
     return { state: idle, command: { type: 'move', delta: key === 'j' ? 1 : -1 } }
   }
+  if (key === 'c') return { state: idle, command: { type: 'capture' } }
   if (key === 'x' && target === 'open') return { state: idle, command: { type: 'done' } }
   if (key === 'z' && target === 'done') return { state: idle, command: { type: 'undo' } }
   if (key === 's' && target === 'open') return { state: { pending: 's' }, command: null }
@@ -43,9 +46,9 @@ export function availableKeys(context: {
   target: Target
   armed: boolean
 }): KeyHint[] {
-  if (!context.hasRows) return []
+  if (!context.hasRows) return ['capture']
   if (context.armed) return ['hour', 'tomorrow', 'cancel']
-  if (context.target === 'open') return ['move', 'done', 'snooze']
-  if (context.target === 'done') return ['move', 'undo']
-  return ['move']
+  if (context.target === 'open') return ['move', 'done', 'snooze', 'capture']
+  if (context.target === 'done') return ['move', 'undo', 'capture']
+  return ['move', 'capture']
 }

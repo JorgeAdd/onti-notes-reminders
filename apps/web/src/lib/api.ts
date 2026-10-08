@@ -1,5 +1,6 @@
 import {
   noteResponseSchema,
+  type CaptureRequest,
   timezoneResponseSchema,
   todayResponseSchema,
   type NoteResponse,
@@ -77,4 +78,12 @@ export async function markNoteDone(accessToken: string, id: string): Promise<Not
 
 export async function undoNoteDone(accessToken: string, id: string): Promise<NoteResponse> {
   return noteResponseSchema.parse(await post(`/notes/${id}/undo`, accessToken))
+}
+
+/** R11 · the structured result of the preview: title, tag slugs and a minute-aligned due instant. */
+export async function captureNote(
+  accessToken: string,
+  capture: CaptureRequest,
+): Promise<NoteResponse> {
+  return noteResponseSchema.parse(await post('/notes', accessToken, capture))
 }

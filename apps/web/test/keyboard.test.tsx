@@ -21,6 +21,7 @@ function setup(today: TodayResponse = c4Response(), api: Partial<ReminderApi> = 
     snooze: vi.fn(pending),
     done: vi.fn(pending),
     undo: vi.fn(pending),
+    capture: vi.fn(pending),
     ...api,
   }
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
