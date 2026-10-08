@@ -1,6 +1,7 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { expect, it, vi } from 'vitest'
 import { DayPage } from '../src/features/today/DayPage'
+import { useNow } from '../src/features/today/use-now'
 import { messages } from '../src/messages'
 import { c4Response } from './today-fixture'
 
@@ -51,4 +52,68 @@ it('offers a sign-out control in the date column', () => {
 it('never renders internal note ids', () => {
   renderPage()
   expect(document.body.textContent).not.toMatch(/\bN\d{1,2}\b/)
+})
+
+it('C4: carried group, rail items with labels, statusline counts (R3, R2, R6)', () => {
+  renderPage()
+  const main = screen.getByRole('main')
+  expect(within(main).getByRole('region', { name: 'Still open from Tue 6' })).toBeInTheDocument()
+  expect(within(main).getByText('late 15h05')).toBeInTheDocument()
+  expect(within(main).getByText('late 14h35')).toBeInTheDocument()
+  expect(within(main).getByText('in 25 min')).toBeInTheDocument()
+  expect(within(main).getByText('in 6h55')).toBeInTheDocument()
+  expect(screen.getByRole('contentinfo')).toHaveTextContent('4 today · 2 carried · 15 notes')
+})
+
+it('renders the empty page with calm copy, header, date block and statusline', () => {
+  renderPage({
+    ...c4Response(),
+    openCount: 0,
+    anyDoneToday: false,
+    carried: [],
+    rail: [],
+    otherCount: 3,
+  })
+  expect(screen.getByRole('main')).toHaveTextContent('Nothing today')
+  expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+  expect(screen.getByRole('complementary')).toBeInTheDocument()
+  expect(screen.getByRole('contentinfo')).toHaveTextContent('0 today · 0 carried · 3 notes')
+})
+
+it('reads "No notes yet" for an account with nothing at all', () => {
+  renderPage({ ...c4Response(), openCount: 0, carried: [], rail: [], otherCount: 0 })
+  expect(screen.getByRole('main')).toHaveTextContent('No notes yet')
+})
+
+it('strikes a done item and counts it in the "left today" header (C3)', () => {
+  const today = c4Response()
+  const [first, ...rest] = today.rail
+  renderPage({
+    ...today,
+    openCount: 3,
+    anyDoneToday: true,
+    rail: [{ ...first!, doneAt: today.now }, ...rest],
+  })
+  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('3 left today')
+  expect(screen.getByText(first!.title).closest('s')).not.toBeNull()
+})
+
+it('ticks: "in 25 min" reads "in 24 min" and the clock steps at the minute (C7)', () => {
+  vi.useFakeTimers()
+  vi.setSystemTime(c4Response().now)
+  function Live() {
+    const ticking = useNow(0)
+    return <DayPage today={c4Response()} now={ticking} onSignOut={() => undefined} />
+  }
+  render(<Live />)
+  expect(screen.getByText('in 25 min')).toBeInTheDocument()
+  expect(screen.getByText('late 15h05')).toBeInTheDocument()
+  expect(screen.getByRole('contentinfo')).toHaveTextContent('09:05')
+
+  act(() => void vi.advanceTimersByTime(60_000))
+
+  expect(screen.getByText('in 24 min')).toBeInTheDocument()
+  expect(screen.getByText('late 15h06')).toBeInTheDocument()
+  expect(screen.getByRole('contentinfo')).toHaveTextContent('09:06')
+  vi.useRealTimers()
 })
