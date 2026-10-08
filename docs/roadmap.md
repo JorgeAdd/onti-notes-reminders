@@ -10,12 +10,13 @@ yet specified), **Proposed** (inferred from the v1 scope, not yet agreed).
 | Slice | Theme                                   | Status   |
 | ----- | --------------------------------------- | -------- |
 | 1     | Read-only Today page                    | Done     |
-| 2     | Timezone, capture, snooze and done/undo | Named    |
+| 2     | Timezone, capture, snooze and done/undo | Done     |
 | 3     | Day navigation and tag filter           | Named    |
 | 4     | Note editing and markdown               | Proposed |
 | 5     | All notes and search                    | Proposed |
 | 6     | Web Push notifications                  | Proposed |
 | 7     | Merged into slice 2                     | —        |
+| 8     | Page entrance and theme override        | Named    |
 
 ## Slice 1 — Read-only Today page
 
@@ -25,6 +26,10 @@ hour rail with a now line. Archived at
 in `docs/backlog.md`.
 
 ## Slice 2 — Timezone, capture, snooze and done/undo
+
+Done 2026-10-08. Archived at
+`openspec/changes/archive/2026-10-08-slice-2-capture-snooze/`. Scope as
+shipped:
 
 - **First:** store the browser's IANA timezone in `profiles.timezone` on first
   login (R16), validated by the API. Capture (R11), snooze (R7) and the day
@@ -38,8 +43,6 @@ in `docs/backlog.md`.
 - Optimistic mutations on the Today page (anticipated in slice 1 design,
   decision 6).
 - DST transitions covered by tests.
-
-_Pending: product sync._
 
 ## Slice 3 — Day navigation and tag filter
 
@@ -58,7 +61,6 @@ note lifecycle.
 - Edit and delete notes.
 - Manual reschedule and reminder removal (R8).
 - Basic markdown body, always sanitized; raw HTML is never rendered (R14).
-- Manual theme override UI (`docs/backlog.md`).
 
 ## Slice 5 — All notes and search (proposed)
 
@@ -76,6 +78,15 @@ note lifecycle.
 Timezone-on-first-login was named slice 7 in slice 1's artifacts. It moved to
 the start of slice 2 because capture and snooze depend on it.
 
-## Unassigned
+## Slice 8 — Page entrance and theme override
 
-- Welcome / onboarding (out of slice 1, no slice yet).
+Brief: `docs/design/landing-brief.md` (binding). Style guide: SG19, SG18.
+
+- A quiet sheet entrance of about 300 ms on every full page load (Today
+  and the sign-in card), CSS-only, with a reduced-motion fallback (SG16).
+- Only the desk renders while the session or Today's data is pending;
+  `TodayStatus` appears only on error or after about 400 ms.
+- Manual theme override (moved from slice 4): System / Light / Dark,
+  stored in `localStorage` and applied before first paint by an inline
+  script in `index.html`.
+- Budget: ≤ 3 kB gzipped of added CSS and JS, no new dependency.

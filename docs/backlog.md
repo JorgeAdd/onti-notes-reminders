@@ -6,7 +6,7 @@ Deferred items and future enhancements, sourced from slice 1 verification and de
 
 ### Manual theme override UI
 
-Design decision 14 noted; UI deferred to future slice. Now assigned to Slice 4 (`docs/roadmap.md`).
+Design decision 14 noted; UI deferred to future slice. Moved from Slice 4 to Slice 8 (page entrance and theme override), because the stored theme must apply before the entrance's first paint (`docs/design/landing-brief.md`, decisions 22–30).
 _Source: slice 1 verify report_
 
 ### Automated proof for themes and mobile layouts
@@ -23,6 +23,13 @@ _Source: slice 1 verify report_
 
 Unit tests and manual verification passed; automated database-level integration test is future work.
 _Source: slice 1 verify report_
+
+## Deferred from Slice 8
+
+### Theme sync across devices
+
+The theme override is stored per device in `localStorage`. Syncing it through the profile (a new column, an API field and a merge rule against the local value) is future work.
+_Source: `docs/design/landing-brief.md`, decision 23_
 
 ## Suggestions
 
