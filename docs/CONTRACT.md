@@ -79,7 +79,10 @@ timezone; `start(d)` is local midnight of day `d`.
   Missing or invalid token → `401`.
 - **R16 · Time storage.** Instants are stored in UTC; everything shown or
   computed "per day" uses the profile timezone. A nonexistent local time
-  (DST gap) resolves to the first valid instant after it.
+  (DST gap) resolves to the first valid instant after it (02:30 on
+  2026-03-08 in America/New_York is 03:00 EDT). An ambiguous local time
+  (DST fall-back overlap) resolves to its first occurrence (01:30 on
+  2026-11-01 in America/New_York is 01:30 EDT, 05:30Z).
 - **R17 · Missed (v2, documented now).** A reminder is missed when
   `done_at is null` and `now >= original_due_at + 24 h`. Snoozing does not
   reset it; that is why `original_due_at` exists.
