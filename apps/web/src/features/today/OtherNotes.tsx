@@ -37,7 +37,7 @@ export function OtherNotes({ items, tag, timezone }: Props) {
               {item.doneAt === null ? title : <s className={styles.done}>{title}</s>}
               <span className={styles.meta}>
                 {item.tags.map((t) => (
-                  <span key={t.slug}>#{t.slug}</span>
+                  <span key={t.slug}>{messages.filter.chip(t.slug)}</span>
                 ))}
               </span>
             </li>
