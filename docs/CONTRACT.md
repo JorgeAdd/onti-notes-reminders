@@ -44,8 +44,10 @@ timezone; `start(d)` is local midnight of day `d`.
 - **R8 · Manual reschedule.** Setting a due time by hand sets `due_at` and
   `original_due_at` to the new value and `snooze_count := 0`. Removing the
   reminder clears all reminder fields.
-- **R9 · Done / undo.** Done: `done_at := now`. Undo: `done_at := null`.
-  Done never touches `due_at`.
+- **R9 · Done / undo.** Done: `done_at := now`. Done on an already-done
+  note keeps the first `done_at`. Done on a note without a reminder is a
+  conflict (an error, `409` over HTTP). Undo: `done_at := null`; undo on an
+  open note changes nothing. Done never touches `due_at`.
 - **R10 · Notification.** Sent once per `due_at` value, when
   `due_at <= now`, `done_at is null` and
   `notified_due_at is distinct from due_at`; then

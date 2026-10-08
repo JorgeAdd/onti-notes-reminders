@@ -90,4 +90,15 @@ describe('R8–R9 · lifecycle', () => {
   it('a note without a reminder cannot be done', () => {
     expect(() => markDone(NO_REMINDER, at('2026-10-06 17:00'))).toThrow()
   })
+
+  it('done on an already-done note keeps the first done_at', () => {
+    const first = at('2026-10-06 17:00')
+    const done = markDone(reschedule(NO_REMINDER, at('2026-10-06 16:00')), first)
+    expect(markDone(done, at('2026-10-06 18:30')).doneAt).toEqual(first)
+  })
+
+  it('done never touches due_at', () => {
+    const open = reschedule(NO_REMINDER, at('2026-10-06 16:00'))
+    expect(markDone(open, at('2026-10-06 17:00')).dueAt).toEqual(at('2026-10-06 16:00'))
+  })
 })

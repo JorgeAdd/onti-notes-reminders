@@ -64,9 +64,10 @@ export function reschedule(reminder: Reminder, dueAt: Date): ScheduledReminder {
   return { ...reminder, dueAt, originalDueAt: dueAt, snoozeCount: 0, doneAt: null }
 }
 
-/** R9 */
+/** R9 · done on a done note keeps the first `doneAt`. */
 export function markDone(reminder: Reminder, now: Date): Reminder {
   if (!hasReminder(reminder)) throw new Error('A note without a reminder cannot be done')
+  if (reminder.doneAt !== null) return reminder
   return { ...reminder, doneAt: now }
 }
 
