@@ -104,7 +104,7 @@ Slice 2 implements timezone sync for user profiles, quick capture from one-line 
 **Process Notes**:
 
 - Attempt ledger required three maintainer resets (line budgets did not count strict-TDD tests and SDD docs initially)
-- Roadmap PR #10 (theme override → slice 4, onboarding → slice 3) is separate and still open
+- Roadmap PR #10 (only the theme override → slice 4) is separate and merged; slice 3 is day navigation and tag filter
 - All 13 conventional commits, zero Co-Authored-By lines
 
 ## Engram Artifacts (Hybrid Mode Traceability)

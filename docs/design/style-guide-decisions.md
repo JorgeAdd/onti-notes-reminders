@@ -23,3 +23,13 @@ Boards live in `chosen/`; token names refer to `apps/web/src/styles/tokens.css`.
 | SG16 | Reduced motion         | **Nothing travels; only opacity, ≤ 150 ms.** Tear-off → 150 ms cross-fade; strike appears at once; snooze re-places instantly and focus follows.                                                                                                                                                                                      | Removing all feedback (state changes become hard to notice).                                                                                      | `00`            |
 | SG17 | Notifications          | Title "HH:MM · <note title>", body = the note's first lines + tag, actions **Done** and **+1 h**. App name "Notes + Reminders". **No internal IDs anywhere in the UI.**                                                                                                                                                               | A generic "You have a reminder" (loses the context, which is the product's core idea).                                                            | `02`, `08`      |
 | SG18 | Theme                  | Follows the system setting by default, with a manual override. Same layout in both themes; only semantic tokens change.                                                                                                                                                                                                               | Dark-only (the brief asks for both).                                                                                                              | `07`–`12`       |
+
+## Recorded deviations
+
+### Board 04 (Thu 14:30, `#client-b` filter), slice 3
+
+Slice 3 implements the tag filter with these deliberate differences from board 04:
+
+- **Header keeps CONTRACT R12.** It reads "{n} notes" and the muted line reads "{total − n} notes hidden". The board's alternative header wording is not used.
+- **Only the statusline mode is borrowed.** `FILTER · #client-b` is taken from the board as is.
+- **No "NO DATE" label.** Notes without a date are listed under "Other notes with #client-b" and show no date text, per SG8 ("N other notes", not a label of what they are). Dated notes show their date and time.
