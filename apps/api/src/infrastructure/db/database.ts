@@ -19,6 +19,11 @@ export interface Database {
     snooze_count: Generated<number>
     done_at: Date | null
     notified_due_at: Date | null
+    /** Defaults to '' on insert. */
+    body: Generated<string>
+    created_at: ColumnType<Date, never, never>
+    /** Generated tsvector (`simple`, title + body); read in `where`, never written. */
+    search: ColumnType<string, never, never>
   }
   tags: {
     id: Generated<string>

@@ -57,13 +57,13 @@ Global checks for every commit:
 
 ### Commit 2: `feat(api):` shared contract, port, adapter, use case (~388 lines)
 
-- [ ] 2.1 `docs/CONTRACT.md`: add "max 50, newest first, no pagination or highlighting" to R13 first (rule 23).
-- [ ] 2.2 RED: `packages/shared/test/notes-list.test.ts`: `z.encode` round trip, 51 notes rejected, excerpt 121 rejected, `q` 201 rejected, emoji-heavy body via `excerptOf` passes `notesListResponseSchema`.
-- [ ] 2.3 GREEN: `packages/shared/src/notes-list.ts` (`SEARCH_LIMITS`, `notesQuerySchema`, `noteListItemSchema`, `notesListResponseSchema`); export at the END of `index.ts`.
-- [ ] 2.4 RED: `apps/api/test/search-notes.test.ts`: C9 on `jorge-week` + N1/N8 bodies (`staging`, `STAGING`, `stag` give N2 and N8), body-only (`collaborators` gives N1), AND of terms, empty `q` newest first, cap 50 with total 60, `total` not narrowed (2 matches / total 15; no match / total 15), R15 (Ana sees 0 of Jorge's), operator input never throws, tz fallback `UTC`, clock read once. No assertions on `client`, `example`, `web`.
-- [ ] 2.3b GREEN: `application/ports.ts` (`NoteListRow`, `searchOwn`, appended), `test/fakes.ts` (`InMemoryNotes.searchOwn`, one-line `failingNotes` update), `application/search-notes.ts`.
-- [ ] 2.5 GREEN: `infrastructure/db/database.ts` (`body`, `created_at`, `search` columns) and `postgres-note-repository.ts` `searchOwn` + `tsqueryOf` (bound parameter, per-term `/^[\p{L}\p{N}]+$/u` re-check).
-- [ ] 2.6 `npm run verify`; commit.
+- [x] 2.1 `docs/CONTRACT.md`: add "max 50, newest first, no pagination or highlighting" to R13 first (rule 23).
+- [x] 2.2 RED: `packages/shared/test/notes-list.test.ts`: `z.encode` round trip, 51 notes rejected, excerpt 121 rejected, `q` 201 rejected, emoji-heavy body via `excerptOf` passes `notesListResponseSchema`.
+- [x] 2.3 GREEN: `packages/shared/src/notes-list.ts` (`SEARCH_LIMITS`, `notesQuerySchema`, `noteListItemSchema`, `notesListResponseSchema`); export at the END of `index.ts`.
+- [x] 2.4 RED: `apps/api/test/search-notes.test.ts`: C9 on `jorge-week` + N1/N8 bodies (`staging`, `STAGING`, `stag` give N2 and N8), body-only (`collaborators` gives N1), AND of terms, empty `q` newest first, cap 50 with total 60, `total` not narrowed (2 matches / total 15; no match / total 15), R15 (Ana sees 0 of Jorge's), operator input never throws, tz fallback `UTC`, clock read once. No assertions on `client`, `example`, `web`.
+- [x] 2.3b GREEN: `application/ports.ts` (`NoteListRow`, `searchOwn`, appended), `test/fakes.ts` (`InMemoryNotes.searchOwn`, one-line `failingNotes` update), `application/search-notes.ts`.
+- [x] 2.5 GREEN: `infrastructure/db/database.ts` (`body`, `created_at`, `search` columns) and `postgres-note-repository.ts` `searchOwn` + `tsqueryOf` (bound parameter, per-term `/^[\p{L}\p{N}]+$/u` re-check).
+- [x] 2.6 `npm run verify`; commit.
 
 ### Commit 3: `test(api):` real-Postgres characterization (~183 lines)
 

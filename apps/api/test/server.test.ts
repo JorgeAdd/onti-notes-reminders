@@ -57,6 +57,7 @@ const failingNotes: NoteRepository = {
   createOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
   listOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
   mutateReminder: () => Promise.reject(new Error('connection refused: postgres://secret')),
+  searchOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
 }
 
 /** N1 (index 0) is done; N2 (index 1) is the late open item due Tue 18:00. */

@@ -40,3 +40,12 @@ export * from './domain/reminder'
 export * from './domain/tag'
 export * from './domain/time'
 export { CAPTURE_LIMITS, isValidTimeZone } from './timezone'
+export {
+  noteListItemSchema,
+  notesListResponseSchema,
+  notesQuerySchema,
+  SEARCH_LIMITS,
+  type NoteListItem,
+  type NotesListResponse,
+  type NotesQuery,
+} from './notes-list'
