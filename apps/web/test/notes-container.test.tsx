@@ -243,6 +243,17 @@ it('# opens the slice 3 tag bar with the tags of the list, also from the search 
   expect(footer()).toHaveTextContent(messages.notes.hints.tags)
 })
 
+it('drops the / search hint while the tag bar is open, as / is disabled then', async () => {
+  renderNotes(byTag)
+  const box = await input()
+  fireEvent.blur(box)
+  expect(footer()).toHaveTextContent(messages.notes.hints.search)
+  fireEvent.keyDown(document.body, { key: '#' })
+
+  await bar()
+  expect(footer()).not.toHaveTextContent(messages.notes.hints.search)
+})
+
 it('applies a tag: the load carries it, the list narrows and the statusline shows it', async () => {
   byTag.mockClear()
   renderNotes(byTag)

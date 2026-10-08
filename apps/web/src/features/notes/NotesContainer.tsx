@@ -119,7 +119,7 @@ export function NotesContainer({ load, onSessionExpired, onBack, onSignOut }: Pr
   )
   const exit: NotesHint = tag === null ? 'back' : 'clear'
   const hints: NotesHint[] = [
-    ...(inputFocused ? [] : (['search'] as const)),
+    ...(inputFocused || tagBarOpen ? [] : (['search'] as const)),
     ...(canTag ? (['tags'] as const) : []),
     exit,
   ]
