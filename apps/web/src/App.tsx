@@ -1,6 +1,6 @@
 import type { CaptureRequest, SnoozePreset } from '@onti/shared'
 import type { Session } from '@supabase/supabase-js'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import type { DayView } from './features/today/day-view'
 import { AuthContainer } from './features/auth/AuthContainer'
 import { TodayContainer } from './features/today/TodayContainer'
@@ -9,15 +9,22 @@ import {
   fetchToday,
   markNoteDone,
   patchTimezone,
+  searchNotes,
   snoozeNote,
   undoNoteDone,
 } from './lib/api'
 import { supabase } from './lib/supabase'
 
+// The All notes view loads on demand (Decision 7); an idle preload makes `/` instant.
+const importNotes = () => import('./features/notes/NotesContainer')
+const NotesContainer = lazy(() => importNotes().then((m) => ({ default: m.NotesContainer })))
+
 export function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [ready, setReady] = useState(false)
   const [expired, setExpired] = useState(false)
+  // Two views, no router and no URL state (Q6): a refresh returns to today.
+  const [view, setView] = useState<'today' | 'notes'>('today')
 
   useEffect(() => {
     supabase.auth
@@ -32,8 +39,26 @@ export function App() {
     return () => data.subscription.unsubscribe()
   }, [])
 
+  // Signing out resets the view (adjusted while rendering, not in an effect).
+  if (session === null && view !== 'today') setView('today')
+
   const accessToken = session?.access_token
-  const load = useCallback((view: DayView) => fetchToday(accessToken ?? '', view), [accessToken])
+  useEffect(() => {
+    if (!accessToken) return
+    const preload = () => void importNotes()
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(preload)
+      return () => window.cancelIdleCallback(id)
+    }
+    const timer = setTimeout(preload, 2000)
+    return () => clearTimeout(timer)
+  }, [accessToken])
+  const load = useCallback((day: DayView) => fetchToday(accessToken ?? '', day), [accessToken])
+  const loadNotes = useCallback(
+    (term: string) => searchNotes(accessToken ?? '', term),
+    [accessToken],
+  )
+  const showToday = useCallback(() => setView('today'), [])
   const syncTimezone = useCallback(
     (timezone: string) => patchTimezone(accessToken ?? '', timezone),
     [accessToken],
@@ -59,15 +84,24 @@ export function App() {
   }, [signOut])
 
   if (!ready) return null
-  return session ? (
+  if (!session) return <AuthContainer expired={expired} />
+  return view === 'notes' ? (
+    <Suspense fallback={null}>
+      <NotesContainer
+        load={loadNotes}
+        onSessionExpired={onSessionExpired}
+        onBack={showToday}
+        onSignOut={signOut}
+      />
+    </Suspense>
+  ) : (
     <TodayContainer
       load={load}
       onSessionExpired={onSessionExpired}
       onSignOut={signOut}
       syncTimezone={syncTimezone}
       reminders={reminders}
+      onOpenSearch={() => setView('notes')}
     />
-  ) : (
-    <AuthContainer expired={expired} />
   )
 }

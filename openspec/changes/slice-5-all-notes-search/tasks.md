@@ -104,10 +104,10 @@ Global checks for every commit:
 
 ### Commit 8: `feat(web):` entry points (~221 lines, HIGH risk)
 
-- [ ] 8.1 RED: `notes-view.test.tsx` and `mobile-bar.test.tsx`: `/` opens and focuses; `esc` and "Back to today" return; `/` ignored in capture bar and while `s` armed; `x`, `s`, `z` in notes view change nothing and send no request; Today hint lists `/ search` also with no rows (bar null, sheet null, not armed); mobile Search opens; `MobileBar` renders by handler; sign-out resets view.
-- [ ] 8.2 GREEN: `App.tsx` (`view` state, `React.lazy`, idle preload, `Suspense fallback={null}`); `TodayContainer` `/` hook + `search` hint; `keys.ts` `KeyHint 'search'` (one line); `DayPage`/`MobileBar` `onSearch`; `messages.ts` `mobile.search`, `statusline.keys.search`.
-- [ ] 8.3 If slice 3 has already merged, rebase first (see 9.0) and take its `MobileBar` by-handler version; otherwise include the by-handler change here.
-- [ ] 8.4 `npm run verify`; record `vite build` sizes (main vs 591.44 kB baseline, lazy chunk); commit.
+- [x] 8.1 RED: `notes-view.test.tsx` and `mobile-bar.test.tsx`: `/` opens and focuses; `esc` and "Back to today" return; `/` ignored in capture bar and while `s` armed; `x`, `s`, `z` in notes view change nothing and send no request; Today hint lists `/ search` also with no rows (bar null, sheet null, not armed); mobile Search opens; `MobileBar` renders by handler; sign-out resets view.
+- [x] 8.2 GREEN: `App.tsx` (`view` state, `React.lazy`, idle preload, `Suspense fallback={null}`); `TodayContainer` `/` hook + `search` hint; `keys.ts` `KeyHint 'search'` (one line); `DayPage`/`MobileBar` `onSearch`; `messages.ts` `mobile.search`, `statusline.keys.search`.
+- [x] 8.3 If slice 3 has already merged, rebase first (see 9.0) and take its `MobileBar` by-handler version; otherwise include the by-handler change here.
+- [x] 8.4 `npm run verify`; record `vite build` sizes (main vs 591.44 kB baseline, lazy chunk); commit.
 - [ ] 8.5 Manual smoke at 1280x720 and 375x667 (`/`, `staging` gives N2 and N8, `collaborators` gives N1, esc, mobile Search, reduced motion). Note the missing design board for visual confirmation.
 
 ## Batch 3 (commit 9, ~263 lines, own batch after the rebase)

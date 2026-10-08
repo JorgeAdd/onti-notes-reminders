@@ -2,23 +2,31 @@ import { messages } from '../../messages'
 import styles from './MobileBar.module.css'
 
 interface Props {
-  onCapture: () => void
-  /** Rendered only when given. Append-only: a later slice adds Search before Tags. */
+  /** Each button renders only when its handler exists. */
+  onSearch?: (() => void) | undefined
   onTags?: (() => void) | undefined
+  onCapture?: (() => void) | undefined
 }
 
-/** SG14 · the bottom bar on a phone: [Search?] [Tags?] "+ Capture". Each button exists only when its handler does. */
-export function MobileBar({ onCapture, onTags }: Props) {
+/** SG14 · the bottom bar on a phone: [Search?] [Tags?] [+ Capture?]. Each button exists only when its handler does. */
+export function MobileBar({ onSearch, onTags, onCapture }: Props) {
   return (
     <nav className={styles.bar}>
+      {onSearch ? (
+        <button type="button" className={styles.search} onClick={onSearch}>
+          {messages.mobile.search}
+        </button>
+      ) : null}
       {onTags ? (
         <button type="button" className={styles.secondary} onClick={onTags}>
           {messages.mobile.tags}
         </button>
       ) : null}
-      <button type="button" className={styles.capture} onClick={onCapture}>
-        {messages.mobile.capture}
-      </button>
+      {onCapture ? (
+        <button type="button" className={styles.capture} onClick={onCapture}>
+          {messages.mobile.capture}
+        </button>
+      ) : null}
     </nav>
   )
 }

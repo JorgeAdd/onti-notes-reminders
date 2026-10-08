@@ -1,8 +1,9 @@
 import type { NotesListResponse } from '@onti/shared'
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { UnauthorizedError } from '../../lib/api'
 import { skewOf } from '../../lib/clock'
+import { useKeyboardLayer } from '../today/use-keyboard-layer'
 import { useNow } from '../today/use-now'
 import { NoteList } from './NoteList'
 import { NotesPage } from './NotesPage'
@@ -37,6 +38,7 @@ interface Shown {
 export function NotesContainer({ load, onSessionExpired, onBack, onSignOut }: Props) {
   const [text, setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
   const term = useDebouncedValue(text.trim(), SEARCH_DEBOUNCE_MS)
   const query = useQuery({ queryKey: ['notes', term], queryFn: () => load(term) })
   const [shown, setShown] = useState<Shown | null>(null)
@@ -45,6 +47,17 @@ export function NotesContainer({ load, onSessionExpired, onBack, onSignOut }: Pr
     setShown({ data: query.data, term, receivedAt: query.dataUpdatedAt })
   }
   const now = useNow(shown ? skewOf(shown.data.now, shown.receivedAt) : 0)
+
+  // `esc` leaves from anywhere (Q6), but not while an IME composes; `/` outside the input comes
+  // back to it. Typing is never intercepted, and no other key does anything here (rows are read-only).
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && !event.isComposing && !event.defaultPrevented) onBack()
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [onBack])
+  useKeyboardLayer(true, (key) => (key === '/' ? (inputRef.current?.focus(), true) : false))
 
   const expired = query.error instanceof UnauthorizedError
   useEffect(() => {
@@ -77,6 +90,7 @@ export function NotesContainer({ load, onSessionExpired, onBack, onSignOut }: Pr
     <NotesPage
       now={now}
       timezone={data.timezone}
+      inputRef={inputRef}
       term={text}
       onTermChange={setText}
       onInputFocusChange={setInputFocused}

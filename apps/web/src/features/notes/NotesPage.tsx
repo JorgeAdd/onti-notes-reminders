@@ -1,5 +1,5 @@
 import { localCalendarDate } from '@onti/shared'
-import type { ReactNode } from 'react'
+import type { ReactNode, RefObject } from 'react'
 import { messages } from '../../messages'
 import { DateColumn } from '../today/DateColumn'
 import styles from './NotesPage.module.css'
@@ -9,6 +9,7 @@ import { SearchStatusline, type NotesHint } from './SearchStatusline'
 interface Props {
   now: Date
   timezone: string
+  inputRef: RefObject<HTMLInputElement | null>
   term: string
   onTermChange: (term: string) => void
   onInputFocusChange: (focused: boolean) => void
@@ -25,6 +26,7 @@ interface Props {
 export function NotesPage({
   now,
   timezone,
+  inputRef,
   term,
   onTermChange,
   onInputFocusChange,
@@ -59,7 +61,12 @@ export function NotesPage({
         </main>
       </div>
       <div className={styles.dock}>
-        <SearchInput value={term} onChange={onTermChange} onFocusChange={onInputFocusChange} />
+        <SearchInput
+          inputRef={inputRef}
+          value={term}
+          onChange={onTermChange}
+          onFocusChange={onInputFocusChange}
+        />
         <SearchStatusline
           now={now}
           timezone={timezone}

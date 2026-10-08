@@ -78,6 +78,8 @@ interface Props {
   /** Phone width: bottom "+ Capture" bar, presets in the command bar, and the row-tap sheet. */
   mobile?: boolean
   onOpenCapture?: () => void
+  /** `/` or the phone's Search button: leave for All notes. */
+  onOpenSearch?: (() => void) | undefined
   sheet?: SheetState | null
   /** D5 · set while the viewed day loads: the day to show instead of the previous page's. */
   loading?: { date: string; isToday: boolean; tag: string | null } | null
@@ -102,6 +104,7 @@ export function DayPage({
   capture = null,
   mobile = false,
   onOpenCapture = noop,
+  onOpenSearch,
   sheet = null,
   loading = null,
   nav,
@@ -187,7 +190,7 @@ export function DayPage({
         )}
         {sheet === null ? null : <ActionSheet now={now} timezone={today.timezone} {...sheet} />}
         {mobile && capture === null && sheet === null && tagBar === null ? (
-          <MobileBar onCapture={onOpenCapture} onTags={onOpenTags} />
+          <MobileBar onSearch={onOpenSearch} onTags={onOpenTags} onCapture={onOpenCapture} />
         ) : null}
         <Statusline
           now={now}

@@ -59,7 +59,7 @@ export const messages = {
       when === null ? title : `${title}, ${when}`,
     hiddenNotice: (slug: string) => `Saved. It does not carry #${slug}, so the filter hides it.`,
   },
-  mobile: { capture: '+ Capture', tags: 'Tags' },
+  mobile: { capture: '+ Capture', tags: 'Tags', search: 'Search' },
   actionSheet: {
     label: (title: string) => `Actions for ${title}`,
     done: 'Done',
@@ -103,6 +103,7 @@ export const messages = {
       today: 't today',
       tags: '# tag',
       clear: 'esc clear filter',
+      search: '/ search',
     },
   },
   errors: {
