@@ -67,11 +67,11 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 5: `feat(web):` ThemeControl and placements (~200 lines)
 
-- [ ] 5.1 RED: `apps/web/test/theme-control.test.tsx`: radiogroup named by `messages.theme.label`, three radios, one checked, initial from the DOM; click applies and stores; arrows move; failing write keeps choice; remount shows applied; no network call; no global key changes theme; present in `DayPage` column and sign-in card, absent in `NotesPage` and status card; labels equal messages; source has no copy literals; CSS has `--size-target`, `--focus-ring`, ink checked state, no `--color-date`, no `transition`.
-- [ ] 5.2 GREEN: `apps/web/src/messages.ts` `theme: {label, system, light, dark}` (append-only).
-- [ ] 5.3 GREEN: create `features/theme/ThemeControl.tsx` and `ThemeControl.module.css` (design Decision 7).
-- [ ] 5.4 GREEN: `DateColumn.tsx` `showTheme?` prop (set by `DayPage` only); `AuthForm.tsx` renders the control last in the card.
-- [ ] 5.5 `npm run verify`; commit.
+- [x] 5.1 RED: `apps/web/test/theme-control.test.tsx`: radiogroup named by `messages.theme.label`, three radios, one checked, initial from the DOM; click applies and stores; arrows move; failing write keeps choice; remount shows applied; no network call; no global key changes theme; present in `DayPage` column and sign-in card, absent in `NotesPage` and status card; labels equal messages; source has no copy literals; CSS has `--size-target`, `--focus-ring`, ink checked state, no `--color-date`, no `transition`.
+- [x] 5.2 GREEN: `apps/web/src/messages.ts` `theme: {label, system, light, dark}` (append-only).
+- [x] 5.3 GREEN: create `features/theme/ThemeControl.tsx` and `ThemeControl.module.css` (design Decision 7).
+- [x] 5.4 GREEN: `DateColumn.tsx` `showTheme?` prop (set by `DayPage` only); `AuthForm.tsx` renders the control last in the card.
+- [x] 5.5 `npm run verify`; commit.
 
 ## Commit 6: `docs:` size check and verify report (~40 lines)
 

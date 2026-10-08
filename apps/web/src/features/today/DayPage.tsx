@@ -138,6 +138,7 @@ export function DayPage({
           timezone={today.timezone}
           note={note}
           onSignOut={onSignOut}
+          showTheme
           nav={nav ? { ...nav, mobile } : undefined}
         />
         <PageHeader title={loading ? messages.day.loading(dayText) : pageTitle(today)} />
