@@ -85,7 +85,9 @@ timezone; `start(d)` is local midnight of day `d`.
   user's own notes; any other slug is a validation error (R15: no
   existence leak).
 - **R13 · Search.** Case-insensitive full-text match on title + body over
-  all of the user's notes.
+  all of the user's notes. Matching is by word prefix: every word typed
+  must start a word of the title or body (`stag` finds "Staging"), and
+  punctuation in the query is ignored, never read as query syntax.
 - **R14 · Markdown safety.** Note bodies render the basic markdown subset
   (bold, italic, lists, links, inline code, code blocks). Raw HTML is never
   rendered; it shows as text. Links are `http`, `https` or `mailto` only

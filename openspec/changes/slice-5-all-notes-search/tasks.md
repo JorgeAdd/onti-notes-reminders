@@ -49,11 +49,11 @@ Global checks for every commit:
 
 ### Commit 1: `docs:`+`test:` R13 word-prefix, domain (~160 lines)
 
-- [ ] 1.1 `docs/CONTRACT.md`: R13 word-prefix wording ONLY (no "50 / newest first" sentence yet; that is commit 2).
-- [ ] 1.2 RED: `apps/api/test/search-terms.test.ts`: split on punctuation, lowercase, dedupe, cap 8, `''`/spaces/`???` give `[]`, NFC accents, every operator char (`' " \ & | ! : ( ) < >`, `-`) disappears.
-- [ ] 1.3 RED: `apps/api/test/excerpt.test.ts`: newline collapse, 120 UTF-16 units incl. `…`, word cut in last 40 units, exactly 120 untouched, no cut between surrogate halves, empty gives `''`.
-- [ ] 1.4 GREEN: `apps/api/src/domain/search-terms.ts` and `excerpt.ts` (Decisions 2, 4). No IO, no framework imports (rule 15).
-- [ ] 1.5 `npm run verify`; commit `docs:`/`test:` style message (e.g. `feat(api): word-prefix search terms and excerpts`).
+- [x] 1.1 `docs/CONTRACT.md`: R13 word-prefix wording ONLY (no "50 / newest first" sentence yet; that is commit 2).
+- [x] 1.2 RED: `apps/api/test/search-terms.test.ts`: split on punctuation, lowercase, dedupe, cap 8, `''`/spaces/`???` give `[]`, NFC accents, every operator char (`' " \ & | ! : ( ) < >`, `-`) disappears.
+- [x] 1.3 RED: `apps/api/test/excerpt.test.ts`: newline collapse, 120 UTF-16 units incl. `…`, word cut in last 40 units, exactly 120 untouched, no cut between surrogate halves, empty gives `''`.
+- [x] 1.4 GREEN: `apps/api/src/domain/search-terms.ts` and `excerpt.ts` (Decisions 2, 4). No IO, no framework imports (rule 15).
+- [x] 1.5 `npm run verify`; commit `docs:`/`test:` style message (e.g. `feat(api): word-prefix search terms and excerpts`).
 
 ### Commit 2: `feat(api):` shared contract, port, adapter, use case (~388 lines)
 
