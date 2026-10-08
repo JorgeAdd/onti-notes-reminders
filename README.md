@@ -98,6 +98,8 @@ that the account's current local day plays Wed 7 (2 carried, 2 due today,
 - **Behavior is a contract** (`docs/CONTRACT.md`): general rules proven by
   the brief's scenario with exact numbers, asserted by tests.
 
+See [`docs/backlog.md`](docs/backlog.md) for deferred items and future enhancements.
+
 ## Quality
 
 `npm run verify` = Prettier check → ESLint (type-aware) → typecheck → tests.
