@@ -82,15 +82,15 @@ Ownership gate (slice 5): the branch MUST NOT modify `apps/api/src/application/p
 
 ## Commit 5: `feat(web):` data layer (~470 lines, High)
 
-- [ ] 5.1 RED: `day-view.test.ts`: `readView` drops syntax errors via `dayQuerySchema`, unknown params preserved, today writes no `d`, `]` at 2099-12-31 and `[` at 2000-01-01 no-ops, `dayKey`.
-- [ ] 5.2 RED: `api.test.ts` `fetchToday(token, view)` URL; component tests: push on nav, back restores, `popstate`, redundant `d` dropped.
-- [ ] 5.3 RED: write in flight then navigate -> rollback and success patch hit the stored key; actions blocked on placeholder; `c` allowed and no `cancelQueries` on a key without data; `onMutate` removes inactive `['day']`; settle invalidates `['day']`.
-- [ ] 5.4 RED: rollover: past day + minute ticks no refetch; tomorrow viewed + midnight one refetch; URL 400 (`?d=garbage` no request; `?tag=nope` -> `replaceState` + one message line).
-- [ ] 5.5 GREEN: create `features/today/day-view.ts`, `use-day-view.ts` (`useSyncExternalStore`); modify `lib/api.ts`, `App.tsx` `load(view)`, `TodayContainer.tsx` (`keepPreviousData`, `todayWindow` rollover), `mutations/use-reminder-actions.ts` (key in `Context`).
-- [ ] 5.6 Append `messages.ts` error line.
-- [ ] 5.7 Grep gate: `grep -rn "\['today'\]" apps/web/src apps/web/test` returns nothing (fix `reminder-actions.test.tsx:68`); only `day-view.ts` builds keys.
-- [ ] 5.8 `npm run build -w @onti/web`; record bundle size (baseline 591.44 kB).
-- [ ] 5.9 Check slice-5 files untouched. `npm run verify`; commit.
+- [x] 5.1 RED: `day-view.test.ts`: `readView` drops syntax errors via `dayQuerySchema`, unknown params preserved, today writes no `d`, `]` at 2099-12-31 and `[` at 2000-01-01 no-ops, `dayKey`.
+- [x] 5.2 RED: `api.test.ts` `fetchToday(token, view)` URL; component tests: push on nav, back restores, `popstate`, redundant `d` dropped.
+- [x] 5.3 RED: write in flight then navigate -> rollback and success patch hit the stored key; actions blocked on placeholder; `c` allowed and no `cancelQueries` on a key without data; `onMutate` removes inactive `['day']`; settle invalidates `['day']`.
+- [x] 5.4 RED: rollover: past day + minute ticks no refetch; tomorrow viewed + midnight one refetch; URL 400 (`?d=garbage` no request; `?tag=nope` -> `replaceState` + one message line).
+- [x] 5.5 GREEN: create `features/today/day-view.ts`, `use-day-view.ts` (`useSyncExternalStore`); modify `lib/api.ts`, `App.tsx` `load(view)`, `TodayContainer.tsx` (`keepPreviousData`, `todayWindow` rollover), `mutations/use-reminder-actions.ts` (key in `Context`).
+- [x] 5.6 Append `messages.ts` error line.
+- [x] 5.7 Grep gate: `grep -rn "\['today'\]" apps/web/src apps/web/test` returns nothing (fix `reminder-actions.test.tsx:68`); only `day-view.ts` builds keys.
+- [x] 5.8 `npm run build -w @onti/web`; record bundle size (baseline 591.44 kB).
+- [x] 5.9 Check slice-5 files untouched. `npm run verify`; commit.
 
 ## Commit 6: `feat(web):` day navigation UI (~425 lines)
 

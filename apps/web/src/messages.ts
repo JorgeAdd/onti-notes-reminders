@@ -83,5 +83,6 @@ export const messages = {
       `“${title}” changed on another device. It is back where it was.`,
     captureFailed: (title: string) => `Could not save “${title}”. Your text is back in the bar.`,
     actionMissing: (title: string) => `“${title}” no longer exists. It is back where it was.`,
+    viewUnavailable: 'That view is not available, so it was reset.',
   },
 } as const

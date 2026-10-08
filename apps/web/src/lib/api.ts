@@ -53,8 +53,16 @@ export async function request(
 export const post = (path: string, accessToken: string, body?: unknown) =>
   request('POST', path, accessToken, body)
 
-export async function fetchToday(accessToken: string): Promise<TodayResponse> {
-  return todayResponseSchema.parse(await request('GET', '/today', accessToken))
+/** GET /today for a viewed day and tag (`null` or absent: today, unfiltered). */
+export async function fetchToday(
+  accessToken: string,
+  view: { date: string | null; tag: string | null } = { date: null, tag: null },
+): Promise<TodayResponse> {
+  const query = new URLSearchParams()
+  if (view.date !== null) query.set('date', view.date)
+  if (view.tag !== null) query.set('tag', view.tag)
+  const search = query.size === 0 ? '' : `?${query}`
+  return todayResponseSchema.parse(await request('GET', `/today${search}`, accessToken))
 }
 
 /** Sends the browser zone once; resolves to the zone the server stored. */

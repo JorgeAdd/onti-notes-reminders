@@ -50,6 +50,32 @@ const respond = (status: number, json: unknown = {}) =>
 
 afterEach(() => vi.restoreAllMocks())
 
+describe('fetchToday · view', () => {
+  it.each([
+    ['no view', undefined, 'http://localhost:3000/today'],
+    ['today', { date: null, tag: null }, 'http://localhost:3000/today'],
+    ['a day', { date: '2026-10-06', tag: null }, 'http://localhost:3000/today?date=2026-10-06'],
+    ['a tag', { date: null, tag: 'client-b' }, 'http://localhost:3000/today?tag=client-b'],
+    [
+      'a day and a tag',
+      { date: '2026-10-09', tag: 'client-b' },
+      'http://localhost:3000/today?date=2026-10-09&tag=client-b',
+    ],
+  ])('requests %s', async (_label, view, expected) => {
+    const fetchMock = respond(200, body)
+    await fetchToday('token-1', view)
+    expect((fetchMock.mock.calls[0]![0] as URL).href).toBe(expected)
+  })
+
+  it('a 400 is an ApiError the caller can tell from a 5xx', async () => {
+    respond(400, { error: 'validation_error' })
+    await expect(fetchToday('token-1', { date: null, tag: 'nope' })).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 400,
+    })
+  })
+})
+
 it('calls GET /today with the bearer token and decodes instants to Date', async () => {
   const fetchMock = respond(200, body)
   const today = await fetchToday('token-1')

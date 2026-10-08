@@ -18,7 +18,7 @@ type Actions = Pick<ReturnType<typeof useReminderActions>, 'snooze' | 'done' | '
 export function useTodayRows(
   today: TodayResponse | undefined,
   actions: Actions,
-  bar: { open: boolean; onOpen: () => void; mobile: boolean },
+  bar: { open: boolean; onOpen: () => void; mobile: boolean; blocked: boolean },
 ) {
   const ids = useMemo(() => (today ? orderedIds(today) : NO_IDS), [today])
   const { focusedId, tabStopId, setFocusedId } = useFocus(ids)
@@ -30,9 +30,14 @@ export function useTodayRows(
     [today],
   )
   const focused = items.find((item) => item.id === focusedId)
-  // A pending capture has no server id yet: no done, snooze or undo until it is confirmed.
+  // A pending capture has no server id yet: no done, snooze or undo until it is confirmed. While
+  // the viewed page loads, the rows on screen are the previous page's: no actions either.
   const target: Target =
-    focused && !isPendingId(focused.id) ? (focused.doneAt === null ? 'open' : 'done') : null
+    focused && !isPendingId(focused.id) && !bar.blocked
+      ? focused.doneAt === null
+        ? 'open'
+        : 'done'
+      : null
 
   const [sheetId, setSheetId] = useState<string | null>(null)
   const sheetItem = items.find((item) => item.id === sheetId)
@@ -71,7 +76,7 @@ export function useTodayRows(
     onFocusRow: (id: string) => {
       setFocusedId(id)
       // A tap on a phone opens the sheet; a pending capture has no actions yet.
-      if (bar.mobile && !isPendingId(id)) setSheetId(id)
+      if (bar.mobile && !bar.blocked && !isPendingId(id)) setSheetId(id)
     },
     onChangeSettled: () => setChanged(null),
   }
