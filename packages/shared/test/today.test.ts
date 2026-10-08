@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { todayResponseSchema, type TodayResponse } from '../src'
+import { dayQuerySchema, todayResponseSchema, type TodayResponse } from '../src'
 
 const wire = {
   now: '2026-10-07T15:05:00.000Z',
@@ -9,6 +9,15 @@ const wire = {
   openCount: 2,
   anyDoneToday: true,
   otherCount: 11,
+  date: '2026-10-07',
+  isToday: true,
+  tag: null,
+  tags: [
+    { slug: 'client-a', name: 'Client A' },
+    { slug: 'client-c', name: 'Client C' },
+  ],
+  hiddenCount: 0,
+  others: [],
   carried: [
     {
       day: '2026-10-06T06:00:00.000Z',
@@ -64,5 +73,93 @@ describe('todayResponseSchema (decision 1)', () => {
     const item = todayResponseSchema.parse(withBody).rail[0]
     expect(item).not.toHaveProperty('body')
     expect(item).not.toHaveProperty('notifiedDueAt')
+  })
+})
+
+const otherWire = {
+  id: '9d2c5a1e-3b7f-4c60-8e14-2f6a7b8c9d33',
+  title: 'API keys rotate every 90 days',
+  tags: [{ name: 'Client B', slug: 'client-b' }],
+  dueAt: null,
+  originalDueAt: null,
+  snoozeCount: 0,
+  doneAt: null,
+}
+
+describe('todayResponseSchema · day and filter fields (slice 3)', () => {
+  const filtered = {
+    ...wire,
+    tag: 'client-b',
+    hiddenCount: 10,
+    others: [
+      otherWire,
+      {
+        ...otherWire,
+        id: 'a1b2c3d4-3b7f-4c60-8e14-2f6a7b8c9d44',
+        dueAt: '2026-10-09T15:00:00.000Z',
+        originalDueAt: '2026-10-09T15:00:00.000Z',
+      },
+    ],
+  }
+
+  it('parses a filtered page: others may have null dates and dated ones decode to Dates', () => {
+    const parsed = todayResponseSchema.parse(filtered)
+    expect(parsed.tag).toBe('client-b')
+    expect(parsed.hiddenCount).toBe(10)
+    expect(parsed.others[0]?.dueAt).toBeNull()
+    expect(parsed.others[0]?.originalDueAt).toBeNull()
+    expect(parsed.others[1]?.dueAt).toEqual(new Date('2026-10-09T15:00:00.000Z'))
+    expect(z.encode(todayResponseSchema, parsed)).toEqual(filtered)
+  })
+
+  it('the rail still rejects a null due time (only others are nullable)', () => {
+    const bad = structuredClone(wire)
+    Object.assign(bad.rail[0] as object, { dueAt: null })
+    expect(todayResponseSchema.safeParse(bad).success).toBe(false)
+  })
+
+  it.each(['date', 'isToday', 'tag', 'tags', 'hiddenCount', 'others'])('requires %s', (field) => {
+    const rest: Record<string, unknown> = { ...wire }
+    delete rest[field]
+    expect(todayResponseSchema.safeParse(rest).success).toBe(false)
+  })
+
+  it('rejects an impossible viewed date', () => {
+    expect(todayResponseSchema.safeParse({ ...wire, date: '2026-02-30' }).success).toBe(false)
+  })
+})
+
+describe('dayQuerySchema', () => {
+  it('accepts no params, a date, a tag, or both', () => {
+    expect(dayQuerySchema.parse({})).toEqual({})
+    expect(dayQuerySchema.parse({ date: '2026-10-08' })).toEqual({ date: '2026-10-08' })
+    expect(dayQuerySchema.parse({ tag: 'client-b' })).toEqual({ tag: 'client-b' })
+    expect(dayQuerySchema.parse({ date: '2000-01-01', tag: 'a' })).toEqual({
+      date: '2000-01-01',
+      tag: 'a',
+    })
+  })
+
+  it('ignores unknown keys', () => {
+    expect(dayQuerySchema.parse({ date: '2026-10-08', other: 'x' })).toEqual({ date: '2026-10-08' })
+  })
+
+  it.each([
+    ['Feb 30', { date: '2026-02-30' }],
+    ['unpadded date', { date: '2026-1-5' }],
+    ['empty date', { date: '' }],
+    ['date before 2000', { date: '1999-12-31' }],
+    ['date after 2099', { date: '2100-01-01' }],
+    ['repeated date', { date: ['2026-10-08', '2026-10-09'] }],
+    ['uppercase tag', { tag: 'Client-B' }],
+    ['empty tag', { tag: '' }],
+    ['41-char tag', { tag: 'a'.repeat(41) }],
+    ['repeated tag', { tag: ['a', 'b'] }],
+  ])('rejects %s', (_label, query) => {
+    expect(dayQuerySchema.safeParse(query).success).toBe(false)
+  })
+
+  it('accepts a 40-char tag slug', () => {
+    expect(dayQuerySchema.safeParse({ tag: 'a'.repeat(40) }).success).toBe(true)
   })
 })

@@ -20,6 +20,12 @@ const body = {
   openCount: 1,
   anyDoneToday: false,
   otherCount: 11,
+  date: '2026-10-07',
+  isToday: true,
+  tag: null,
+  tags: [{ slug: 'client-a', name: 'Client A' }],
+  hiddenCount: 0,
+  others: [],
   carried: [],
   rail: [
     {
