@@ -114,33 +114,35 @@ export function DayPage({
           )}
         </main>
       </div>
-      {snoozeMenu ? <WhichKey now={now} timezone={today.timezone} /> : null}
-      {message === null ? null : (
-        <ActionMessage message={message} onDismiss={onDismissMessage ?? noop} />
-      )}
-      {capture === null ? null : (
-        <Suspense fallback={null}>
-          <CommandBar
-            now={now}
-            timezone={today.timezone}
-            mobile={mobile}
-            tags={tagSlugs(today)}
-            {...capture}
-          />
-        </Suspense>
-      )}
-      {sheet === null ? null : <ActionSheet now={now} timezone={today.timezone} {...sheet} />}
-      {mobile && capture === null && sheet === null ? (
-        <MobileBar onCapture={onOpenCapture} />
-      ) : null}
-      <Statusline
-        now={now}
-        timezone={today.timezone}
-        todayCount={today.openCount}
-        carriedCount={carriedCount}
-        totalCount={totalCount}
-        hints={hints}
-      />
+      <div className={styles.dock} data-testid="dock">
+        {snoozeMenu ? <WhichKey now={now} timezone={today.timezone} /> : null}
+        {message === null ? null : (
+          <ActionMessage message={message} onDismiss={onDismissMessage ?? noop} />
+        )}
+        {capture === null ? null : (
+          <Suspense fallback={null}>
+            <CommandBar
+              now={now}
+              timezone={today.timezone}
+              mobile={mobile}
+              tags={tagSlugs(today)}
+              {...capture}
+            />
+          </Suspense>
+        )}
+        {sheet === null ? null : <ActionSheet now={now} timezone={today.timezone} {...sheet} />}
+        {mobile && capture === null && sheet === null ? (
+          <MobileBar onCapture={onOpenCapture} />
+        ) : null}
+        <Statusline
+          now={now}
+          timezone={today.timezone}
+          todayCount={today.openCount}
+          carriedCount={carriedCount}
+          totalCount={totalCount}
+          hints={hints}
+        />
+      </div>
     </div>
   )
 }

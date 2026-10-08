@@ -139,3 +139,38 @@ it('the now line steps with the ticking clock (C7)', () => {
   expect(screen.getByText('now 09:06')).toBeInTheDocument()
   vi.useRealTimers()
 })
+
+// Smoke 7.5 finding #2: every bottom bar shares one sticky dock with the statusline.
+const noop = () => undefined
+const dockOf = () => screen.getByTestId('dock')
+
+it('docks the which-key menu, message, command bar and sheet with the statusline last', async () => {
+  const today = c4Response()
+  const item = today.rail[0]
+  if (item === undefined) throw new Error('fixture has no rail item')
+  render(
+    <DayPage
+      today={today}
+      now={now}
+      onSignOut={noop}
+      message="Could not save"
+      snoozeMenu
+      capture={{ draft: '', notice: null, onSubmit: noop, onClose: noop }}
+      sheet={{ item, onDone: noop, onUndo: noop, onSnooze: noop, onClose: noop }}
+    />,
+  )
+  const dock = dockOf()
+  expect(dock).toContainElement(screen.getByRole('list', { name: messages.whichKey.label }))
+  expect(dock).toContainElement(screen.getByText('Could not save'))
+  expect(dock).toContainElement(
+    await screen.findByRole('textbox', { name: messages.capture.label }),
+  )
+  expect(dock).toContainElement(screen.getByRole('dialog'))
+  expect(dock.lastElementChild?.textContent).toContain(messages.statusline.mode)
+  expect(screen.getByRole('main').closest('[data-testid="dock"]')).toBeNull()
+})
+
+it('docks the mobile bar with the statusline', () => {
+  render(<DayPage today={c4Response()} now={now} onSignOut={noop} mobile />)
+  expect(dockOf()).toContainElement(screen.getByRole('button', { name: messages.mobile.capture }))
+})

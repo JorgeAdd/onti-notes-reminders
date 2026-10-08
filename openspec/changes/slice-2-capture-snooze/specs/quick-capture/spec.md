@@ -30,6 +30,14 @@ Pressing `c` outside a text field MUST open a one-line command bar with focus in
 - AND the control MUST be at least `--size-target` with a visible `--focus-ring` and a name from the messages module
 - AND a pointer down inside the bar (input, preset chips, tag chips) MUST NOT close it, and `esc` MUST still close it
 
+#### Scenario: Short viewport
+
+- GIVEN a short viewport (for example 1280x720 or 375x667, including with the 4 mobile presets visible)
+- WHEN the command bar is open
+- THEN its preview, presets and close control MUST be visible without scrolling
+- AND the statusline MUST NOT cover any of them, because the bar and the statusline share one bottom dock
+- AND the dock MUST NOT cover the whole page: it has a maximum height and scrolls internally
+
 #### Scenario: Keys while typing
 
 - GIVEN the bar is open

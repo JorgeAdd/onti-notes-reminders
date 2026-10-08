@@ -110,6 +110,7 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 - [x] 7.3 RED then GREEN: `ActionSheet` on row tap, same callbacks as keys, resulting times equal `WhichKey`.
 - [x] 7.4 Docs: `docs/CONTRACT.md` verification status for C1, C3, C5, C6.
 - [x] 7.6 Touch cancel for the command bar (smoke 7.5 finding): close button, outside pointer down, esc kept.
+- [x] 7.7 Bottom dock: bars and statusline stay visible on short viewports (smoke 7.5 finding #2)
 - [ ] 7.5 Manual smoke (record in PR): capture `#client-a 17:00 Call back`, `s h`, `x`, `z`, mobile action sheet, reduced motion, light/dark, no horizontal scroll. Record final bundle size.
 
 ## PR task

@@ -176,6 +176,14 @@
       "sessions": 0,
       "memories": 1,
       "prompts": 2
+    },
+    {
+      "id": "ad809a36",
+      "created_by": "jdd",
+      "created_at": "2026-10-08T16:02:28Z",
+      "sessions": 0,
+      "memories": 1,
+      "prompts": 0
     }
   ]
 }
