@@ -2,7 +2,7 @@
 
 Read-only day page for the signed-in user. Behavior numbers live in `docs/CONTRACT.md`; this spec cites them and adds only API surface, UI states and accessibility. Scenario data: `docs/product/scenario-dataset.md` (Wed 7, 09:05 = C4). Copy: `apps/web/src/messages.ts` only.
 
-## ADDED Requirements
+## ADDED Requirements (Slice 1)
 
 ### Requirement: GET /today API
 
@@ -35,7 +35,7 @@ The API MUST expose `GET /today`, verify the JWT, and return the day page of the
 
 ### Requirement: Page sections
 
-The page MUST show, per boards 03/05 (light) and 09/11 (dark): date block (SG2, SG6), header count with R4 copy variants ("things today" / "left today"), a carried group per local day "Still open from {day}" with "late {duration}" oldest first (R3, R2, SG3), the hour rail with a NOW line and "in {duration}" (SG7, R6), done items struck through and read-only (SG12), and "{n} other notes on the back of the pad" (R5, SG8). Titles and tags MUST render as plain text.
+The page MUST show, per boards 03/05 (light) and 09/11 (dark): date block (SG2, SG6), header count with R4 copy variants ("things today" / "left today"), a carried group per local day "Still open from {day}" with "late {duration}" oldest first (R3, R2, SG3), the hour rail with a NOW line and "in {duration}" (SG7, R6), done items struck through (SG12), and "{n} other notes on the back of the pad" (R5, SG8). Titles and tags MUST render as plain text. Open items MUST offer the actions of `reminder-actions`; done items MUST offer undo (`z`, or the mobile sheet) and no other action.
 
 #### Scenario: Morning page (C4)
 
@@ -47,7 +47,7 @@ The page MUST show, per boards 03/05 (light) and 09/11 (dark): date block (SG2, 
 
 - GIVEN an item due today is done
 - WHEN the page renders
-- THEN the header reads "{n} left today", the item is struck and has no actions
+- THEN the header reads "{n} left today", the item is struck and offers undo only
 
 #### Scenario: Late label (C7)
 
@@ -63,13 +63,25 @@ The page MUST show, per boards 03/05 (light) and 09/11 (dark): date block (SG2, 
 
 ### Requirement: Statusline
 
-A statusline fixed at the bottom MUST show the weekday, day, today/carried/total counts and the current time, matching boards 03/09. The mode label MUST show on desktop; MAY be hidden on narrow (mobile) layouts per board 05. It MUST NOT show key hints for actions not available in this slice.
+A statusline fixed at the bottom MUST show the weekday, day, today/carried/total counts and the current time, matching boards 03/09. The mode label MUST show on desktop; MAY be hidden on narrow (mobile) layouts per board 05. On desktop it MUST show key hints only for keys that work in the current state (`c`, `j`/`k`, `x`, `z`, `s`, `esc`), and MUST NOT show hints for keys of unshipped features. Hint text MUST come from messages.
 
 #### Scenario: Counts
 
 - GIVEN the C4 state
 - WHEN the page renders
 - THEN the statusline shows 4 today, 2 carried, 15 notes, and the current local time
+
+#### Scenario: Working hints only
+
+- GIVEN a desktop viewport and no item focused
+- WHEN the statusline renders
+- THEN it hints `c` and `j`/`k`, and does not hint `x`, `z` or `s`; with an open item focused it adds `x` and `s`; with a done item focused, `z`
+
+#### Scenario: No search hint
+
+- GIVEN any state
+- WHEN the statusline renders
+- THEN no hint for search, tag filter or day navigation shows
 
 ### Requirement: Live labels and refresh
 
@@ -123,6 +135,6 @@ The page MUST have landmarks (main, header, statusline) and one h1. Times MUST b
 - WHEN it receives focus
 - THEN a visible ink outline shows and its target is at least 44 px
 
-## Out of scope
+## Out of scope (replaces the slice-1 list)
 
-Done/undo, snooze, capture, key actions, mobile bottom bar and action sheet, day navigation (`[ ]`), tag filter, search, tear-off animation (SG15), onboarding, timezone selection.
+Note edit/delete, manual reschedule (R8), markdown (R14), day navigation (`[ ]`), tag filter (R12), search (R13), all-notes view, "Pick…" time picker, Web Push and notification-click done, tear-off animation (SG15), onboarding, `?` help, theme override UI, timezone picker, undo of snooze.

@@ -111,9 +111,9 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 - [x] 7.4 Docs: `docs/CONTRACT.md` verification status for C1, C3, C5, C6.
 - [x] 7.6 Touch cancel for the command bar (smoke 7.5 finding): close button, outside pointer down, esc kept.
 - [x] 7.7 Bottom dock: bars and statusline stay visible on short viewports (smoke 7.5 finding #2)
-- [ ] 7.5 Manual smoke (record in PR): capture `#client-a 17:00 Call back`, `s h`, `x`, `z`, mobile action sheet, reduced motion, light/dark, no horizontal scroll. Record final bundle size.
+- [x] 7.5 Manual smoke (record in PR): capture `#client-a 17:00 Call back`, `s h`, `x`, `z`, mobile action sheet, reduced motion, light/dark, no horizontal scroll. Record final bundle size.
 
 ## PR task
 
-- [ ] P.1 Ask the human before pushing (rule 6). Open PR to `main` with label `size:exception`, commit-by-commit reading guide, manual checklists, bundle sizes (baseline 569 kB), and the unconfirmed 17:00 preset default.
-- [ ] P.2 Merge only with green "Verify and build".
+- [x] P.1 Ask the human before pushing (rule 6). Open PR to `main` with label `size:exception`, commit-by-commit reading guide, manual checklists, bundle sizes (baseline 569 kB), and the unconfirmed 17:00 preset default.
+- [x] P.2 Merge only with green "Verify and build".
