@@ -1,16 +1,19 @@
 change: slice-1-today-page
 artifact_store: hybrid
-phase: tasks
+phase: verify
 status: done
 completed:
   - proposal
   - spec
   - design
   - tasks
-next: [apply]
+  - apply
+  - verify
+next: [archive]
 delivery_strategy: ask-on-risk
 chain_strategy: feature-branch-chain
 tracker_branch: feat/slice-1-today-page
 review_budget_lines: 400
 chained_prs: 6
 decision_needed_before_apply: false
+verify_verdict: pass_with_warnings
