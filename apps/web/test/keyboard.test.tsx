@@ -3,6 +3,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { readFileSync } from 'node:fs'
+import { useState } from 'react'
+import { flushSync } from 'react-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { TodayContainer } from '../src/features/today/TodayContainer'
 import { useKeyboardLayer } from '../src/features/today/use-keyboard-layer'
@@ -249,6 +251,63 @@ describe('keys are ignored where they must be', () => {
     rerender(<Harness enabled />)
     await user.keyboard('x')
     expect(document.body.dataset.last).toBe('x')
+  })
+})
+
+describe('the layer keeps its listener stable', () => {
+  function Latest({ tag }: { tag: string }) {
+    useKeyboardLayer(true, (key) => {
+      document.body.dataset.last = `${tag}:${key}`
+      return false
+    })
+    return null
+  }
+
+  it('does not re-register when only the handle changes, and calls the latest handle', async () => {
+    delete document.body.dataset.last
+    const user = userEvent.setup()
+    const { rerender } = render(<Latest tag="a" />)
+    const add = vi.spyOn(document, 'addEventListener')
+    const remove = vi.spyOn(document, 'removeEventListener')
+
+    rerender(<Latest tag="b" />)
+    await user.keyboard('x')
+
+    expect(add).not.toHaveBeenCalled()
+    expect(remove).not.toHaveBeenCalled()
+    expect(document.body.dataset.last).toBe('b:x')
+    add.mockRestore()
+    remove.mockRestore()
+  })
+
+  it('still reaches a later layer when an earlier one re-renders synchronously', async () => {
+    delete document.body.dataset.last
+    const user = userEvent.setup()
+    function First() {
+      const [, setN] = useState(0)
+      useKeyboardLayer(true, () => {
+        flushSync(() => setN((n) => n + 1))
+        return false
+      })
+      return null
+    }
+    function Second() {
+      useKeyboardLayer(true, (key) => {
+        document.body.dataset.last = `second:${key}`
+        return false
+      })
+      return null
+    }
+    render(
+      <>
+        <First />
+        <Second />
+      </>,
+    )
+
+    await user.keyboard('/')
+
+    expect(document.body.dataset.last).toBe('second:/')
   })
 })
 

@@ -109,6 +109,7 @@ Global checks for every commit:
 - [x] 8.3 If slice 3 has already merged, rebase first (see 9.0) and take its `MobileBar` by-handler version; otherwise include the by-handler change here.
 - [x] 8.4 `npm run verify`; record `vite build` sizes (main vs 591.44 kB baseline, lazy chunk); commit.
 - [ ] 8.5 Manual smoke at 1280x720 and 375x667 (`/`, `staging` gives N2 and N8, `collaborators` gives N1, esc, mobile Search, reduced motion). Note the missing design board for visual confirmation.
+- [x] 8.6 Stable keyboard listeners: real `/` opens All notes (smoke 8.5 finding). RED: re-render with a new handle re-registered the listener; GREEN: latest handle in a ref, listener keyed on `enabled`. Real Chromium key press verified.
 
 ## Batch 3 (commit 9, ~263 lines, own batch after the rebase)
 
