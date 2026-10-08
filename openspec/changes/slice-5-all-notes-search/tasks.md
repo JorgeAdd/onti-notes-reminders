@@ -108,7 +108,8 @@ Global checks for every commit:
 - [x] 8.2 GREEN: `App.tsx` (`view` state, `React.lazy`, idle preload, `Suspense fallback={null}`); `TodayContainer` `/` hook + `search` hint; `keys.ts` `KeyHint 'search'` (one line); `DayPage`/`MobileBar` `onSearch`; `messages.ts` `mobile.search`, `statusline.keys.search`.
 - [x] 8.3 If slice 3 has already merged, rebase first (see 9.0) and take its `MobileBar` by-handler version; otherwise include the by-handler change here.
 - [x] 8.4 `npm run verify`; record `vite build` sizes (main vs 591.44 kB baseline, lazy chunk); commit.
-- [ ] 8.5 Manual smoke at 1280x720 and 375x667 (`/`, `staging` gives N2 and N8, `collaborators` gives N1, esc, mobile Search, reduced motion). Note the missing design board for visual confirmation.
+- [x] 8.5 Manual smoke at 1280x720 and 375x667 (`/`, `staging` gives N2 and N8, `collaborators` gives N1, esc, mobile Search, reduced motion). Note the missing design board for visual confirmation.
+  - Smoke 2026-10-08 (Playwright, mocked data): `/` hint and mobile Search; real `/` opens All notes (after 4682eed); `staging` → N2, N8 (`2 of 15`); `zzz` no-match; esc / Back to today; plain-text excerpts; rows unfocusable; x/s/z send no POST; no horizontal scroll; dark and reduced motion. `collaborators` → N1 is covered by `search.pg.test.ts` and `search-notes.test.ts`, not the smoke.
 - [x] 8.6 Stable keyboard listeners: real `/` opens All notes (smoke 8.5 finding). RED: re-render with a new handle re-registered the listener; GREEN: latest handle in a ref, listener keyed on `enabled`. Real Chromium key press verified.
 
 ## Batch 3 (commit 9, ~263 lines, own batch after the rebase)
