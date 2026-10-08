@@ -72,6 +72,14 @@
       "sessions": 0,
       "memories": 1,
       "prompts": 0
+    },
+    {
+      "id": "1e7d5cb1",
+      "created_by": "jdd",
+      "created_at": "2026-10-08T04:57:24Z",
+      "sessions": 0,
+      "memories": 1,
+      "prompts": 0
     }
   ]
 }

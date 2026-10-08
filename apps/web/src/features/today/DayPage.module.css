@@ -1,12 +1,14 @@
 .desk {
   min-height: 100%;
+  display: grid;
+  grid-template-rows: 1fr auto;
 }
 
 .page {
-  width: min(100% - 2 * var(--space-lg), 1040px);
+  width: min(100% - 2 * var(--space-lg), var(--size-page-max));
   margin: var(--space-2xl) auto;
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
+  grid-template-columns: var(--size-date-col) minmax(0, 1fr);
   grid-template-rows: auto 1fr;
   grid-template-areas:
     'date header'
@@ -20,14 +22,24 @@
   padding: 0 var(--space-xl) var(--space-xl);
 }
 
+.items {
+  margin: var(--space-lg) 0 0;
+  padding: 0;
+}
+
 @media (max-width: 640px) {
   .page {
     width: 100%;
     margin: 0;
     grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
     grid-template-areas:
       'date'
       'header'
       'main';
+  }
+
+  .main {
+    padding: 0 var(--space-lg) var(--space-lg);
   }
 }

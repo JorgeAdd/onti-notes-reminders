@@ -87,11 +87,11 @@ PR body: TodayContainer replaces hello-world; loading, error/retry, session-expi
 
 PR body: carried group, item rows, statusline, empty state. Out: HourRail. Prior: PR4.
 
-- [ ] 5.1 RED then GREEN: `CarriedGroup` "Still open from Tue 6" oldest first, "late 15h05"; `ItemRow` (struck when done, no actions, tags as plain text, no `N#`). R2, R3, SG3, SG12; C3/C4.
-- [ ] 5.2 RED then GREEN: `Statusline` `<footer>` "4 today · 2 carried · 15 notes", weekday/day, ticking clock; move `messages.me.modeNormal` to `messages.statusline.mode`; no key hints. Decision 13; "Statusline".
-- [ ] 5.3 RED then GREEN: `EmptyState` (calm copy, no onboarding, same layout) + "{n} other notes on the back of the pad" (R5, SG8).
-- [ ] 5.4 DayPage render test for C4 (header "4 things today", header "left today" when done), landmarks, one `h1`. CSS per component.
-- [ ] 5.5 `npm run verify`.
+- [x] 5.1 RED then GREEN: `CarriedGroup` "Still open from Tue 6" oldest first, "late 15h05"; `ItemRow` (struck when done, no actions, tags as plain text, no `N#`). R2, R3, SG3, SG12; C3/C4.
+- [x] 5.2 RED then GREEN: `Statusline` `<footer>` "4 today · 2 carried · 15 notes", weekday/day, ticking clock; move `messages.me.modeNormal` to `messages.statusline.mode`; no key hints. Decision 13; "Statusline".
+- [x] 5.3 RED then GREEN: `EmptyState` (calm copy, no onboarding, same layout) + "{n} other notes on the back of the pad" (R5, SG8).
+- [x] 5.4 DayPage render test for C4 (header "4 things today", header "left today" when done), landmarks, one `h1`. CSS per component.
+- [x] 5.5 `npm run verify`.
 
 ## PR 6: HourRail + CONTRACT status (~250 lines)
 

@@ -6,7 +6,7 @@
 }
 
 .page {
-  width: min(100%, 420px);
+  width: min(100%, var(--size-card-max));
   display: grid;
   gap: var(--space-md);
   padding: var(--space-xl);

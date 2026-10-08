@@ -6,7 +6,7 @@
 }
 
 .page {
-  width: min(100%, 420px);
+  width: min(100%, var(--size-card-max));
   display: grid;
   gap: var(--space-md);
   padding: var(--space-xl);
@@ -18,7 +18,7 @@
   margin: 0;
   font: var(--text-label);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--tracking-label);
   color: var(--color-ink-muted);
 }
 

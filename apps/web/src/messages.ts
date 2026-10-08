@@ -25,6 +25,13 @@ export const messages = {
     loadError: 'Your day could not be loaded.',
     retry: 'Try again',
     signOut: 'Sign out',
+    nothingToday: 'Nothing today',
+    noNotes: 'No notes yet',
+  },
+  statusline: {
+    mode: 'NORMAL',
+    counts: (today: number, carried: number, total: number) =>
+      `${today} today · ${carried} carried · ${total} ${total === 1 ? 'note' : 'notes'}`,
   },
   errors: {
     generic: 'Something went wrong. Please try again.',
