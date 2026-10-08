@@ -47,7 +47,7 @@ function readExisting(db: Kysely<Database>, identity: Identity, scenario: Scenar
     const noteIds = scenario.notes.map((n) => n.id)
     const notes = await trx
       .selectFrom('notes')
-      .select(['id', 'title', 'due_at', 'done_at', 'snooze_count'])
+      .select(['id', 'title', 'body', 'due_at', 'done_at', 'snooze_count'])
       .where('user_id', '=', identity.userId)
       .where('id', 'in', noteIds)
       .execute()
@@ -67,6 +67,7 @@ function readExisting(db: Kysely<Database>, identity: Identity, scenario: Scenar
       notes: notes.map((n) => ({
         id: n.id,
         title: n.title,
+        body: n.body,
         dueAt: n.due_at,
         doneAt: n.done_at,
         snoozeCount: n.snooze_count,
@@ -104,6 +105,7 @@ function writeSeed(
           id: n.id,
           user_id: userId,
           title: n.title,
+          body: n.body,
           due_at: n.dueAt,
           original_due_at: n.dueAt,
           snooze_count: 0,
@@ -114,6 +116,7 @@ function writeSeed(
       .onConflict((oc) =>
         oc.column('id').doUpdateSet((eb) => ({
           title: eb.ref('excluded.title'),
+          body: eb.ref('excluded.body'),
           due_at: eb.ref('excluded.due_at'),
           original_due_at: eb.ref('excluded.original_due_at'),
           done_at: eb.ref('excluded.done_at'),

@@ -26,6 +26,7 @@ export type KeyHint =
   | 'today'
   | 'tags'
   | 'clear'
+  | 'search'
 
 /** What the page around the keys says: slice 3 keys depend on the viewed day. */
 export interface KeyContext {

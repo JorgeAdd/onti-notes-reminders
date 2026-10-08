@@ -83,9 +83,18 @@ timezone; `start(d)` is local midnight of day `d`.
   side note "{total − matching} notes hidden"; `esc` clears. The filter
   persists across day navigation. The slug must be on at least one of the
   user's own notes; any other slug is a validation error (R15: no
-  existence leak).
+  existence leak). In All notes (R13) the same filter narrows the list: only
+  notes with that tag, combined with the search text, applied before the
+  50-note cap. There an unknown slug is an empty list, not an error (a list
+  never confirms or denies a tag); `#` opens the tag bar, the first `esc`
+  clears the tag and closes the bar, the next `esc` leaves the view.
 - **R13 · Search.** Case-insensitive full-text match on title + body over
-  all of the user's notes.
+  all of the user's notes. Matching is by word prefix: every word typed
+  must start a word of the title or body (`stag` finds "Staging"), and
+  punctuation in the query is ignored, never read as query syntax. Results
+  are the user's notes, newest first, at most 50, with no pagination and no
+  highlighting; the total shown beside them is always the user's whole note
+  count.
 - **R14 · Markdown safety.** Note bodies render the basic markdown subset
   (bold, italic, lists, links, inline code, code blocks). Raw HTML is never
   rendered; it shows as text. Links are `http`, `https` or `mailto` only
@@ -177,8 +186,17 @@ of slice 3: Thu 8 14:30 `#client-b`, `[` to Wed 7, `t`, reload and back keep
 the view, `s t` then `]`, 2 Nov and 8 Mar with a New York profile, light and
 dark, reduced motion, no horizontal scroll.
 
-Still `todo` in that suite, asserted elsewhere when the feature lands:
-C9 (search, API + Postgres), C10 (markdown rendering, web), C11 (`404`
-for another user's note, API). C11's `401` part is already covered in
-`apps/api/test/server.test.ts`; RLS isolation was verified with SQL on the
-migration (see `docs/db/schema.md`).
+Slice 5 (all notes and search) adds the read-side proof. The `it.todo` markers
+for these rows stay in `packages/shared/test/contract.test.ts`; the rows are
+asserted where the feature lives:
+
+| Rows                    | Proven by                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C9 (search)             | `apps/api/test/search-notes.test.ts` (use case over the fake) and `apps/api/test/postgres/search.pg.test.ts` (real Postgres, run with `ONTI_TEST_DATABASE_URL`, not in CI): `staging` gives N2 (title) and N8 (title and body); a word only in the body of N1 finds N1; word prefix, case, AND, newest first, at most 50, total never narrowed. `apps/api/test/search-route.test.ts`: `GET /notes?q=`.                                                                                                                                                       |
+| R12 in All notes        | `packages/shared/test/notes-list.test.ts` (`tag` is a slug), `apps/api/test/search-notes.test.ts` (tag alone, with a term, before the 50 cap, unknown and other users' tags give an empty list), `search-route.test.ts` (`GET /notes?q=&tag=`, 400 for a malformed or repeated tag), `postgres/search.pg.test.ts` (SQL `exists`, 5 tagged notes among 55 newer ones, Ana's same-slug tag). `apps/web/test/notes-container.test.tsx` and `notes-view.test.tsx`: `#` bar, tag applied, statusline `· #slug`, two-step `esc`, phone Tags button and Clear chip. |
+| C11 (listing and `401`) | `apps/api/test/search-route.test.ts`: no token and a forged token give `401`; Ana lists 0 of Jorge's notes. `search-notes.test.ts` and `search.pg.test.ts`: Ana's search never sees his notes (explicit `user_id` plus RLS).                                                                                                                                                                                                                                                                                                                                 |
+
+Still `todo`: C10 (markdown rendering, web) and the `404` half of C11
+(`GET /notes/{id}` for another user's note, API; slice 4 owns note detail).
+C11's `401` part is also covered in `apps/api/test/server.test.ts`; RLS
+isolation was verified with SQL on the migration (see `docs/db/schema.md`).

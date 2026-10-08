@@ -17,11 +17,7 @@
   cursor: pointer;
 }
 
-.capture:focus-visible {
-  outline: var(--focus-ring);
-  outline-offset: var(--space-xs);
-}
-
+.search,
 .secondary {
   min-width: var(--size-target);
   min-height: var(--size-target);
@@ -34,7 +30,9 @@
   cursor: pointer;
 }
 
-.secondary:focus-visible {
+.search:focus-visible,
+.secondary:focus-visible,
+.capture:focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--space-xs);
 }

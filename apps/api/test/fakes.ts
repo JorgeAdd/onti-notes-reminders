@@ -1,6 +1,12 @@
 import type { Reminder } from '@onti/shared'
 import type { Identity } from '../src/domain/identity'
-import type { NewNote, NoteRepository, Profile, ProfileRepository } from '../src/application/ports'
+import type {
+  NewNote,
+  NoteListRow,
+  NoteRepository,
+  Profile,
+  ProfileRepository,
+} from '../src/application/ports'
 import type { NoteRecord } from '../src/domain/note'
 
 export const JORGE: Identity = {
@@ -67,6 +73,23 @@ export function noteRecord(n: number, overrides: Partial<NoteRecord> = {}): Note
   }
 }
 
+interface OwnedNote {
+  ownerId: string
+  note: NoteRecord
+  body?: string
+  createdAt?: Date
+}
+type StoredNote = Required<OwnedNote>
+
+/** The words a stored note offers to a search: the fake's stand-in for Postgres' `simple` parser. */
+const wordsOf = (text: string): string[] =>
+  text
+    .toLowerCase()
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter((word) => word !== '')
+
+const BODY_HEAD = 400
+
 /**
  * Owner-scoped like RLS plus the adapter's contract: an unknown or foreign id answers `null`,
  * `decide` runs on the stored reminder, a thrown error leaves the row untouched (rollback), and
@@ -76,10 +99,17 @@ export class InMemoryNotes implements NoteRepository {
   readonly writes: string[] = []
   readonly created: { ownerId: string; input: NewNote }[] = []
   private nextId = 1000
-  private readonly rows = new Map<string, { ownerId: string; note: NoteRecord }>()
+  private readonly rows = new Map<string, StoredNote>()
 
-  constructor(owned: { ownerId: string; note: NoteRecord }[] = []) {
-    for (const row of owned) this.rows.set(row.note.id, row)
+  /** `body` defaults to empty; `createdAt` defaults to the insertion order (later is newer). */
+  constructor(owned: OwnedNote[] = []) {
+    for (const row of owned) {
+      this.rows.set(row.note.id, {
+        body: '',
+        createdAt: new Date(this.rows.size),
+        ...row,
+      })
+    }
   }
 
   get(id: string): NoteRecord | undefined {
@@ -94,7 +124,12 @@ export class InMemoryNotes implements NoteRepository {
       dueAt: input.dueAt,
       originalDueAt: input.dueAt,
     }
-    this.rows.set(note.id, { ownerId: identity.userId, note })
+    this.rows.set(note.id, {
+      ownerId: identity.userId,
+      note,
+      body: '',
+      createdAt: new Date(this.rows.size),
+    })
     this.created.push({ ownerId: identity.userId, input })
     return Promise.resolve(note)
   }
@@ -129,5 +164,38 @@ export class InMemoryNotes implements NoteRepository {
     } catch (error) {
       return Promise.reject(error instanceof Error ? error : new Error(String(error)))
     }
+  }
+
+  /**
+   * Same word-prefix rule as the adapter (every term starts some word of title or body), newest
+   * first with the id as tie-break. It splits on `[^\p{L}\p{N}]`, so unlike Postgres it also matches
+   * words inside hosts and paths: tests must not assert those terms.
+   */
+  searchOwn(
+    identity: Identity,
+    query: { terms: string[]; limit: number; tag?: string },
+  ): Promise<{ rows: NoteListRow[]; total: number }> {
+    const own = [...this.rows.values()].filter((r) => r.ownerId === identity.userId)
+    const matches = own.filter((r) => {
+      const words = wordsOf(`${r.note.title} ${r.body}`)
+      return (
+        query.terms.every((term) => words.some((word) => word.startsWith(term))) &&
+        (query.tag === undefined || r.note.tags.some((t) => t.slug === query.tag))
+      )
+    })
+    const rows = matches
+      .sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime() || (a.note.id < b.note.id ? 1 : -1),
+      )
+      .slice(0, query.limit)
+      .map((r) => ({
+        id: r.note.id,
+        title: r.note.title,
+        bodyHead: r.body.slice(0, BODY_HEAD),
+        tags: r.note.tags,
+        dueAt: r.note.dueAt,
+        doneAt: r.note.doneAt,
+      }))
+    return Promise.resolve({ rows, total: own.length })
   }
 }

@@ -4,6 +4,8 @@ import {
   dayQuerySchema,
   meResponseSchema,
   noteResponseSchema,
+  notesListResponseSchema,
+  notesQuerySchema,
   snoozeRequestSchema,
   timezoneRequestSchema,
   todayResponseSchema,
@@ -21,6 +23,7 @@ import type { GetMe } from '../../application/get-me'
 import type { GetToday } from '../../application/get-today'
 import type { MarkDone } from '../../application/mark-done'
 import type { TokenVerifier } from '../../application/ports'
+import type { SearchNotes } from '../../application/search-notes'
 import type { SetTimezone } from '../../application/set-timezone'
 import type { SnoozeNote } from '../../application/snooze-note'
 import type { UndoDone } from '../../application/undo-done'
@@ -40,6 +43,7 @@ export interface ServerDeps {
   }
   corsOrigins: string[]
   logger?: boolean
+  searchNotes: SearchNotes
 }
 
 const BEARER = /^Bearer\s+(\S+)$/i
@@ -78,6 +82,7 @@ export function buildServer({
   actions,
   corsOrigins,
   logger = false,
+  searchNotes,
 }: ServerDeps) {
   const app = Fastify({ logger })
 
@@ -147,6 +152,17 @@ export function buildServer({
   app.post('/notes/:id/undo', async (request) => {
     const identity = await authenticate(request)
     return noteBody(await actions.undoDone(identity, noteIdOf(request.params)))
+  })
+
+  app.get('/notes', async (request) => {
+    const identity = await authenticate(request)
+    const query = notesQuerySchema.safeParse(request.query)
+    if (!query.success)
+      throw new ValidationError('q and tag must be single strings: q up to 200 chars, tag a slug')
+    return z.encode(
+      notesListResponseSchema,
+      await searchNotes(identity, query.data.q, query.data.tag),
+    )
   })
 
   app.get('/today', async (request) => {

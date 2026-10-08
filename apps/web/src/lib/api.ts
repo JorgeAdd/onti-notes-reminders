@@ -4,6 +4,8 @@ import {
   timezoneResponseSchema,
   todayResponseSchema,
   type NoteResponse,
+  notesListResponseSchema,
+  type NotesListResponse,
   type SnoozePreset,
   type TodayResponse,
 } from '@onti/shared'
@@ -94,4 +96,17 @@ export async function captureNote(
   capture: CaptureRequest,
 ): Promise<NoteResponse> {
   return noteResponseSchema.parse(await post('/notes', accessToken, capture))
+}
+
+/** R13 and R12 · the caller's notes, newest first; a term and a tag narrow them server-side. */
+export async function searchNotes(
+  accessToken: string,
+  term: string,
+  tag: string | null = null,
+): Promise<NotesListResponse> {
+  const params = new URLSearchParams()
+  if (term !== '') params.set('q', term)
+  if (tag !== null) params.set('tag', tag)
+  const query = params.size === 0 ? '' : `?${params}`
+  return notesListResponseSchema.parse(await request('GET', `/notes${query}`, accessToken))
 }

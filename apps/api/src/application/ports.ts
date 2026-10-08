@@ -33,6 +33,16 @@ export interface NewNote {
   tags: { slug: string; name: string }[]
 }
 
+/** One row of the notes listing: the head of the body only (the use case builds the excerpt). */
+export interface NoteListRow {
+  id: string
+  title: string
+  bodyHead: string
+  tags: { name: string; slug: string }[]
+  dueAt: Date | null
+  doneAt: Date | null
+}
+
 /** Reads and writes notes as the caller (RLS applies). */
 export interface NoteRepository {
   /** Every note of the caller, without bodies, with its tags. */
@@ -54,4 +64,15 @@ export interface NoteRepository {
     id: string,
     decide: (reminder: Reminder) => Reminder,
   ): Promise<NoteRecord | null>
+  /**
+   * The caller's notes newest first (`created_at desc, id desc`), at most `limit`. With terms, only
+   * notes matching EVERY term as a word prefix on title or body; no terms means no filter. `total`
+   * is the count of ALL the caller's notes, never narrowed by the terms. `tag` keeps only notes
+   * carrying that slug among the caller's own tags, applied BEFORE the limit; an unknown slug
+   * matches nothing.
+   */
+  searchOwn(
+    identity: Identity,
+    query: { terms: string[]; limit: number; tag?: string },
+  ): Promise<{ rows: NoteListRow[]; total: number }>
 }

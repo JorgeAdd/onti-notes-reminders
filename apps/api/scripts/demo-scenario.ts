@@ -9,9 +9,27 @@ interface ScenarioNote {
   due: { day: number; hours: number; minutes: number } | null
   /** Done at the due time (N1 only). */
   done?: boolean
+  /** Markdown body, verbatim from the dataset. Only N1 and N8 have one; none is invented. */
+  body?: string
 }
 
 const due = (day: number, hours: number, minutes: number) => ({ day, hours, minutes })
+
+/** docs/product/scenario-dataset.md, "Body examples". */
+const N1_BODY = [
+  'Ana needs to move **admin** permissions on `client-a/web` from me to Luis',
+  "before Friday's release.",
+  '',
+  '- Repo settings → Collaborators',
+  '- Keep me as _maintainer_ until the handoff',
+].join('\n')
+
+const N8_BODY = [
+  'Staging: https://staging.client-b.example',
+  '',
+  '- `qa-admin` / see 1Password',
+  '- `qa-viewer` / see 1Password',
+].join('\n')
 
 const SCENARIO: ScenarioNote[] = [
   {
@@ -20,6 +38,7 @@ const SCENARIO: ScenarioNote[] = [
     tag: 'client-a',
     due: due(-1, 17, 0),
     done: true,
+    body: N1_BODY,
   },
   {
     key: 'N2',
@@ -52,7 +71,13 @@ const SCENARIO: ScenarioNote[] = [
     due: due(1, 15, 0),
   },
   { key: 'N7', title: 'API keys rotate every 90 days', tag: 'client-b', due: null },
-  { key: 'N8', title: 'Staging URL and test accounts', tag: 'client-b', due: null },
+  {
+    key: 'N8',
+    title: 'Staging URL and test accounts',
+    tag: 'client-b',
+    due: null,
+    body: N8_BODY,
+  },
   { key: 'N9', title: 'Review agenda: search, exports, roles', tag: 'client-b', due: null },
   { key: 'N10', title: 'Diego prefers async updates on Slack', tag: 'client-b', due: null },
   { key: 'N11', title: 'PR review checklist', tag: 'client-a', due: null },
@@ -70,6 +95,8 @@ export interface DesiredNote {
   tagSlugs: string[]
   dueAt: Date | null
   doneAt: Date | null
+  /** Empty for the notes the dataset gives no body. */
+  body: string
 }
 
 export interface DesiredTag {
@@ -113,6 +140,7 @@ export function buildScenario(userId: string, now: Date, timeZone: string): Scen
       tagSlugs: [n.tag],
       dueAt,
       doneAt: n.done ? dueAt : null,
+      body: n.body ?? '',
     }
   })
   const slugs = [...new Set(SCENARIO.map((n) => n.tag))]

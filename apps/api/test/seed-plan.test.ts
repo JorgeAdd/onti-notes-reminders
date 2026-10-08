@@ -23,6 +23,7 @@ const stored = (s = scenario): ExistingState => ({
     doneAt: n.doneAt,
     snoozeCount: 0,
     tagSlugs: n.tagSlugs,
+    body: n.body,
   })),
   tags: s.tags.map((t) => ({ id: t.id, slug: t.slug })),
 })
@@ -56,6 +57,19 @@ describe('planSeed', () => {
     expect(plan.tags.unchanged).toHaveLength(4)
   })
 
+  it('a user seeded before bodies existed is updated once (N1, N8), then unchanged', () => {
+    const before = stored()
+    for (const note of before.notes) note.body = ''
+    const first = planSeed(before, scenario)
+    expect(first.notes.updated.map((n) => n.key)).toEqual(['N1', 'N8'])
+    expect(first.notes.unchanged).toHaveLength(13)
+    expect(first.notes.created).toHaveLength(0)
+
+    const applied = planSeed(stored(), scenario)
+    expect(applied.notes.updated).toHaveLength(0)
+    expect(applied.notes.unchanged).toHaveLength(15)
+  })
+
   it('a later day re-anchors only the dated notes (6 updated, 9 unchanged)', () => {
     const plan = planSeed(stored(), buildScenario(USER, THU, TZ))
     expect(plan.notes.created).toHaveLength(0)
@@ -73,6 +87,7 @@ describe('planSeed', () => {
           doneAt: null,
           snoozeCount: 0,
           tagSlugs: ['client-a'],
+          body: '',
         },
       ],
       tags: [{ id: 'real-tag', slug: 'client-a' }],
@@ -103,6 +118,7 @@ describe('planRemove', () => {
       doneAt: null,
       snoozeCount: 0,
       tagSlugs: [],
+      body: '',
     })
     existing.tags.push({ id: 'real-tag', slug: 'other' })
     const plan = planRemove(existing, scenario)

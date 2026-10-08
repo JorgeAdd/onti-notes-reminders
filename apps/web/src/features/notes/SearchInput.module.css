@@ -1,0 +1,7 @@
+.bar {
+  composes: bar from '../today/CommandBar.module.css';
+}
+
+.input {
+  composes: input from '../today/CommandBar.module.css';
+}

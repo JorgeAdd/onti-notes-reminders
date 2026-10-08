@@ -1,0 +1,32 @@
+.bar {
+  composes: bar from '../today/Statusline.module.css';
+}
+
+.clock {
+  composes: clock from '../today/Statusline.module.css';
+}
+
+.hints {
+  composes: hints from '../today/Statusline.module.css';
+}
+
+.head {
+  min-width: 0;
+  padding-left: var(--space-lg);
+  font: var(--text-meta-strong);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tail {
+  flex: none;
+  color: var(--color-ink-muted);
+}
+
+@media (max-width: 640px) {
+  /* Same as the day statusline on a phone: the hints give way to the term and the count. */
+  .hints {
+    display: none;
+  }
+}

@@ -2,6 +2,7 @@ import { makeCaptureNote } from './application/capture-note'
 import { makeGetMe } from './application/get-me'
 import { makeGetToday } from './application/get-today'
 import { makeMarkDone } from './application/mark-done'
+import { makeSearchNotes } from './application/search-notes'
 import { makeSetTimezone } from './application/set-timezone'
 import { makeSnoozeNote } from './application/snooze-note'
 import { makeUndoDone } from './application/undo-done'
@@ -32,6 +33,7 @@ const app = buildServer({
   },
   corsOrigins: config.CORS_ORIGINS,
   logger: true,
+  searchNotes: makeSearchNotes({ clock, notes, profiles }),
 })
 
 async function shutdown() {

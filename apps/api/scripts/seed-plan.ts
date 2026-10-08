@@ -10,6 +10,7 @@ export interface ExistingState {
     doneAt: Date | null
     snoozeCount: number
     tagSlugs: string[]
+    body: string
   }[]
   tags: { id: string; slug: string }[]
 }
@@ -43,6 +44,7 @@ export function planSeed(existing: ExistingState, desired: Scenario): SeedPlan {
     if (!row) notes.created.push(note)
     else if (
       row.title === note.title &&
+      row.body === note.body &&
       sameInstant(row.dueAt, note.dueAt) &&
       sameInstant(row.doneAt, note.doneAt) &&
       row.snoozeCount === 0 &&

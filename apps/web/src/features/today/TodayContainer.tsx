@@ -12,6 +12,7 @@ import { pageTitle } from './page-title'
 import styles from './TodayContainer.module.css'
 import { DayPage, type CaptureBar } from './DayPage'
 import { useReminderActions, type ReminderApi } from './mutations/use-reminder-actions'
+import { useKeyboardLayer } from './use-keyboard-layer'
 import { useTodayRows } from './use-today-rows'
 import { TodayStatus } from './TodayStatus'
 import { useDayView } from './use-day-view'
@@ -27,6 +28,8 @@ interface Props {
   syncTimezone: (timezone: string) => Promise<unknown>
   /** Snooze, done and undo calls, bound to the session token. */
   reminders: ReminderApi
+  /** `/` or the phone's Search button: the app switches to All notes. */
+  onOpenSearch?: () => void
   /** Injectable for tests; defaults to the browser's zone. */
   browserTimeZone?: () => string
 }
@@ -42,6 +45,7 @@ export function TodayContainer({
   onSignOut,
   syncTimezone,
   reminders,
+  onOpenSearch,
   browserTimeZone = readBrowserTimeZone,
 }: Props) {
   const queryClient = useQueryClient()
@@ -99,6 +103,16 @@ export function TodayContainer({
     },
     days,
   )
+  // `/` works exactly when the key layer does (no bar, tag bar or sheet open), no snooze menu is
+  // armed and no placeholder page is on screen; so does its hint.
+  const searchAvailable =
+    onOpenSearch !== undefined &&
+    bar === null &&
+    !tagBarOpen &&
+    sheet === null &&
+    !armed &&
+    !isPlaceholderData
+  useKeyboardLayer(searchAvailable, (key) => (key === '/' ? (onOpenSearch?.(), true) : false))
   const captureBar: CaptureBar | null =
     bar === null
       ? null
@@ -182,10 +196,11 @@ export function TodayContainer({
           }}
           rows={rows}
           snoozeMenu={armed}
-          hints={hints}
+          hints={searchAvailable ? [...hints, 'search'] : hints}
           capture={captureBar}
           mobile={mobile}
           onOpenCapture={openBar}
+          onOpenSearch={onOpenSearch}
           sheet={sheet}
           loading={loading}
           nav={days}

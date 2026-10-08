@@ -59,7 +59,7 @@ export const messages = {
       when === null ? title : `${title}, ${when}`,
     hiddenNotice: (slug: string) => `Saved. It does not carry #${slug}, so the filter hides it.`,
   },
-  mobile: { capture: '+ Capture', tags: 'Tags' },
+  mobile: { capture: '+ Capture', tags: 'Tags', search: 'Search' },
   actionSheet: {
     label: (title: string) => `Actions for ${title}`,
     done: 'Done',
@@ -103,6 +103,7 @@ export const messages = {
       today: 't today',
       tags: '# tag',
       clear: 'esc clear filter',
+      search: '/ search',
     },
   },
   errors: {
@@ -115,5 +116,25 @@ export const messages = {
     captureFailed: (title: string) => `Could not save “${title}”. Your text is back in the bar.`,
     actionMissing: (title: string) => `“${title}” no longer exists. It is back where it was.`,
     viewUnavailable: 'That view is not available, so it was reset.',
+  },
+  /** Slice 5: the All notes and search view. */
+  notes: {
+    done: 'done',
+    title: 'All notes',
+    back: 'Back to today',
+    searchLabel: 'Search your notes',
+    searchPlaceholder: 'Search notes',
+    loading: 'Opening your notes…',
+    loadError: 'Your notes could not be loaded.',
+    retry: 'Try again',
+    empty: 'No notes yet',
+    noMatch: (term: string) => `No notes match “${term}”.`,
+    count: (n: number) => `${n} ${n === 1 ? 'note' : 'notes'}`,
+    allNotes: 'all notes',
+    /** `SEARCH · term` and `· n of total`: `n` is shown, `total` is every note the user has. */
+    statusHead: (term: string, tag: string | null = null) =>
+      `SEARCH · ${term}${tag === null ? '' : ` · #${tag}`}`,
+    statusTail: (shown: number, total: number) => `· ${shown} of ${total}`,
+    hints: { search: '/ search', tags: '# tag', clear: 'esc clear filter', back: 'esc back' },
   },
 } as const
