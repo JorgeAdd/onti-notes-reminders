@@ -306,6 +306,14 @@
       "prompts": 0
     },
     {
+      "id": "ead29c7b",
+      "created_by": "jdd",
+      "created_at": "2026-10-08T20:44:37Z",
+      "sessions": 0,
+      "memories": 3,
+      "prompts": 0
+    },
+    {
       "id": "3dabc838",
       "created_by": "jdd",
       "created_at": "2026-10-08T21:04:45Z",
@@ -359,6 +367,14 @@
       "created_at": "2026-10-08T22:35:15Z",
       "sessions": 1,
       "memories": 3,
+      "prompts": 0
+    },
+    {
+      "id": "69d9fed3",
+      "created_by": "jdd",
+      "created_at": "2026-10-08T22:40:10Z",
+      "sessions": 0,
+      "memories": 1,
       "prompts": 0
     }
   ]

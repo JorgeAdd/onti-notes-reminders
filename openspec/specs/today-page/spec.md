@@ -35,7 +35,7 @@ The API MUST expose `GET /today`, verify the JWT, and return the day page of the
 
 ### Requirement: Page sections
 
-The page MUST show, per boards 03/05 (light) and 09/11 (dark): date block (SG2, SG6), header count with R4 copy variants ("things today" / "left today"), a carried group per local day "Still open from {day}" with "late {duration}" oldest first (R3, R2, SG3), the hour rail with a NOW line and "in {duration}" (SG7, R6), done items struck through (SG12), and "{n} other notes on the back of the pad" (R5, SG8). Titles and tags MUST render as plain text. Open items MUST offer the actions of `reminder-actions`; done items MUST offer undo (`z`, or the mobile sheet) and no other action.
+On today's page the page MUST show, per boards 03/05 (light) and 09/11 (dark): date block (SG2, SG6), header count with R4 copy variants ("things today" / "left today"), a carried group per local day "Still open from {day}" with "late {duration}" oldest first (R3, R2, SG3), the hour rail with a NOW line and "in {duration}" (SG7, R6), done items struck through (SG12), and "{n} other notes on the back of the pad" (R5, SG8). Titles and tags MUST render as plain text. Open items MUST offer the actions of `reminder-actions`; done items MUST offer undo (`z`, or the mobile sheet) and no other action. Other days and filtered views follow `day-navigation` and `tag-filter`.
 
 #### Scenario: Morning page (C4)
 
@@ -63,7 +63,7 @@ The page MUST show, per boards 03/05 (light) and 09/11 (dark): date block (SG2, 
 
 ### Requirement: Statusline
 
-A statusline fixed at the bottom MUST show the weekday, day, today/carried/total counts and the current time, matching boards 03/09. The mode label MUST show on desktop; MAY be hidden on narrow (mobile) layouts per board 05. On desktop it MUST show key hints only for keys that work in the current state (`c`, `j`/`k`, `x`, `z`, `s`, `esc`), and MUST NOT show hints for keys of unshipped features. Hint text MUST come from messages.
+A statusline fixed at the bottom MUST show the weekday, day, today/carried/total counts and the current time, matching boards 03/09; weekday and day name the viewed day. The mode label MUST show on desktop; MAY be hidden on narrow (mobile) layouts per board 05. While a tag filter is on, the mode label MUST read `FILTER · #{slug}` (`tag-filter`). On desktop it MUST show key hints only for keys that work in the current state (`c`, `j`/`k`, `x`, `z`, `s`, `esc`, and `[`/`]`, `t`, `#`, `tab`, `↵` per `day-navigation` and `tag-filter`, and `/` for search), and MUST NOT show hints for keys of unshipped features. Hint text MUST come from messages.
 
 #### Scenario: Counts
 
@@ -73,15 +73,21 @@ A statusline fixed at the bottom MUST show the weekday, day, today/carried/total
 
 #### Scenario: Working hints only
 
-- GIVEN a desktop viewport and no item focused
+- GIVEN a desktop viewport, today, no item focused and no filter
 - WHEN the statusline renders
-- THEN it hints `c` and `j`/`k`, and does not hint `x`, `z` or `s`; with an open item focused it adds `x` and `s`; with a done item focused, `z`
+- THEN it hints `c`, `j`/`k`, `[`/`]`, `#` and `/`, and does not hint `x`, `z`, `s`, `t`, `tab` or `↵`; with an open item focused it adds `x` and `s`; with a done item focused, `z`
 
-#### Scenario: No search hint
+#### Scenario: Day and filter hints
 
-- GIVEN any state
+- GIVEN a desktop viewport viewing Tue 6, with a filter on
 - WHEN the statusline renders
-- THEN no hint for search, tag filter or day navigation shows
+- THEN it hints `t` and `esc`, and shows `FILTER · #{slug}`; with the tag bar open it also hints `tab` and `↵`
+
+#### Scenario: Search hint, no unshipped hints
+
+- GIVEN any state of the day page in which `/` works (no capture bar, tag bar or sheet open, no `s` armed, no page loading), including when there are no rows
+- WHEN the statusline renders
+- THEN `/` is hinted only in those states, and never while the tag bar is open or a page is loading
 
 ### Requirement: Live labels and refresh
 
@@ -117,13 +123,19 @@ With no items the page MUST render the same layout with an empty rail and calm c
 
 ### Requirement: Layout and theme
 
-Desktop MUST follow board 03/09. At mobile width it MUST follow board 05/11 minus action controls (SG14). Light/dark follows the system by default with manual override (SG18); only semantic tokens change; vermilion only on the date block; no animation without reduced-motion fallback (SG16); all rules per CLAUDE.md 8-13.
+Desktop MUST follow board 03/09. At mobile width it MUST follow board 05/11 minus action controls (SG14), plus a "Search" button in the bottom bar next to "+ Capture" that opens the All notes view (`notes-search`). Light/dark follows the system by default with manual override (SG18); only semantic tokens change; vermilion only on the date block; no animation without reduced-motion fallback (SG16); all rules per CLAUDE.md 8-13.
 
 #### Scenario: Themes and mobile
 
 - GIVEN a system dark preference and a narrow viewport
 - WHEN the page renders
 - THEN it matches board 11 content with no horizontal scroll
+
+#### Scenario: Mobile Search button
+
+- GIVEN a narrow viewport on the day page
+- WHEN the bottom bar renders and Search is tapped
+- THEN the button is at least 44 px, copy comes from messages, and the All notes view opens
 
 ### Requirement: Accessibility
 
@@ -137,4 +149,4 @@ The page MUST have landmarks (main, header, statusline) and one h1. Times MUST b
 
 ## Out of scope (replaces the slice-1 list)
 
-Note edit/delete, manual reschedule (R8), markdown (R14), day navigation (`[ ]`), tag filter (R12), search (R13), all-notes view, "Pick…" time picker, Web Push and notification-click done, tear-off animation (SG15), onboarding, `?` help, theme override UI, timezone picker, undo of snooze.
+Note edit/delete, manual reschedule (R8), markdown (R14), "Pick…" time picker, Web Push and notification-click done, tear-off animation (SG15), onboarding, `?` help, theme override UI, timezone picker, undo of snooze. Search (R13) and the All notes view ship in `notes-search`.
