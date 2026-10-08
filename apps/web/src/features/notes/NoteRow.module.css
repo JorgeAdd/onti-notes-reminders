@@ -1,0 +1,64 @@
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--space-lg);
+  row-gap: var(--space-xs);
+  padding: var(--space-md) var(--space-row-x);
+  border-block-end: 1px solid var(--color-rule);
+  list-style: none;
+}
+
+.title {
+  font: var(--text-item-title);
+  overflow-wrap: anywhere;
+}
+
+/* SG12: done is an ink strike, never a colour. */
+.done {
+  text-decoration-line: line-through;
+  text-decoration-color: var(--color-ink);
+  color: var(--color-ink-muted);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+}
+
+.meta > span + span::before {
+  content: '·';
+  margin-right: var(--space-sm);
+}
+
+.excerpt {
+  grid-column: 1 / -1;
+  margin: 0;
+  font: var(--text-body);
+  color: var(--color-ink-muted);
+  overflow-wrap: anywhere;
+}
+
+/* Read by assistive technology only: the strike is the sighted cue. */
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meta {
+    justify-content: flex-start;
+  }
+}

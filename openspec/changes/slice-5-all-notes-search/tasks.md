@@ -91,9 +91,9 @@ Global checks for every commit:
 
 ### Commit 6: `feat(web):` read-only rows and list (~260 lines)
 
-- [ ] 6.1 RED: `apps/web/test/notes-format.test.ts` (`dueLabel`: year only when different, timezone) and `notes-row.test.tsx` (done strike, tags, due, excerpt as text: `<img src=x onerror=alert(1)>` renders literally, hidden "done", no tabindex or handlers).
-- [ ] 6.2 GREEN: `features/notes/{format.ts,NoteRow.tsx,NoteList.tsx}` + CSS Modules (tokens only), `messages.ts` `notes` group (append-only).
-- [ ] 6.3 `npm run verify`; record bundle size; commit.
+- [x] 6.1 RED: `apps/web/test/notes-format.test.ts` (`dueLabel`: year only when different, timezone) and `notes-row.test.tsx` (done strike, tags, due, excerpt as text: `<img src=x onerror=alert(1)>` renders literally, hidden "done", no tabindex or handlers).
+- [x] 6.2 GREEN: `features/notes/{format.ts,NoteRow.tsx,NoteList.tsx}` + CSS Modules (tokens only), `messages.ts` `notes` group (append-only).
+- [x] 6.3 `npm run verify`; record bundle size; commit.
 
 ### Commit 7: `feat(web):` container, page, input, statusline (~431 lines)
 

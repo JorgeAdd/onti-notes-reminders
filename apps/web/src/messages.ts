@@ -116,4 +116,8 @@ export const messages = {
     actionMissing: (title: string) => `“${title}” no longer exists. It is back where it was.`,
     viewUnavailable: 'That view is not available, so it was reset.',
   },
+  /** Slice 5: the All notes and search view. */
+  notes: {
+    done: 'done',
+  },
 } as const
