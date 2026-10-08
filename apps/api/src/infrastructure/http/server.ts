@@ -1,5 +1,11 @@
 import cors from '@fastify/cors'
-import { meResponseSchema, timezoneRequestSchema, todayResponseSchema } from '@onti/shared'
+import {
+  meResponseSchema,
+  noteResponseSchema,
+  snoozeRequestSchema,
+  timezoneRequestSchema,
+  todayResponseSchema,
+} from '@onti/shared'
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify'
 import { z } from 'zod'
 import {
@@ -10,15 +16,20 @@ import {
 } from '../../application/errors'
 import type { GetMe } from '../../application/get-me'
 import type { GetToday } from '../../application/get-today'
+import type { MarkDone } from '../../application/mark-done'
 import type { TokenVerifier } from '../../application/ports'
 import type { SetTimezone } from '../../application/set-timezone'
+import type { SnoozeNote } from '../../application/snooze-note'
+import type { UndoDone } from '../../application/undo-done'
 import type { Identity } from '../../domain/identity'
+import type { NoteRecord } from '../../domain/note'
 
 export interface ServerDeps {
   verifier: TokenVerifier
   getMe: GetMe
   setTimezone: SetTimezone
   getToday: GetToday
+  actions: { snoozeNote: SnoozeNote; markDone: MarkDone; undoDone: UndoDone }
   corsOrigins: string[]
   logger?: boolean
 }
@@ -30,11 +41,33 @@ function isFastifyClientError(error: unknown): boolean {
   return typeof status === 'number' && status >= 400 && status < 500
 }
 
+/** `{note}` on the wire: the reminder state without the notification bookkeeping. */
+function noteBody(note: NoteRecord) {
+  const { id, title, tags, dueAt, originalDueAt, snoozeCount, doneAt } = note
+  return z.encode(noteResponseSchema, {
+    id,
+    title,
+    tags,
+    dueAt,
+    originalDueAt,
+    snoozeCount,
+    doneAt,
+  })
+}
+
+/** A non-UUID id cannot exist, so it is the same 404 as an unknown one (R15). */
+function noteIdOf(params: unknown): string {
+  const parsed = z.object({ id: z.uuid() }).safeParse(params)
+  if (!parsed.success) throw new NotFoundError('Note not found')
+  return parsed.data.id
+}
+
 export function buildServer({
   verifier,
   getMe,
   setTimezone,
   getToday,
+  actions,
   corsOrigins,
   logger = false,
 }: ServerDeps) {
@@ -81,6 +114,24 @@ export function buildServer({
     const body = timezoneRequestSchema.safeParse(request.body)
     if (!body.success) throw new ValidationError('Body must be {timezone: string}')
     return { timezone: await setTimezone(identity, body.data.timezone) }
+  })
+
+  app.post('/notes/:id/snooze', async (request) => {
+    const identity = await authenticate(request)
+    const id = noteIdOf(request.params)
+    const body = snoozeRequestSchema.safeParse(request.body)
+    if (!body.success) throw new ValidationError('Body must be {preset: "hour" | "tomorrow"}')
+    return noteBody(await actions.snoozeNote(identity, id, body.data.preset))
+  })
+
+  app.post('/notes/:id/done', async (request) => {
+    const identity = await authenticate(request)
+    return noteBody(await actions.markDone(identity, noteIdOf(request.params)))
+  })
+
+  app.post('/notes/:id/undo', async (request) => {
+    const identity = await authenticate(request)
+    return noteBody(await actions.undoDone(identity, noteIdOf(request.params)))
   })
 
   app.get('/today', async (request) => {

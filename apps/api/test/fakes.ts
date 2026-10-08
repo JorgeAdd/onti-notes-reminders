@@ -1,5 +1,7 @@
+import type { Reminder } from '@onti/shared'
 import type { Identity } from '../src/domain/identity'
-import type { Profile, ProfileRepository } from '../src/application/ports'
+import type { NoteRepository, Profile, ProfileRepository } from '../src/application/ports'
+import type { NoteRecord } from '../src/domain/note'
 
 export const JORGE: Identity = {
   userId: '7b0c5a2e-3f4d-4c1a-9e8b-2d6f0a1b3c4d',
@@ -46,5 +48,71 @@ export function profileReturning(profile: Profile | null): ProfileRepository {
   return {
     findOwn: () => Promise.resolve(profile),
     setTimezoneIfDefault: () => Promise.reject(new Error('unexpected write')),
+  }
+}
+
+export const noteId = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
+
+export function noteRecord(n: number, overrides: Partial<NoteRecord> = {}): NoteRecord {
+  return {
+    id: noteId(n),
+    title: `Note ${n}`,
+    tags: [],
+    dueAt: null,
+    originalDueAt: null,
+    snoozeCount: 0,
+    doneAt: null,
+    notifiedDueAt: null,
+    ...overrides,
+  }
+}
+
+/**
+ * Owner-scoped like RLS plus the adapter's contract: an unknown or foreign id answers `null`,
+ * `decide` runs on the stored reminder, a thrown error leaves the row untouched (rollback), and
+ * an unchanged result writes nothing.
+ */
+export class InMemoryNotes implements NoteRepository {
+  readonly writes: string[] = []
+  private readonly rows = new Map<string, { ownerId: string; note: NoteRecord }>()
+
+  constructor(owned: { ownerId: string; note: NoteRecord }[] = []) {
+    for (const row of owned) this.rows.set(row.note.id, row)
+  }
+
+  get(id: string): NoteRecord | undefined {
+    return this.rows.get(id)?.note
+  }
+
+  listOwn(identity: Identity): Promise<NoteRecord[]> {
+    return Promise.resolve(
+      [...this.rows.values()].filter((r) => r.ownerId === identity.userId).map((r) => r.note),
+    )
+  }
+
+  mutateReminder(
+    identity: Identity,
+    id: string,
+    decide: (reminder: Reminder) => Reminder,
+  ): Promise<NoteRecord | null> {
+    const row = this.rows.get(id)
+    if (!row || row.ownerId !== identity.userId) return Promise.resolve(null)
+    try {
+      const next = decide(row.note)
+      if (next !== row.note) {
+        row.note = {
+          ...row.note,
+          dueAt: next.dueAt,
+          originalDueAt: next.originalDueAt,
+          snoozeCount: next.snoozeCount,
+          doneAt: next.doneAt,
+          notifiedDueAt: next.notifiedDueAt,
+        }
+        this.writes.push(id)
+      }
+      return Promise.resolve(row.note)
+    } catch (error) {
+      return Promise.reject(error instanceof Error ? error : new Error(String(error)))
+    }
   }
 }

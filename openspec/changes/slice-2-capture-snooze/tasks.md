@@ -64,11 +64,11 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 2: Reminder actions API (~340 lines)
 
-- [ ] 2.1 RED then GREEN: shared `instant.ts` (codec moved from `today.ts`), `notes.ts` `noteResponseSchema`, `snoozeRequestSchema`; tests in `notes.test.ts`.
-- [ ] 2.2 RED: `apps/api/test/reminder-actions.test.ts`: +1 h from 09:05 -> 10:05 count 1 (C5); Tomorrow 9:00 across DST (C6); done sets `done_at`; done-on-done and undo-on-open no-ops; snooze on done/no-reminder and done on no-reminder -> `ConflictError`; unknown/other-user id -> `NotFoundError`.
-- [ ] 2.3 GREEN: `ports.ts` `mutateReminder`; `snooze-note.ts`, `mark-done.ts`, `undo-done.ts` (state checks before domain calls).
-- [ ] 2.4 RED then GREEN: `server.test.ts` routes `POST /notes/:id/{snooze,done,undo}`: 401, 400, 404 (incl. non-UUID), 409, 200 round-trips schema.
-- [ ] 2.5 GREEN: `postgres-note-repository.ts` `mutateReminder` (`for update`, update only if changed); `database.ts` update shapes; wire `main.ts`.
+- [x] 2.1 RED then GREEN: shared `instant.ts` (codec moved from `today.ts`), `notes.ts` `noteResponseSchema`, `snoozeRequestSchema`; tests in `notes.test.ts`.
+- [x] 2.2 RED: `apps/api/test/reminder-actions.test.ts`: +1 h from 09:05 -> 10:05 count 1 (C5); Tomorrow 9:00 across DST (C6); done sets `done_at`; done-on-done and undo-on-open no-ops; snooze on done/no-reminder and done on no-reminder -> `ConflictError`; unknown/other-user id -> `NotFoundError`.
+- [x] 2.3 GREEN: `ports.ts` `mutateReminder`; `snooze-note.ts`, `mark-done.ts`, `undo-done.ts` (state checks before domain calls).
+- [x] 2.4 RED then GREEN: `server.test.ts` routes `POST /notes/:id/{snooze,done,undo}`: 401, 400, 404 (incl. non-UUID), 409, 200 round-trips schema.
+- [x] 2.5 GREEN: `postgres-note-repository.ts` `mutateReminder` (`for update`, update only if changed); `database.ts` update shapes; wire `main.ts`.
 - [ ] 2.6 Manual checklist (record in PR): two parallel snoozes end at `snooze_count = 2`; other user's id -> 404.
 
 ## Commit 3: Capture API (~340 lines)

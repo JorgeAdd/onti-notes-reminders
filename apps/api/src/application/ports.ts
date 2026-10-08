@@ -1,3 +1,4 @@
+import type { Reminder } from '@onti/shared'
 import type { Identity } from '../domain/identity'
 import type { NoteRecord } from '../domain/note'
 
@@ -29,4 +30,15 @@ export interface Clock {
 export interface NoteRepository {
   /** Every note of the caller, without bodies, with its tags. */
   listOwn(identity: Identity): Promise<NoteRecord[]>
+  /**
+   * Runs `decide` on the caller's note under a row lock, in one transaction, and stores the
+   * reminder it returns when it differs. Returns the stored note, or null when the id is unknown
+   * or not the caller's (R15). `decide` is pure and synchronous; anything it throws rolls the
+   * transaction back and propagates.
+   */
+  mutateReminder(
+    identity: Identity,
+    id: string,
+    decide: (reminder: Reminder) => Reminder,
+  ): Promise<NoteRecord | null>
 }
