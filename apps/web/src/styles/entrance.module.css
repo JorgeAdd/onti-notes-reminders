@@ -1,0 +1,49 @@
+/* Page entrance (SG19). Applied only under [data-entrance], which lib/entrance.ts sets on the
+   first sheet of a full page load. `backwards`: no transform or clip-path outlives the animation. */
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--entrance-rise));
+    clip-path: var(--entrance-clip-start);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    clip-path: inset(0);
+  }
+}
+
+@keyframes date-in {
+  from {
+    transform: translateY(var(--entrance-rise-detail));
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes last-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+[data-entrance] .sheet {
+  animation: sheet-in var(--motion-entrance) var(--ease-paper) backwards;
+}
+
+[data-entrance] .date {
+  animation: date-in var(--motion-entrance-detail) var(--ease-paper) var(--entrance-delay-date)
+    backwards;
+}
+
+[data-entrance] .last {
+  animation: last-in var(--motion-entrance-detail) var(--ease-paper) var(--entrance-delay-bar)
+    backwards;
+}

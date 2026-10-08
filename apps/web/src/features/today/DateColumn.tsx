@@ -1,4 +1,5 @@
 import { messages } from '../../messages'
+import { ThemeControl } from '../theme/ThemeControl'
 import styles from './DateColumn.module.css'
 import { DayNav, type DayNavState } from './DayNav'
 import { calendarDateBlock } from './format'
@@ -13,9 +14,19 @@ interface Props {
   note: string | null
   onSignOut: () => void
   nav?: (DayNavState & { mobile: boolean }) | undefined
+  /** Today only: the theme control sits above Sign out (not on All notes). */
+  showTheme?: boolean
 }
 
-export function DateColumn({ date, isToday, timezone, note, onSignOut, nav }: Props) {
+export function DateColumn({
+  date,
+  isToday,
+  timezone,
+  note,
+  onSignOut,
+  nav,
+  showTheme = false,
+}: Props) {
   const { day, weekday, month } = calendarDateBlock(date, timezone)
   return (
     <aside className={styles.column}>
@@ -28,9 +39,12 @@ export function DateColumn({ date, isToday, timezone, note, onSignOut, nav }: Pr
       <p className={styles.muted}>{timezone}</p>
       {note === null ? null : <p className={styles.muted}>{note}</p>}
       {nav ? <DayNav {...nav} /> : null}
-      <button className={styles.signOut} type="button" onClick={onSignOut}>
-        {messages.today.signOut}
-      </button>
+      <div className={styles.account}>
+        {showTheme ? <ThemeControl /> : null}
+        <button className={styles.signOut} type="button" onClick={onSignOut}>
+          {messages.today.signOut}
+        </button>
+      </div>
     </aside>
   )
 }

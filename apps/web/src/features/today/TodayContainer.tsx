@@ -15,6 +15,7 @@ import { useReminderActions, type ReminderApi } from './mutations/use-reminder-a
 import { useKeyboardLayer } from './use-keyboard-layer'
 import { useTodayRows } from './use-today-rows'
 import { TodayStatus } from './TodayStatus'
+import { STATUS_DELAY_MS, useAfterDelay } from './use-after-delay'
 import { useDayView } from './use-day-view'
 import { useNarrow } from './use-narrow'
 import { useNow } from './use-now'
@@ -57,6 +58,8 @@ export function TodayContainer({
     placeholderData: keepPreviousData,
   })
   const { data, dataUpdatedAt, refetch, isPlaceholderData } = query
+  // Only the desk shows while Today loads; the status card waits for an error or ~400 ms.
+  const slow = useAfterDelay(data === undefined && !query.isError, STATUS_DELAY_MS)
   // A placeholder is the previous page: its `dataUpdatedAt` is not when it arrived, so the skew
   // of the last real answer stays.
   const [skew, setSkew] = useState(0)
@@ -230,5 +233,6 @@ export function TodayContainer({
     )
   }
   if (expired) return null
+  if (!query.isError && !slow) return null
   return <TodayStatus failed={query.isError} onRetry={() => void refetch()} />
 }

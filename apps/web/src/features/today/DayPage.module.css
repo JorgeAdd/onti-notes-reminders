@@ -4,7 +4,9 @@
   grid-template-rows: 1fr auto;
 }
 
+/* The sheet: the entrance reaches it as a descendant of the [data-entrance] desk. */
 .page {
+  composes: sheet from '../../styles/entrance.module.css';
   width: min(100% - 2 * var(--space-lg), var(--size-page-max));
   margin: var(--space-2xl) auto;
   display: grid;

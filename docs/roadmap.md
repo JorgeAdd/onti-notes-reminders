@@ -16,6 +16,7 @@ yet specified), **Proposed** (inferred from the v1 scope, not yet agreed).
 | 5     | All notes and search                    | Done     |
 | 6     | Web Push notifications                  | Proposed |
 | 7     | Merged into slice 2                     | —        |
+| 8     | Page entrance and theme override        | Done     |
 
 ## Slice 1 — Read-only Today page
 
@@ -25,6 +26,10 @@ hour rail with a now line. Archived at
 in `docs/backlog.md`.
 
 ## Slice 2 — Timezone, capture, snooze and done/undo
+
+Done 2026-10-08. Archived at
+`openspec/changes/archive/2026-10-08-slice-2-capture-snooze/`. Scope as
+shipped:
 
 - **First:** store the browser's IANA timezone in `profiles.timezone` on first
   login (R16), validated by the API. Capture (R11), snooze (R7) and the day
@@ -39,8 +44,6 @@ in `docs/backlog.md`.
   decision 6).
 - DST transitions covered by tests.
 
-_Pending: product sync._
-
 ## Slice 3 — Day navigation and tag filter
 
 Done 2026-10-08. Day navigation keys (`[`, `]`, `t`) and tag filter (`#`) with URL state persistence. Archived at
@@ -54,7 +57,6 @@ note lifecycle.
 - Edit and delete notes.
 - Manual reschedule and reminder removal (R8).
 - Basic markdown body, always sanitized; raw HTML is never rendered (R14).
-- Manual theme override UI (`docs/backlog.md`).
 
 ## Slice 5 — All notes and search
 
@@ -72,6 +74,6 @@ Done 2026-10-08. All notes view with full-text word-prefix search (`/` key), exc
 Timezone-on-first-login was named slice 7 in slice 1's artifacts. It moved to
 the start of slice 2 because capture and snooze depend on it.
 
-## Unassigned
+## Slice 8 — Page entrance and theme override
 
-- Welcome / onboarding (out of slice 1, no slice yet).
+Done 2026-10-08. Archived at `openspec/changes/archive/2026-10-08-slice-8-page-entrance-theme/`. Deferred items in `docs/backlog.md`.
