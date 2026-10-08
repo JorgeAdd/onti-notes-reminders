@@ -10,10 +10,10 @@ yet specified), **Proposed** (inferred from the v1 scope, not yet agreed).
 | Slice | Theme                                   | Status   |
 | ----- | --------------------------------------- | -------- |
 | 1     | Read-only Today page                    | Done     |
-| 2     | Timezone, capture, snooze and done/undo | Named    |
-| 3     | Day navigation and tag filter           | Named    |
+| 2     | Timezone, capture, snooze and done/undo | Done     |
+| 3     | Day navigation and tag filter           | Done     |
 | 4     | Note editing and markdown               | Proposed |
-| 5     | All notes and search                    | Proposed |
+| 5     | All notes and search                    | Done     |
 | 6     | Web Push notifications                  | Proposed |
 | 7     | Merged into slice 2                     | —        |
 
@@ -43,12 +43,8 @@ _Pending: product sync._
 
 ## Slice 3 — Day navigation and tag filter
 
-- Move between days from the Today page.
-- Tag filter on the day page (R12): timed items on the rail, the rest listed
-  below; "{n} notes" header, "{total − n} notes hidden"; `esc` clears.
-
-_Implemented on `feat/slice-3-day-navigation-tag-filter`; pending the manual
-smoke and merge._
+Done 2026-10-08. Day navigation keys (`[`, `]`, `t`) and tag filter (`#`) with URL state persistence. Archived at
+`openspec/changes/archive/2026-10-08-slice-3-day-navigation-tag-filter/`. Deferred items in `docs/backlog.md`.
 
 ## Slice 4 — Note editing and markdown (proposed)
 
@@ -60,10 +56,10 @@ note lifecycle.
 - Basic markdown body, always sanitized; raw HTML is never rendered (R14).
 - Manual theme override UI (`docs/backlog.md`).
 
-## Slice 5 — All notes and search (proposed)
+## Slice 5 — All notes and search
 
-- All notes view.
-- Case-insensitive full-text search on title + body over all notes (R13).
+Done 2026-10-08. All notes view with full-text word-prefix search (`/` key), excerpts, and tag filtering in All notes. Archived at
+`openspec/changes/archive/2026-10-08-slice-5-all-notes-search/`. Deferred items in `docs/backlog.md`.
 
 ## Slice 6 — Web Push notifications (proposed)
 

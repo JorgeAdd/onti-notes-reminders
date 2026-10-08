@@ -137,5 +137,5 @@ Smoke checklist (record results in the PR; tick each when observed):
 
 ## PR task
 
-- [ ] P.1 Ask the human before pushing (rule 6). Open PR to `main`, label `size:exception`, commit-by-commit reading guide, bundle sizes (baseline 591.44 kB), smoke results, open-question defaults (R4 wording, no tag injected on capture, read-only others).
-- [ ] P.2 Save prompts in `prompts/durante/` (rule 7). Merge only with green "Verify and build".
+- [x] P.1 Ask the human before pushing (rule 6). Open PR to `main`, label `size:exception`, commit-by-commit reading guide, bundle sizes (baseline 591.44 kB), smoke results, open-question defaults (R4 wording, no tag injected on capture, read-only others).
+- [x] P.2 Save prompts in `prompts/durante/` (rule 7). Merge only with green "Verify and build".
