@@ -47,7 +47,8 @@ _Pending: product sync._
 - Tag filter on the day page (R12): timed items on the rail, the rest listed
   below; "{n} notes" header, "{total − n} notes hidden"; `esc` clears.
 
-_Pending: spec alignment._
+_Implemented on `feat/slice-3-day-navigation-tag-filter`; pending the manual
+smoke and merge._
 
 ## Slice 4 — Note editing and markdown (proposed)
 

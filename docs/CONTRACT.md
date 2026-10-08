@@ -164,6 +164,19 @@ Slice 2 (capture, snooze, done and undo) adds the write-side proof:
 | C5 (`s h`)         | `apps/api/test/reminder-actions.test.ts` and `server.test.ts`: +1 h from 09:05 is 10:05, count 1, original due unchanged. `apps/web/test/keyboard.test.tsx` (`s h`), `which-key.test.tsx` and `action-sheet.test.tsx`: the resulting time shown is the one saved.                                                                                                                     |
 | C6 (`s t`)         | `apps/api/test/reminder-actions.test.ts` and `server.test.ts`: Tomorrow 9:00 is Thu 09:00, count 1. `packages/shared/test/dst.test.ts` (D4): the same rule across DST. `apps/web/test/keyboard.test.tsx` (`s t`): the item leaves the page and joins the other notes.                                                                                                                 |
 
+Slice 3 (day navigation and tag filter) adds the read-side proof:
+
+| Rows    | Proven by                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C8, R12 | `packages/shared/test/contract.test.ts`, `day-response.test.ts` and `other-notes.test.ts`: 1 rail row, 4 other notes, 10 hidden. `apps/api/test/today.test.ts` (`GET /today?tag`). `apps/web/test/tag-filter.test.tsx` and `filtered-page.test.tsx`: `#` and the tag bar, "5 notes", "10 notes hidden", the other-notes section. `apps/web/test/mobile-tags.test.tsx`: Tags button, chips, Clear chip, outside tap keeps the filter. |
+| R18     | `packages/shared/test/day-page.test.ts` and `apps/api/test/today.test.ts`: a past day has no carried group and no now line, done items stay. `apps/web/test/day-navigation.test.tsx`: time-only rows, viewed-day date block, header and statusline, per-day empty state.                                                                                                                                                             |
+| D5, D6  | `packages/shared/test/calendar-date.test.ts` (`dayWindow`): Sun 8 Mar is 23 h, Sun 1 Nov is 25 h, windows tile with no day skipped or repeated, 04:59Z and 05:00Z fall on Sun 1 and Mon 2. `apps/web/test/day-navigation.test.tsx`: `[` `]` `t` step through the days.                                                                                                                                                               |
+
+Manual smoke (viewport 1280x720 and 375x667) is recorded in the pull request
+of slice 3: Thu 8 14:30 `#client-b`, `[` to Wed 7, `t`, reload and back keep
+the view, `s t` then `]`, 2 Nov and 8 Mar with a New York profile, light and
+dark, reduced motion, no horizontal scroll.
+
 Still `todo` in that suite, asserted elsewhere when the feature lands:
 C9 (search, API + Postgres), C10 (markdown rendering, web), C11 (`404`
 for another user's note, API). C11's `401` part is already covered in

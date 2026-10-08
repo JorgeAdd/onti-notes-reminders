@@ -113,16 +113,25 @@ Ownership gate (slice 5): the branch MUST NOT modify `apps/api/src/application/p
 
 ## Commit 8: `feat(web):` mobile (~300 lines)
 
-- [ ] 8.1 RED: ‹ › Today >= 44 px with labels; "Tags" button only when `onTags` passed (order search?, tags?, capture); chips with `aria-pressed`, "Clear #tag" chip; outside tap closes dock, keeps filter, opens no row sheet (backdrop swallows click); narrow note "{hiddenCount} notes hidden · #slug".
-- [ ] 8.2 GREEN: `DayNav` mobile, `MobileBar` handler-prop buttons, `TagBar` `mobile` + backdrop, CSS tokens and reduced motion.
-- [ ] 8.3 Bundle size recorded. `npm run verify`; commit.
+- [x] 8.1 RED: ‹ › Today >= 44 px with labels; "Tags" button only when `onTags` passed (order search?, tags?, capture); chips with `aria-pressed`, "Clear #tag" chip; outside tap closes dock, keeps filter, opens no row sheet (backdrop swallows click); narrow note "{hiddenCount} notes hidden · #slug".
+- [x] 8.2 GREEN: `DayNav` mobile, `MobileBar` handler-prop buttons, `TagBar` `mobile` + backdrop, CSS tokens and reduced motion.
+- [x] 8.3 Bundle size recorded. `npm run verify`; commit.
 
 ## Commit 9: `docs:` status + smoke (~35 lines)
 
-- [ ] 9.1 `docs/CONTRACT.md` verification status for C8, D5, D6, Q1; roadmap tick; smoke checklist text.
-- [ ] 9.2 Final check: `git diff --name-only main...HEAD | grep -E "ports.ts|fakes.ts|packages/shared/src/notes.ts|domain/note.ts|database.ts|postgres-note"` returns nothing.
-- [ ] 9.3 Manual smoke at 1280x720 and 375x667: seed Thu 8 14:30 `#client-b` (5 notes, 10 hidden), `[` to Wed 7, `t`, refresh and back keep view, `s t` then `]`, 2 Nov and 8 Mar with a New York profile, light/dark, reduced motion, no horizontal scroll. Record in PR with final bundle size.
-- [ ] 9.4 `npm run verify`; commit.
+- [x] 9.1 `docs/CONTRACT.md` verification status for C8, D5, D6, Q1; roadmap tick; smoke checklist text.
+- [x] 9.2 Final check: `git diff --name-only main...HEAD | grep -E "ports.ts|fakes.ts|packages/shared/src/notes.ts|domain/note.ts|database.ts|postgres-note"` returns nothing.
+- [ ] 9.3 Manual smoke (checklist below; the orchestrator runs it with real key presses) at 1280x720 and 375x667: seed Thu 8 14:30 `#client-b` (5 notes, 10 hidden), `[` to Wed 7, `t`, refresh and back keep view, `s t` then `]`, 2 Nov and 8 Mar with a New York profile, light/dark, reduced motion, no horizontal scroll. Record in PR with final bundle size.
+- [x] 9.4 `npm run verify`; commit.
+
+Smoke checklist (record results in the PR; tick each when observed):
+
+- 1280x720: `[` goes to Wed 7 and the date block, header and statusline name it; `t` returns to today; `]` past 2099-12-31 does nothing.
+- 1280x720: `#` opens the tag bar, Tab cycles, ↵ applies `#client-b` (5 notes, 10 hidden), esc clears the filter.
+- Reload and the browser back button keep the viewed day and tag; `s t` on a row, then `]` shows it on Fri 9.
+- New York profile: 2 Nov (25 h) and 8 Mar (23 h) show no skipped or repeated day.
+- 375x667: ‹ › Today buttons work; Tags opens the chips; Clear #tag removes the filter; a tap outside closes the dock, keeps the filter and opens no row sheet.
+- Light and dark theme, reduced motion, no horizontal scroll at 375 px.
 
 ## PR task
 
