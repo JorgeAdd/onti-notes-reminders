@@ -8,6 +8,7 @@ import { CarriedGroup } from './CarriedGroup'
 import { DateColumn } from './DateColumn'
 import type { DayNavState } from './DayNav'
 import { calendarDayLabel } from './format'
+import { OtherNotes } from './OtherNotes'
 import { pageTitle } from './page-title'
 import styles from './DayPage.module.css'
 import { EmptyState } from './EmptyState'
@@ -78,7 +79,7 @@ interface Props {
   onOpenCapture?: () => void
   sheet?: SheetState | null
   /** D5 · set while the viewed day loads: the day to show instead of the previous page's. */
-  loading?: { date: string; isToday: boolean } | null
+  loading?: { date: string; isToday: boolean; tag: string | null } | null
   /** Day navigation: `[` `]` `t` handlers and the viewed day's state. */
   nav?: DayNavState | undefined
   /** The tag bar, when open (`#`). */
@@ -106,6 +107,15 @@ export function DayPage({
   const date = loading?.date ?? today.date
   const isToday = loading?.isToday ?? today.isToday
   const dayText = calendarDayLabel(date, today.timezone)
+  const tag = loading ? loading.tag : today.tag
+  // R5, or R12's side note when filtered (it names the tag where the page is narrow).
+  const note = loading
+    ? null
+    : today.tag === null
+      ? messages.today.otherNotes(today.otherCount)
+      : mobile
+        ? messages.filter.hiddenNamed(today.hiddenCount, today.tag)
+        : messages.filter.hidden(today.hiddenCount)
   const carriedCount = today.carried.reduce((sum, group) => sum + group.items.length, 0)
   // Decision 13: total notes derive from the page itself, no extra wire field.
   const totalCount = carriedCount + today.rail.length + today.otherCount
@@ -117,7 +127,7 @@ export function DayPage({
           date={date}
           isToday={isToday}
           timezone={today.timezone}
-          otherCount={loading ? null : today.otherCount}
+          note={note}
           onSignOut={onSignOut}
           nav={nav ? { ...nav, mobile } : undefined}
         />
@@ -145,6 +155,9 @@ export function DayPage({
               />
             </>
           )}
+          {today.tag !== null && today.others.length > 0 ? (
+            <OtherNotes items={today.others} tag={today.tag} timezone={today.timezone} />
+          ) : null}
         </main>
       </div>
       <div className={styles.dock} data-testid="dock">
@@ -182,6 +195,7 @@ export function DayPage({
           date={date}
           isToday={isToday}
           loading={loading !== null}
+          mode={tag === null ? undefined : messages.statusline.filterMode(tag)}
         />
       </div>
     </div>

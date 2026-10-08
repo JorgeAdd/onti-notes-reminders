@@ -107,9 +107,9 @@ Ownership gate (slice 5): the branch MUST NOT modify `apps/api/src/application/p
 
 ## Commit 7b: `feat(web):` filtered page (~290 lines)
 
-- [ ] 7b.1 RED: C8 view (1 rail row, "Other notes with #client-b" 4 rows); dated rows show date+time, undated rows show NO date text; header "{n} notes" (page + others); muted "{hiddenCount} notes hidden"; `FILTER · #slug` mode; capture on filtered view: notice and `hiddenCount` +1 once.
-- [ ] 7b.2 GREEN: `OtherNotes.tsx` + CSS (read-only, no focus), `PageHeader`, `DateColumn`, `Statusline`, capture notice, messages only.
-- [ ] 7b.3 Bundle size recorded. `npm run verify`; commit.
+- [x] 7b.1 RED: C8 view (1 rail row, "Other notes with #client-b" 4 rows); dated rows show date+time, undated rows show NO date text; header "{n} notes" (page + others); muted "{hiddenCount} notes hidden"; `FILTER · #slug` mode; capture on filtered view: notice and `hiddenCount` +1 once.
+- [x] 7b.2 GREEN: `OtherNotes.tsx` + CSS (read-only, no focus), `PageHeader`, `DateColumn`, `Statusline`, capture notice, messages only.
+- [x] 7b.3 Bundle size recorded. `npm run verify`; commit.
 
 ## Commit 8: `feat(web):` mobile (~300 lines)
 

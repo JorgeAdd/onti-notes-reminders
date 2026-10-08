@@ -8,13 +8,14 @@ interface Props {
   date: string
   isToday: boolean
   timezone: string
-  /** `null` while the viewed day loads: the count on screen would be the previous page's. */
-  otherCount: number | null
+  /** The muted side note (R5, or R12's "hidden"); `null` while the day loads, as the count on
+   *  screen would be the previous page's. */
+  note: string | null
   onSignOut: () => void
   nav?: (DayNavState & { mobile: boolean }) | undefined
 }
 
-export function DateColumn({ date, isToday, timezone, otherCount, onSignOut, nav }: Props) {
+export function DateColumn({ date, isToday, timezone, note, onSignOut, nav }: Props) {
   const { day, weekday, month } = calendarDateBlock(date, timezone)
   return (
     <aside className={styles.column}>
@@ -25,9 +26,7 @@ export function DateColumn({ date, isToday, timezone, otherCount, onSignOut, nav
       </div>
       <p className={styles.month}>{month}</p>
       <p className={styles.muted}>{timezone}</p>
-      {otherCount === null ? null : (
-        <p className={styles.muted}>{messages.today.otherNotes(otherCount)}</p>
-      )}
+      {note === null ? null : <p className={styles.muted}>{note}</p>}
       {nav ? <DayNav {...nav} /> : null}
       <button className={styles.signOut} type="button" onClick={onSignOut}>
         {messages.today.signOut}

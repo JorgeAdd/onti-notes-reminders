@@ -107,6 +107,11 @@ export function TodayContainer({
           onSubmit: (submit: CaptureSubmit) => {
             setBar(null)
             actions.capture(submit)
+            // R11 · no tag is injected: a note without the active tag is hidden by the filter.
+            const { tag } = view
+            if (tag !== null && !submit.capture.tags.some((t) => t.slug === tag)) {
+              setViewMessage(messages.filter.hiddenNotice(tag))
+            }
           },
           onClose: () => setBar(null),
         }
@@ -161,7 +166,7 @@ export function TodayContainer({
     const shownDate = isPlaceholderData ? (view.date ?? todayDate) : data.date
     const loading =
       isPlaceholderData && shownDate !== null
-        ? { date: shownDate, isToday: shownDate === todayDate }
+        ? { date: shownDate, isToday: shownDate === todayDate, tag: view.tag }
         : null
     const day = calendarDayLabel(shownDate ?? data.date, data.timezone)
     return (

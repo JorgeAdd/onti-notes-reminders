@@ -16,6 +16,8 @@ interface Props {
   isToday?: boolean
   /** The viewed day is loading: its counts are not known yet. */
   loading?: boolean
+  /** The mode label; NORMAL unless a tag filter is applied. */
+  mode?: string | undefined
 }
 
 /** Decision 13 · the footer landmark: mode, weekday + day, counts, hints for the keys that work, and the ticking clock. */
@@ -29,13 +31,14 @@ export function Statusline({
   date,
   isToday = true,
   loading = false,
+  mode = messages.statusline.mode,
 }: Props) {
   const counts = isToday
     ? messages.statusline.counts(todayCount, carriedCount, totalCount)
     : messages.statusline.dayCounts(todayCount, totalCount)
   return (
     <footer className={styles.bar}>
-      <span className={styles.mode}>{messages.statusline.mode}</span>
+      <span className={styles.mode}>{mode}</span>
       <span className={styles.day}>
         {date === undefined ? dayLabel(now, timezone) : calendarDayLabel(date, timezone)}
       </span>
