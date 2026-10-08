@@ -1,7 +1,11 @@
 import { buildDayPage } from '@onti/shared'
 import { at, BEFORE_CAPTURE, N1, TZ } from '@onti/shared/fixtures/jorge-week'
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { buildScenario, seedId } from '../scripts/demo-scenario'
+import { makeSearchNotes } from '../src/application/search-notes'
+import { searchTerms } from '../src/domain/search-terms'
+import { InMemoryNotes, JORGE, noteRecord, profileReturning } from './fakes'
 
 const USER = '11111111-1111-4111-8111-111111111111'
 const WED_0905 = at('2026-10-07 09:05')
@@ -69,5 +73,55 @@ describe('buildScenario', () => {
     expect(page.otherCount).toBe(11)
     const n4 = buildScenario(USER, monday, TZ).notes.find((n) => n.key === 'N4')
     expect(n4?.dueAt).toEqual(at('2026-01-12 09:30'))
+  })
+})
+
+/** The dataset is the source of truth for bodies (CLAUDE.md rule 14). */
+const DATASET = readFileSync(
+  new URL('../../../docs/product/scenario-dataset.md', import.meta.url),
+  'utf8',
+)
+const FENCE = '```'
+const datasetBody = (key: string): string => {
+  const opening = `\n${key}:\n\n${FENCE}markdown\n`
+  const start = DATASET.indexOf(opening)
+  const end = DATASET.indexOf(`\n${FENCE}`, start + opening.length)
+  if (start < 0 || end < 0) throw new Error(`No body for ${key} in the dataset`)
+  return DATASET.slice(start + opening.length, end)
+}
+
+describe('scenario bodies', () => {
+  const scenario = buildScenario(USER, WED_0905, TZ)
+  const bodyOf = (key: string) => scenario.notes.find((n) => n.key === key)?.body
+
+  it('gives N1 and N8 the dataset bodies verbatim', () => {
+    expect(bodyOf('N1')).toBe(datasetBody('N1'))
+    expect(bodyOf('N8')).toBe(datasetBody('N8'))
+    expect(bodyOf('N1')).toContain('Collaborators')
+    expect(bodyOf('N8')).toContain('https://staging.client-b.example')
+  })
+
+  it('invents no body for the other 13 notes', () => {
+    const others = scenario.notes.filter((n) => n.key !== 'N1' && n.key !== 'N8')
+    expect(others).toHaveLength(13)
+    expect(others.map((n) => n.body)).toEqual(Array(13).fill(''))
+  })
+
+  it('C9 over the seeded scenario: "staging" finds N2 and N8, "collaborators" finds N1', async () => {
+    const owned = scenario.notes.map((n, i) => ({
+      ownerId: JORGE.userId,
+      body: n.body,
+      note: noteRecord(i, { id: n.id, title: n.title }),
+    }))
+    const search = makeSearchNotes({
+      clock: { now: () => WED_0905 },
+      notes: new InMemoryNotes(owned),
+      profiles: profileReturning(null),
+    })
+    const keyOf = (id: string) => scenario.notes.find((n) => n.id === id)?.key
+    const found = async (q: string) => (await search(JORGE, q)).notes.map((n) => keyOf(n.id)).sort()
+    expect(await found('staging')).toEqual(['N2', 'N8'])
+    expect(await found('collaborators')).toEqual(['N1'])
+    expect(searchTerms('staging')).toEqual(['staging'])
   })
 })

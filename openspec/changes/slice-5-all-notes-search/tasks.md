@@ -83,9 +83,9 @@ Global checks for every commit:
 
 ### Commit 5: `feat(seed):` N1 and N8 bodies (~79 lines)
 
-- [ ] 5.1 RED: `seed-plan.test.ts` (empty-body user is "updated" once, then "unchanged"), `demo-scenario.test.ts` (N1 and N8 carry dataset bodies verbatim; `staging` over `buildScenario` gives N2 and N8).
-- [ ] 5.2 GREEN: `apps/api/scripts/demo-scenario.ts` (`ScenarioNote.body?`), `seed-plan.ts` (`DesiredNote.body`, `ExistingState.notes[].body`, body compare), `seed-demo.ts` (`readExisting` selects `body`; insert and `excluded.body` upsert). Bodies from `docs/product/scenario-dataset.md` only; none invented.
-- [ ] 5.3 `npm run verify`; commit.
+- [x] 5.1 RED: `seed-plan.test.ts` (empty-body user is "updated" once, then "unchanged"), `demo-scenario.test.ts` (N1 and N8 carry dataset bodies verbatim; `staging` over `buildScenario` gives N2 and N8).
+- [x] 5.2 GREEN: `apps/api/scripts/demo-scenario.ts` (`ScenarioNote.body?`), `seed-plan.ts` (`DesiredNote.body`, `ExistingState.notes[].body`, body compare), `seed-demo.ts` (`readExisting` selects `body`; insert and `excluded.body` upsert). Bodies from `docs/product/scenario-dataset.md` only; none invented.
+- [x] 5.3 `npm run verify`; commit.
 
 ## Batch 2 (commits 6-8, ~912 lines)
 
