@@ -57,6 +57,7 @@ note lifecycle.
 - Edit and delete notes.
 - Manual reschedule and reminder removal (R8).
 - Basic markdown body, always sanitized; raw HTML is never rendered (R14).
+- Manual theme override UI (`docs/backlog.md`).
 
 ## Slice 5 — All notes and search (proposed)
 
@@ -76,5 +77,4 @@ the start of slice 2 because capture and snooze depend on it.
 
 ## Unassigned
 
-- Manual theme override UI (`docs/backlog.md`).
 - Welcome / onboarding (out of slice 1, no slice yet).
