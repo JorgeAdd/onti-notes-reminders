@@ -11,6 +11,7 @@ import { makeGetMe } from '../src/application/get-me'
 import { makeGetToday } from '../src/application/get-today'
 import { makeCaptureNote } from '../src/application/capture-note'
 import { makeMarkDone } from '../src/application/mark-done'
+import { makeSearchNotes } from '../src/application/search-notes'
 import { makeSetTimezone } from '../src/application/set-timezone'
 import { makeSnoozeNote } from '../src/application/snooze-note'
 import { makeUndoDone } from '../src/application/undo-done'
@@ -89,6 +90,7 @@ function server(
       undoDone: makeUndoDone({ notes: noteRepository }),
     },
     corsOrigins: ['https://app.example'],
+    searchNotes: makeSearchNotes({ clock, notes: noteRepository, profiles }),
   })
 }
 

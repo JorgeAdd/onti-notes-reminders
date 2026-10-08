@@ -76,10 +76,10 @@ Global checks for every commit:
 
 ### Commit 4: `feat(api):` GET /notes route (~140 lines)
 
-- [ ] 4.1 RED: `apps/api/test/search-route.test.ts` (Fastify `inject`): 200 shape round trips the schema; C11 no token 401, forged token 401, Ana lists 0 of Jorge's; 400 for `q` over 200 and repeated `q`; `?q=` equals no filter; 500 hides internals; CORS allows GET.
-- [ ] 4.2 GREEN: `infrastructure/http/server.ts` route; `ServerDeps.searchNotes` added LAST; `main.ts` wiring on its own line.
-- [ ] 4.3 `docs/CONTRACT.md`: status for C9 and the listing half of C11 (404 half stays `todo`).
-- [ ] 4.4 `npm run verify`; commit.
+- [x] 4.1 RED: `apps/api/test/search-route.test.ts` (Fastify `inject`): 200 shape round trips the schema; C11 no token 401, forged token 401, Ana lists 0 of Jorge's; 400 for `q` over 200 and repeated `q`; `?q=` equals no filter; 500 hides internals; CORS allows GET.
+- [x] 4.2 GREEN: `infrastructure/http/server.ts` route; `ServerDeps.searchNotes` added LAST; `main.ts` wiring on its own line.
+- [x] 4.3 `docs/CONTRACT.md`: status for C9 and the listing half of C11 (404 half stays `todo`).
+- [x] 4.4 `npm run verify`; commit.
 
 ### Commit 5: `feat(seed):` N1 and N8 bodies (~79 lines)
 

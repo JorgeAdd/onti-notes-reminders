@@ -182,8 +182,16 @@ of slice 3: Thu 8 14:30 `#client-b`, `[` to Wed 7, `t`, reload and back keep
 the view, `s t` then `]`, 2 Nov and 8 Mar with a New York profile, light and
 dark, reduced motion, no horizontal scroll.
 
-Still `todo` in that suite, asserted elsewhere when the feature lands:
-C9 (search, API + Postgres), C10 (markdown rendering, web), C11 (`404`
-for another user's note, API). C11's `401` part is already covered in
-`apps/api/test/server.test.ts`; RLS isolation was verified with SQL on the
-migration (see `docs/db/schema.md`).
+Slice 5 (all notes and search) adds the read-side proof. The `it.todo` markers
+for these rows stay in `packages/shared/test/contract.test.ts`; the rows are
+asserted where the feature lives:
+
+| Rows                    | Proven by                                                                                                                                                                                                                                                                                                                                                                                              |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C9 (search)             | `apps/api/test/search-notes.test.ts` (use case over the fake) and `apps/api/test/postgres/search.pg.test.ts` (real Postgres, run with `ONTI_TEST_DATABASE_URL`, not in CI): `staging` gives N2 (title) and N8 (title and body); a word only in the body of N1 finds N1; word prefix, case, AND, newest first, at most 50, total never narrowed. `apps/api/test/search-route.test.ts`: `GET /notes?q=`. |
+| C11 (listing and `401`) | `apps/api/test/search-route.test.ts`: no token and a forged token give `401`; Ana lists 0 of Jorge's notes. `search-notes.test.ts` and `search.pg.test.ts`: Ana's search never sees his notes (explicit `user_id` plus RLS).                                                                                                                                                                           |
+
+Still `todo`: C10 (markdown rendering, web) and the `404` half of C11
+(`GET /notes/{id}` for another user's note, API; slice 4 owns note detail).
+C11's `401` part is also covered in `apps/api/test/server.test.ts`; RLS
+isolation was verified with SQL on the migration (see `docs/db/schema.md`).
