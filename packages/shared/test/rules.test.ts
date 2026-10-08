@@ -107,6 +107,16 @@ describe('R8–R9 · lifecycle', () => {
     })
   })
 
+  it('rescheduling a done note reopens it', () => {
+    const done = markDone(reschedule(NO_REMINDER, at('2026-10-06 16:00')), at('2026-10-06 17:00'))
+    expect(reschedule(done, at('2026-10-09 10:00'))).toMatchObject({
+      dueAt: at('2026-10-09 10:00'),
+      originalDueAt: at('2026-10-09 10:00'),
+      snoozeCount: 0,
+      doneAt: null,
+    })
+  })
+
   it('a note without a reminder cannot be done', () => {
     expect(() => markDone(NO_REMINDER, at('2026-10-06 17:00'))).toThrow()
   })
