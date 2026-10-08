@@ -53,6 +53,23 @@ describe('R11 · capture parsing', () => {
     expect(parseCapture('Ping Luis +2h', now, TZ).dueAt).toEqual(at('2026-10-06 13:12'))
   })
 
+  it('accepts "today HH:MM" even when it is already past', () => {
+    expect(parseCapture('Retro today 09:00', now, TZ)).toMatchObject({
+      title: 'Retro',
+      dueAt: at('2026-10-06 09:00'),
+    })
+    expect(parseCapture('Retro today 17:00', now, TZ).dueAt).toEqual(at('2026-10-06 17:00'))
+  })
+
+  it('accepts "+Nm", truncated to the minute', () => {
+    expect(parseCapture('Ping Luis +45m', now, TZ).dueAt).toEqual(at('2026-10-06 11:57'))
+    expect(parseCapture('Ping Luis +5M', now, TZ).dueAt).toEqual(at('2026-10-06 11:17'))
+  })
+
+  it('does not treat "today" without a time as a time expression', () => {
+    expect(parseCapture('Plan today', now, TZ)).toMatchObject({ title: 'Plan today', dueAt: null })
+  })
+
   it('keeps a second time expression in the title', () => {
     expect(parseCapture('Move 15:00 call 16:00', now, TZ)).toMatchObject({
       title: 'Move call 16:00',

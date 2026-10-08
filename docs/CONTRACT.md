@@ -59,7 +59,10 @@ timezone; `start(d)` is local midnight of day `d`.
   - `#slug` tokens become tags (created if missing; display name derived
     from the slug, "client-a" → "Client A").
   - `HH:MM` → today at that time if it is still ahead of `now`, otherwise
-    tomorrow at that time. `tomorrow HH:MM` and `+{n}h` are also accepted.
+    tomorrow at that time. `today HH:MM` is accepted even when that time
+    has already passed (the note is then overdue). `tomorrow HH:MM`,
+    `+{n}h` and `+{n}m` are also accepted; relative times are truncated to
+    the minute.
   - The remaining text, trimmed, is the title (1–200 chars).
   - Until ↵, the parse is shown as an italic preview; nothing is saved.
   - Mobile presets produce the same values (R7 math for "+1 h" and
