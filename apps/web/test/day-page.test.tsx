@@ -117,3 +117,25 @@ it('ticks: "in 25 min" reads "in 24 min" and the clock steps at the minute (C7)'
   expect(screen.getByRole('contentinfo')).toHaveTextContent('09:06')
   vi.useRealTimers()
 })
+
+it('C4: the page rail shows the now line above the 09:30 item and hour 16 (SG7)', () => {
+  renderPage()
+  const main = screen.getByRole('main')
+  const nowLine = within(main).getByText('now 09:05')
+  const standup = within(main).getByText('Standup: mention the flaky checkout e2e test')
+  expect(nowLine.compareDocumentPosition(standup) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(within(main).getByText('16')).toBeInTheDocument()
+})
+
+it('the now line steps with the ticking clock (C7)', () => {
+  vi.useFakeTimers()
+  vi.setSystemTime(c4Response().now)
+  function Live() {
+    return <DayPage today={c4Response()} now={useNow(0)} onSignOut={() => undefined} />
+  }
+  render(<Live />)
+  expect(screen.getByText('now 09:05')).toBeInTheDocument()
+  act(() => void vi.advanceTimersByTime(60_000))
+  expect(screen.getByText('now 09:06')).toBeInTheDocument()
+  vi.useRealTimers()
+})
