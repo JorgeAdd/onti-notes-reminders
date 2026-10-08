@@ -9,6 +9,7 @@ import { DayPage, type CaptureBar } from './DayPage'
 import { useReminderActions, type ReminderApi } from './mutations/use-reminder-actions'
 import { useTodayRows } from './use-today-rows'
 import { TodayStatus } from './TodayStatus'
+import { useNarrow } from './use-narrow'
 import { useNow } from './use-now'
 
 interface Props {
@@ -50,9 +51,11 @@ export function TodayContainer({
     onCaptureFailed: (text, message) => setBar({ draft: text, notice: message }),
   })
   const openBar = useCallback(() => setBar({ draft: '', notice: null }), [])
-  const { rows, armed, hints } = useTodayRows(data, actions, {
+  const mobile = useNarrow()
+  const { rows, armed, hints, sheet } = useTodayRows(data, actions, {
     open: bar !== null,
     onOpen: openBar,
+    mobile,
   })
   const captureBar: CaptureBar | null =
     bar === null
@@ -103,6 +106,9 @@ export function TodayContainer({
         snoozeMenu={armed}
         hints={hints}
         capture={captureBar}
+        mobile={mobile}
+        onOpenCapture={openBar}
+        sheet={sheet}
       />
     )
   }

@@ -105,10 +105,10 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 7: Mobile + CONTRACT status (~320 lines)
 
-- [ ] 7.1 RED then GREEN: `MobileBar` with only "+ Capture" (>= `--size-target`, CSS breakpoint, no Search/Tags).
-- [ ] 7.2 RED then GREEN: preset row inserting tokens (`today 17:00` hidden at or after 17:00 [assumption], `+1h`, `tomorrow 9:00`, `#slug` chips from visible tags).
-- [ ] 7.3 RED then GREEN: `ActionSheet` on row tap, same callbacks as keys, resulting times equal `WhichKey`.
-- [ ] 7.4 Docs: `docs/CONTRACT.md` verification status for C1, C3, C5, C6.
+- [x] 7.1 RED then GREEN: `MobileBar` with only "+ Capture" (>= `--size-target`, CSS breakpoint, no Search/Tags).
+- [x] 7.2 RED then GREEN: preset row inserting tokens (`today 17:00` hidden at or after 17:00 [assumption], `+1h`, `tomorrow 9:00`, `#slug` chips from visible tags).
+- [x] 7.3 RED then GREEN: `ActionSheet` on row tap, same callbacks as keys, resulting times equal `WhichKey`.
+- [x] 7.4 Docs: `docs/CONTRACT.md` verification status for C1, C3, C5, C6.
 - [ ] 7.5 Manual smoke (record in PR): capture `#client-a 17:00 Call back`, `s h`, `x`, `z`, mobile action sheet, reduced motion, light/dark, no horizontal scroll. Record final bundle size.
 
 ## PR task

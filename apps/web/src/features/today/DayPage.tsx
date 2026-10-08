@@ -1,12 +1,14 @@
-import type { TodayResponse } from '@onti/shared'
+import type { SnoozePreset, TodayItem, TodayResponse } from '@onti/shared'
 import { lazy, Suspense } from 'react'
 import { ActionMessage } from './ActionMessage'
 import type { CaptureSubmit } from './capture-preview'
+import { ActionSheet } from './ActionSheet'
 import { CarriedGroup } from './CarriedGroup'
 import { DateColumn } from './DateColumn'
 import styles from './DayPage.module.css'
 import { EmptyState } from './EmptyState'
 import { HourRail } from './HourRail'
+import { MobileBar } from './MobileBar'
 import { PageHeader } from './PageHeader'
 import type { KeyHint } from './keys'
 import type { RowsState } from './rows'
@@ -26,6 +28,23 @@ export interface CaptureBar {
   onClose: () => void
 }
 
+/** The row-tap sheet on a phone: the item and the same actions the keys run. */
+export interface SheetState {
+  item: TodayItem
+  onDone: () => void
+  onUndo: () => void
+  onSnooze: (preset: SnoozePreset) => void
+  onClose: () => void
+}
+
+const tagSlugs = (today: TodayResponse) => [
+  ...new Set(
+    [...today.carried.flatMap((group) => group.items), ...today.rail].flatMap((item) =>
+      item.tags.map((tag) => tag.slug),
+    ),
+  ),
+]
+
 interface Props {
   today: TodayResponse
   /** Ticking display time (use-now), never the device clock directly. */
@@ -41,6 +60,10 @@ interface Props {
   hints?: KeyHint[] | undefined
   /** The command bar, when open (`c`). */
   capture?: CaptureBar | null
+  /** Phone width: bottom "+ Capture" bar, presets in the command bar, and the row-tap sheet. */
+  mobile?: boolean
+  onOpenCapture?: () => void
+  sheet?: SheetState | null
 }
 
 /** The page frame: date column, header and the area the day's items fill. */
@@ -54,6 +77,9 @@ export function DayPage({
   snoozeMenu = false,
   hints,
   capture = null,
+  mobile = false,
+  onOpenCapture = noop,
+  sheet = null,
 }: Props) {
   const carriedCount = today.carried.reduce((sum, group) => sum + group.items.length, 0)
   // Decision 13: total notes derive from the page itself, no extra wire field.
@@ -94,9 +120,19 @@ export function DayPage({
       )}
       {capture === null ? null : (
         <Suspense fallback={null}>
-          <CommandBar now={now} timezone={today.timezone} {...capture} />
+          <CommandBar
+            now={now}
+            timezone={today.timezone}
+            mobile={mobile}
+            tags={tagSlugs(today)}
+            {...capture}
+          />
         </Suspense>
       )}
+      {sheet === null ? null : <ActionSheet now={now} timezone={today.timezone} {...sheet} />}
+      {mobile && capture === null && sheet === null ? (
+        <MobileBar onCapture={onOpenCapture} />
+      ) : null}
       <Statusline
         now={now}
         timezone={today.timezone}

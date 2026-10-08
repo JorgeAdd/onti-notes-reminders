@@ -35,6 +35,13 @@ export const messages = {
     stateDone: 'done',
     stateSnoozed: (count: number) => `snoozed ${count}×`,
   },
+  mobile: { capture: '+ Capture' },
+  actionSheet: {
+    label: (title: string) => `Actions for ${title}`,
+    done: 'Done',
+    undo: 'Undo',
+    close: 'Close',
+  },
   whichKey: {
     label: 'Snooze to',
     hour: (time: string) => `+1 h → ${time}`,
@@ -49,6 +56,7 @@ export const messages = {
     today: (time: string) => `today ${time}`,
     tomorrow: (time: string) => `tomorrow ${time}`,
     preview: (summary: string) => `→ ${summary}`,
+    presets: { label: 'Insert', today: 'Today 17:00', hour: '+1 h', tomorrow: 'Tomorrow 9:00' },
   },
   statusline: {
     mode: 'NORMAL',

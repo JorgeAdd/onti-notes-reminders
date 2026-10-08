@@ -106,3 +106,45 @@ describe('CommandBar', () => {
     expect(css).not.toMatch(/#[0-9a-f]{3,6}\b|--core-/i)
   })
 })
+
+describe('CommandBar presets (mobile, SG14)', () => {
+  const withPresets = (props: Partial<Parameters<typeof CommandBar>[0]> = {}) =>
+    setup({ mobile: true, tags: ['client-a', 'infra'], now: at('2026-10-07 09:05'), ...props })
+
+  it('shows no preset row unless the bar is mobile', () => {
+    setup({ tags: ['client-a'] })
+    expect(screen.queryByRole('button', { name: messages.capture.presets.hour })).toBeNull()
+  })
+
+  it('tapping a preset inserts its token into the draft and the preview follows', async () => {
+    const { user, input } = withPresets()
+    await user.type(input, 'Call back')
+
+    await user.click(screen.getByRole('button', { name: messages.capture.presets.today }))
+    await user.click(screen.getByRole('button', { name: '#client-a' }))
+
+    expect(input).toHaveValue('Call back today 17:00 #client-a ')
+    expect(screen.getByText('→ Client A · today 17:00 · in 7h55')).toBeInTheDocument()
+    expect(input).toHaveFocus()
+  })
+
+  it('+1h and tomorrow 9:00 insert their tokens on an empty draft', async () => {
+    const { user, input } = withPresets()
+
+    await user.click(screen.getByRole('button', { name: messages.capture.presets.hour }))
+    expect(input).toHaveValue('+1h ')
+    await user.click(screen.getByRole('button', { name: messages.capture.presets.tomorrow }))
+    expect(input).toHaveValue('+1h tomorrow 9:00 ')
+  })
+
+  it('hides the today 17:00 preset once 17:00 has passed', () => {
+    withPresets({ now: at('2026-10-07 17:30') })
+    expect(screen.queryByRole('button', { name: messages.capture.presets.today })).toBeNull()
+    expect(screen.getByRole('button', { name: messages.capture.presets.hour })).toBeInTheDocument()
+  })
+
+  it('preset buttons are 44 px targets with tokens only', () => {
+    const css = readFileSync('src/features/today/CommandBar.module.css', 'utf8')
+    expect(css).toMatch(/\.preset\s*\{[^}]*min-height:\s*var\(--size-target\)/)
+  })
+})

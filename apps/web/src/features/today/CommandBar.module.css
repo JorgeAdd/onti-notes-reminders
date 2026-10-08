@@ -20,6 +20,28 @@
   outline: var(--focus-ring);
 }
 
+/* SG14: presets insert tokens; every chip is a 44 px target. */
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.preset {
+  min-height: var(--size-target);
+  padding: 0 var(--space-lg);
+  background: var(--color-page);
+  color: var(--color-ink);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  font: var(--text-meta);
+  cursor: pointer;
+}
+
+.preset:focus-visible {
+  outline: var(--focus-ring);
+}
+
 /* SG9/SG15: the unsaved preview is italic and fades in; reduced motion makes the token instant. */
 .preview {
   margin: 0;
