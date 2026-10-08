@@ -67,10 +67,12 @@ export interface NoteRepository {
   /**
    * The caller's notes newest first (`created_at desc, id desc`), at most `limit`. With terms, only
    * notes matching EVERY term as a word prefix on title or body; no terms means no filter. `total`
-   * is the count of ALL the caller's notes, never narrowed by the terms.
+   * is the count of ALL the caller's notes, never narrowed by the terms. `tag` keeps only notes
+   * carrying that slug among the caller's own tags, applied BEFORE the limit; an unknown slug
+   * matches nothing.
    */
   searchOwn(
     identity: Identity,
-    query: { terms: string[]; limit: number },
+    query: { terms: string[]; limit: number; tag?: string },
   ): Promise<{ rows: NoteListRow[]; total: number }>
 }

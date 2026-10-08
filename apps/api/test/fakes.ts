@@ -173,12 +173,15 @@ export class InMemoryNotes implements NoteRepository {
    */
   searchOwn(
     identity: Identity,
-    query: { terms: string[]; limit: number },
+    query: { terms: string[]; limit: number; tag?: string },
   ): Promise<{ rows: NoteListRow[]; total: number }> {
     const own = [...this.rows.values()].filter((r) => r.ownerId === identity.userId)
     const matches = own.filter((r) => {
       const words = wordsOf(`${r.note.title} ${r.body}`)
-      return query.terms.every((term) => words.some((word) => word.startsWith(term)))
+      return (
+        query.terms.every((term) => words.some((word) => word.startsWith(term))) &&
+        (query.tag === undefined || r.note.tags.some((t) => t.slug === query.tag))
+      )
     })
     const rows = matches
       .sort(

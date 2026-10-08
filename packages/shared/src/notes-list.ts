@@ -1,11 +1,15 @@
 import { z } from 'zod'
+import { TAG_SLUG } from './domain/tag'
 import { instant } from './instant'
 
 /** `excerptMax` is in UTF-16 code units, the unit `z.string().max()` counts. */
 export const SEARCH_LIMITS = { qMax: 200, resultsMax: 50, excerptMax: 120 } as const
 
-/** Query string of GET /notes. */
-export const notesQuerySchema = z.object({ q: z.string().max(SEARCH_LIMITS.qMax).optional() })
+/** Query string of GET /notes: an optional search text and an optional tag slug (R12). */
+export const notesQuerySchema = z.object({
+  q: z.string().max(SEARCH_LIMITS.qMax).optional(),
+  tag: z.string().max(40).regex(TAG_SLUG).optional(),
+})
 
 export const noteListItemSchema = z.object({
   id: z.uuid(),

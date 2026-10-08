@@ -208,3 +208,46 @@ describe('searchNotes ownership (R15)', () => {
     expect(asAna.total).toBe(0)
   })
 })
+
+describe('searchNotes tag filter', () => {
+  const clientB = ['N6', 'N7', 'N8', 'N9', 'N10'].map(
+    (id) => DATASET[Number(id.slice(1)) - 1]!.note.title,
+  )
+
+  it('lists only the notes with the tag, newest first, with the total never narrowed', async () => {
+    const found = await searcher().search(JORGE, undefined, 'client-b')
+    expect(titles(found).sort()).toEqual([...clientB].sort())
+    expect(found.total).toBe(15)
+  })
+
+  it('combines with the search term: staging in client-b is N8 only', async () => {
+    const found = await searcher().search(JORGE, 'staging', 'client-b')
+    expect(titles(found)).toEqual([titleOf(N8)])
+    expect(titles(await searcher().search(JORGE, 'staging', 'personal'))).toEqual([])
+  })
+
+  it('filters before the 50 cap: a tag held only by the 5 oldest of 60 still lists 5', async () => {
+    const sixty = Array.from({ length: 60 }, (_, i) => ({
+      ownerId: JORGE.userId,
+      body: '',
+      createdAt: new Date(Date.UTC(2026, 9, 1, 0, i)),
+      note: noteRecord(i + 1, i < 5 ? { tags: [{ slug: 'old', name: 'Old' }] } : {}),
+    }))
+    const found = await searcher(sixty).search(JORGE, undefined, 'old')
+    expect(found.notes).toHaveLength(5)
+    expect(found.total).toBe(60)
+  })
+
+  it('answers an empty list, not an error, for an unknown tag and for a tag only another user has', async () => {
+    const ana = {
+      ownerId: ANA.userId,
+      body: '',
+      createdAt: new Date(Date.UTC(2026, 9, 7)),
+      note: noteRecord(500, { title: 'Ana note', tags: [{ slug: 'ana-only', name: 'Ana Only' }] }),
+    }
+    for (const tag of ['nope', 'ana-only']) {
+      const found = await searcher([...DATASET, ana]).search(JORGE, undefined, tag)
+      expect(found).toMatchObject({ notes: [], total: 15 })
+    }
+  })
+})

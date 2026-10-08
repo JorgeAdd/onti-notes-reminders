@@ -132,8 +132,9 @@ export const messages = {
     count: (n: number) => `${n} ${n === 1 ? 'note' : 'notes'}`,
     allNotes: 'all notes',
     /** `SEARCH · term` and `· n of total`: `n` is shown, `total` is every note the user has. */
-    statusHead: (term: string) => `SEARCH · ${term}`,
+    statusHead: (term: string, tag: string | null = null) =>
+      `SEARCH · ${term}${tag === null ? '' : ` · #${tag}`}`,
     statusTail: (shown: number, total: number) => `· ${shown} of ${total}`,
-    hints: { search: '/ search', back: 'esc back' },
+    hints: { search: '/ search', tags: '# tag', clear: 'esc clear filter', back: 'esc back' },
   },
 } as const

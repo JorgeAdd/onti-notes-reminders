@@ -9,6 +9,8 @@ interface Props {
   timezone: string
   /** The term the list belongs to; empty reads "all notes". */
   term: string
+  /** The applied tag filter (R12), or `null`. */
+  tag: string | null
   shown: number
   /** Every note the user has, never narrowed by the term. */
   total: number
@@ -16,11 +18,11 @@ interface Props {
 }
 
 /** `SEARCH · term · n of total`, the hints that work now, and the ticking clock. */
-export function SearchStatusline({ now, timezone, term, shown, total, hints }: Props) {
+export function SearchStatusline({ now, timezone, term, tag, shown, total, hints }: Props) {
   return (
     <footer className={styles.bar}>
       <span className={styles.head}>
-        {messages.notes.statusHead(term === '' ? messages.notes.allNotes : term)}
+        {messages.notes.statusHead(term === '' ? messages.notes.allNotes : term, tag)}
       </span>{' '}
       <span className={styles.tail}>{messages.notes.statusTail(shown, total)}</span>
       <span className={styles.hints}>

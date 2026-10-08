@@ -160,7 +160,7 @@ The view MUST have landmarks and one h1, a search input with an accessible name 
 
 ### Requirement: Tag filter in All notes (last step)
 
-This step MUST ship last, after slice 3 merges, reusing its `#` tag bar and tag filter. With a tag selected, All notes and search MUST list only notes with that tag (R12 semantics), and the first `esc` MUST clear the tag (and close the bar); the next `esc` leaves the view.
+This step MUST ship last, after slice 3 merges, reusing its `#` tag bar and tag filter. With a tag selected, All notes and search MUST list only notes with that tag (R12 semantics), and the first `esc` MUST clear the tag (and close the bar); the next `esc` leaves the view. The filter MUST apply before the 50-row cap; an unknown tag MUST give an empty list (200), never an error. The statusline MUST show `#slug` and the `#` hint; a phone MUST get a Tags control reusing the same chips. `#` also opens the bar from the search input (search ignores punctuation). Status: implemented in commit 9; proven by `notes-container.test.tsx`, `notes-view.test.tsx`, `search-notes.test.ts`, `search-route.test.ts` and `search.pg.test.ts`.
 
 #### Scenario: Filter combined with search
 

@@ -124,6 +124,22 @@ describe.skipIf(!URL)('Postgres searchOwn (real database)', () => {
     for (let i = 0; i < 60; i += 1) {
       await insertNote(noteId(200 + i), BULK_ID, `Bulk ${i}`, '', new Date(BASE + i * 60_000))
     }
+    // Tag held only by the 5 OLDEST bulk notes: it must still list 5 although 55 newer notes exist.
+    await q(`insert into tags (user_id, slug, name) values ($1, 'old', 'Old')`, [BULK_ID])
+    for (let i = 0; i < 5; i += 1) {
+      await q(
+        `insert into note_tags (user_id, note_id, tag_id)
+         select $1, $2, id from tags where user_id = $1 and slug = 'old'`,
+        [BULK_ID, noteId(200 + i)],
+      )
+    }
+    // Ana's decoy carries Jorge's tag slug on her own tag row.
+    await q(`insert into tags (user_id, slug, name) values ($1, 'client-b', 'Client B')`, [ANA_ID])
+    await q(
+      `insert into note_tags (user_id, note_id, tag_id)
+       select $1, $2, id from tags where user_id = $1 and slug = 'client-b'`,
+      [ANA_ID, noteId(101)],
+    )
     await insertNote(noteId(300), BULK_ID, 'Longbody', 'x'.repeat(5000), new Date(BASE - 60_000))
   })
 
@@ -215,6 +231,30 @@ describe.skipIf(!URL)('Postgres searchOwn (real database)', () => {
       expect(
         await q('select count(*)::int as n from notes where user_id = $1', [JORGE_ID]),
       ).toEqual([{ n: 15 }])
+    })
+  })
+
+  describe('tag filter', () => {
+    const tagged = (tag: string, who: Identity = JORGE, input = '') =>
+      repo.searchOwn(who, { terms: searchTerms(input), limit: 50, tag })
+
+    it('lists only the notes with the tag, and combines it with the terms', async () => {
+      const page = await tagged('client-b')
+      expect(page.rows).toHaveLength(5)
+      expect(page.total).toBe(15)
+      expect((await tagged('client-b', JORGE, 'staging')).rows.map((r) => r.id)).toEqual([N8_ID])
+    })
+
+    it('filters in SQL before the cap: 5 tagged notes among the 55 newer ones', async () => {
+      const page = await tagged('old', BULK)
+      expect(page.rows.map((r) => r.id)).toEqual([204, 203, 202, 201, 200].map(noteId))
+      expect(page.total).toBe(61)
+    })
+
+    it('never crosses users: Ana`s same-slug tag does not show Jorge`s notes or the reverse', async () => {
+      expect(titles(await tagged('client-b', ANA))).toEqual(['Ana staging checklist'])
+      expect((await tagged('client-b', JORGE, 'ana')).rows).toEqual([])
+      expect(await tagged('old', JORGE)).toEqual({ rows: [], total: 15 })
     })
   })
 

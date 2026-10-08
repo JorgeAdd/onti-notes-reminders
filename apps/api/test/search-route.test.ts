@@ -137,6 +137,27 @@ describe('GET /notes', () => {
     expect(res.json()).toEqual({ error: 'internal_error' })
   })
 
+  it('narrows by tag, alone and with q, and keeps the total', async () => {
+    const byTag = notesListResponseSchema.parse((await get('/notes?tag=client-b')).json())
+    expect(byTag.notes).toHaveLength(5)
+    expect(byTag.total).toBe(15)
+    const both = notesListResponseSchema.parse((await get('/notes?q=staging&tag=client-b')).json())
+    expect(both.notes.map((n) => n.title)).toEqual(['Staging URL and test accounts'])
+  })
+
+  it('answers an empty list for an unknown tag and 400 for a malformed or repeated tag', async () => {
+    const unknown = await get('/notes?tag=nope')
+    expect(unknown.statusCode).toBe(200)
+    expect(notesListResponseSchema.parse(unknown.json())).toMatchObject({ notes: [], total: 15 })
+    for (const url of ['/notes?tag=Client%20B', '/notes?tag=', '/notes?tag=a&tag=b']) {
+      expect((await get(url)).statusCode).toBe(400)
+    }
+    expect((await get('/notes?tag=client-b', 'Bearer ana-token')).json()).toMatchObject({
+      notes: [],
+      total: 0,
+    })
+  })
+
   it('allows GET from the web origin (CORS preflight)', async () => {
     const res = await server().inject({
       method: 'OPTIONS',

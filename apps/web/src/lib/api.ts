@@ -98,8 +98,15 @@ export async function captureNote(
   return noteResponseSchema.parse(await post('/notes', accessToken, capture))
 }
 
-/** R13 · the caller's notes, newest first; a non-empty term narrows them server-side. */
-export async function searchNotes(accessToken: string, term: string): Promise<NotesListResponse> {
-  const query = term === '' ? '' : `?q=${encodeURIComponent(term)}`
+/** R13 and R12 · the caller's notes, newest first; a term and a tag narrow them server-side. */
+export async function searchNotes(
+  accessToken: string,
+  term: string,
+  tag: string | null = null,
+): Promise<NotesListResponse> {
+  const params = new URLSearchParams()
+  if (term !== '') params.set('q', term)
+  if (tag !== null) params.set('tag', tag)
+  const query = params.size === 0 ? '' : `?${params}`
   return notesListResponseSchema.parse(await request('GET', `/notes${query}`, accessToken))
 }

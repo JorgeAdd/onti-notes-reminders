@@ -313,6 +313,17 @@ describe('searchNotes', () => {
     expect((url as URL).href).not.toContain(' ')
   })
 
+  it('adds the tag as its own parameter, after q, and only when there is one', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(() => Promise.resolve(new Response(JSON.stringify(list))))
+    await searchNotes('token-1', 'stag', 'client-b')
+    await searchNotes('token-1', '', 'client-b')
+    await searchNotes('token-1', '', null)
+    const urls = fetchMock.mock.calls.map(([url]) => (url as URL).search)
+    expect(urls).toEqual(['?q=stag&tag=client-b', '?tag=client-b', ''])
+  })
+
   it('turns a 401 into UnauthorizedError and keeps other failures generic', async () => {
     respond(401)
     await expect(searchNotes('expired', 'x')).rejects.toBeInstanceOf(UnauthorizedError)

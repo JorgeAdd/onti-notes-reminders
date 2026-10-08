@@ -4,6 +4,7 @@ import { messages } from '../../messages'
 import { DateColumn } from '../today/DateColumn'
 import styles from './NotesPage.module.css'
 import { SearchInput } from './SearchInput'
+import { MobileBar } from '../today/MobileBar'
 import { SearchStatusline, type NotesHint } from './SearchStatusline'
 
 interface Props {
@@ -18,8 +19,12 @@ interface Props {
   /** The rows or the message that stands in for them. */
   results: ReactNode
   /** The term the rows belong to, with the shown and total counts for the statusline. */
-  shown: { term: string; count: number; total: number }
+  shown: { term: string; tag: string | null; count: number; total: number }
   hints: NotesHint[]
+  /** The open tag bar, rendered in the dock above the input. */
+  tagBar?: ReactNode
+  /** Phone width: the bottom bar's Tags button; omitted when there is no tag or the bar is open. */
+  onOpenTags?: (() => void) | undefined
 }
 
 /** The day-page frame for All notes: date column, one h1, the results, and the search dock. */
@@ -35,6 +40,8 @@ export function NotesPage({
   results,
   shown,
   hints,
+  tagBar = null,
+  onOpenTags,
 }: Props) {
   return (
     <div className={styles.desk}>
@@ -61,6 +68,7 @@ export function NotesPage({
         </main>
       </div>
       <div className={styles.dock}>
+        {tagBar}
         <SearchInput
           inputRef={inputRef}
           value={term}
@@ -71,10 +79,12 @@ export function NotesPage({
           now={now}
           timezone={timezone}
           term={shown.term}
+          tag={shown.tag}
           shown={shown.count}
           total={shown.total}
           hints={hints}
         />
+        {onOpenTags ? <MobileBar onTags={onOpenTags} /> : null}
       </div>
     </div>
   )

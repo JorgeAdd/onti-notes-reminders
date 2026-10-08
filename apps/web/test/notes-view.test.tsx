@@ -1,6 +1,6 @@
 import type { Session } from '@supabase/supabase-js'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { act, render, screen } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, expect, it, vi, type MockInstance } from 'vitest'
 import { App } from '../src/App'
@@ -186,5 +186,35 @@ it('signing out resets the view: the next session starts on today', async () => 
     messages.auth.signInTitle,
   )
   act(() => notify(session))
+  expect(await todayHeading()).toBeInTheDocument()
+})
+
+it('filters by tag over the wire, and esc steps: clear the tag, then leave', async () => {
+  const withTag = (slug: string) => ({ ...notesBody.notes[0]!, tags: [{ slug, name: slug }] })
+  fetchMock.mockImplementation((url) => {
+    const { pathname, searchParams } = url as URL
+    if (pathname !== '/notes') return Promise.resolve(json(today))
+    const tag = searchParams.get('tag')
+    return Promise.resolve(
+      json({ ...notesBody, notes: tag === null ? [withTag('client-b')] : [withTag(tag)] }),
+    )
+  })
+  const user = userEvent.setup()
+  renderApp()
+  await todayHeading()
+  await user.keyboard('/')
+  await searchBox()
+  await screen.findByText('Staging URL and test accounts')
+
+  await user.keyboard('#')
+  await user.click(await screen.findByRole('button', { name: '#client-b' }))
+  await waitFor(() => expect(footer()).toHaveTextContent('· #client-b'))
+  expect(notesCalls().at(-1)![0]).toHaveProperty('search', '?tag=client-b')
+
+  await user.keyboard('{Escape}')
+  await waitFor(() => expect(footer()).not.toHaveTextContent('#client-b'))
+  expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(messages.notes.title)
+
+  await user.keyboard('{Escape}')
   expect(await todayHeading()).toBeInTheDocument()
 })

@@ -116,7 +116,7 @@ Global checks for every commit:
 
 ### Gate: rebase onto main after slice 3 merges
 
-- [ ] 9.0 Wait for slice 3 on `main`. `git fetch` then `git rebase origin/main` with `rerere` on; do it ONCE, before commit 9. Expected conflicts and resolution:
+- [x] 9.0 Wait for slice 3 on `main`. `git fetch` then `git rebase origin/main` with `rerere` on; do it ONCE, before commit 9. Expected conflicts and resolution:
   - `messages.ts`: keep both; `search` beside slice 3's keys.
   - `keys.ts`: union of `KeyHint` values.
   - `MobileBar.tsx` (+ CSS): take slice 3's version, add only `onSearch`, Search first (SG14).
@@ -127,12 +127,12 @@ Global checks for every commit:
 
 ### Commit 9: `feat:` All-notes tag filter (~263 lines)
 
-- [ ] 9.1 Re-check the `TagBar` and `filterByTag` APIs from slice 3 (Open Question 4); adjust the plan only if they differ.
-- [ ] 9.2 `docs/CONTRACT.md`: All-notes tag filter text first (rule 23); C9/C11 status if not done.
-- [ ] 9.3 RED: shared schema (`tag` validated with `TAG_SLUG`), fake and use case (filter before the 50 cap; unknown tag gives empty list, 200), route (`?q=&tag=`), real-Postgres `exists` over `note_tags` -> `tags.slug`.
-- [ ] 9.4 RED: web `notes-view.test.tsx`: `#` opens the bar; tag filters results; with a tag active the first `esc` clears the tag and closes the bar, the next `esc` leaves; `#` hint in notes statusline.
-- [ ] 9.5 GREEN: `notes-list.ts`, port, `search-notes.ts`, `postgres-note-repository.ts` SQL `exists`, fake; web reuses `TagBar` and `filterByTag`, tag state in `NotesContainer`, bar tags = current result plus active tag.
-- [ ] 9.6 `npm run verify`; run the Postgres test with `ONTI_TEST_DATABASE_URL` (throwaway DB); record bundle size; commit.
+- [x] 9.1 Re-check the `TagBar` and `filterByTag` APIs from slice 3 (Open Question 4); adjust the plan only if they differ.
+- [x] 9.2 `docs/CONTRACT.md`: All-notes tag filter text first (rule 23); C9/C11 status if not done.
+- [x] 9.3 RED: shared schema (`tag` validated with `TAG_SLUG`), fake and use case (filter before the 50 cap; unknown tag gives empty list, 200), route (`?q=&tag=`), real-Postgres `exists` over `note_tags` -> `tags.slug`.
+- [x] 9.4 RED: web `notes-view.test.tsx`: `#` opens the bar; tag filters results; with a tag active the first `esc` clears the tag and closes the bar, the next `esc` leaves; `#` hint in notes statusline.
+- [x] 9.5 GREEN: `notes-list.ts`, port, `search-notes.ts`, `postgres-note-repository.ts` SQL `exists`, fake; web reuses `TagBar` and `filterByTag`, tag state in `NotesContainer`, bar tags = current result plus active tag.
+- [x] 9.6 `npm run verify`; run the Postgres test with `ONTI_TEST_DATABASE_URL` (throwaway DB); record bundle size; commit.
 
 ## PR
 

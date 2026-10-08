@@ -157,8 +157,12 @@ export function buildServer({
   app.get('/notes', async (request) => {
     const identity = await authenticate(request)
     const query = notesQuerySchema.safeParse(request.query)
-    if (!query.success) throw new ValidationError('q must be a single string of at most 200 chars')
-    return z.encode(notesListResponseSchema, await searchNotes(identity, query.data.q))
+    if (!query.success)
+      throw new ValidationError('q and tag must be single strings: q up to 200 chars, tag a slug')
+    return z.encode(
+      notesListResponseSchema,
+      await searchNotes(identity, query.data.q, query.data.tag),
+    )
   })
 
   app.get('/today', async (request) => {

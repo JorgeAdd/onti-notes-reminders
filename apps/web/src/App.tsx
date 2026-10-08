@@ -55,7 +55,7 @@ export function App() {
   }, [accessToken])
   const load = useCallback((day: DayView) => fetchToday(accessToken ?? '', day), [accessToken])
   const loadNotes = useCallback(
-    (term: string) => searchNotes(accessToken ?? '', term),
+    (term: string, tag: string | null) => searchNotes(accessToken ?? '', term, tag),
     [accessToken],
   )
   const showToday = useCallback(() => setView('today'), [])

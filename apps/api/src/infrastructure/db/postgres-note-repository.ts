@@ -181,7 +181,7 @@ export class PostgresNoteRepository implements NoteRepository {
 
   async searchOwn(
     identity: Identity,
-    query: { terms: string[]; limit: number },
+    query: { terms: string[]; limit: number; tag?: string },
   ): Promise<{ rows: NoteListRow[]; total: number }> {
     // Built before the transaction: a hostile term rejects without touching the database.
     const tsquery = tsqueryOf(query.terms)
@@ -200,6 +200,23 @@ export class PostgresNoteRepository implements NoteRepository {
       if (tsquery !== null) {
         // The tsquery is a bound parameter, never part of the SQL text.
         select = select.where(sql<boolean>`search @@ to_tsquery('simple', ${tsquery})`)
+      }
+      if (query.tag !== undefined) {
+        // Before the cap, or tagged notes older than the newest 50 would vanish. Both rows are the
+        // caller's (explicit user_id on each side, RLS behind it); the slug is a bound parameter.
+        const slug = query.tag
+        select = select.where((eb) =>
+          eb.exists(
+            eb
+              .selectFrom('note_tags')
+              .innerJoin('tags', 'tags.id', 'note_tags.tag_id')
+              .select('note_tags.note_id')
+              .whereRef('note_tags.note_id', '=', 'notes.id')
+              .where('note_tags.user_id', '=', identity.userId)
+              .where('tags.user_id', '=', identity.userId)
+              .where('tags.slug', '=', slug),
+          ),
+        )
       }
       const found = await select
         .orderBy('created_at', 'desc')

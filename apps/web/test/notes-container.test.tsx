@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { NoteListItem, NotesListResponse } from '@onti/shared'
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
 import { NotesContainer } from '../src/features/notes/NotesContainer'
 import { UnauthorizedError } from '../src/lib/api'
@@ -25,7 +25,7 @@ const list = (notes: NoteListItem[], total = 15): NotesListResponse => ({
 })
 const STAGING = [item(1, 'Staging URL and test accounts'), item(2, 'Staging checklist')]
 
-type Load = (term: string) => Promise<NotesListResponse>
+type Load = (term: string, tag: string | null) => Promise<NotesListResponse>
 
 function renderNotes(
   load: Load,
@@ -128,7 +128,7 @@ it('sends one request per pause (200 ms), trimmed, and keeps the previous list m
   renderNotes(load)
   await act(() => vi.advanceTimersByTimeAsync(0))
   expect(load).toHaveBeenCalledTimes(1)
-  expect(load).toHaveBeenLastCalledWith('')
+  expect(load).toHaveBeenLastCalledWith('', null)
 
   const box = screen.getByRole('textbox', { name: messages.notes.searchLabel })
   for (const value of ['s', 'st', 'sta', '  stag ']) fireEvent.change(box, { target: { value } })
@@ -137,7 +137,7 @@ it('sends one request per pause (200 ms), trimmed, and keeps the previous list m
 
   await act(() => vi.advanceTimersByTimeAsync(1))
   expect(load).toHaveBeenCalledTimes(2)
-  expect(load).toHaveBeenLastCalledWith('stag')
+  expect(load).toHaveBeenLastCalledWith('stag', null)
   expect(screen.getAllByRole('listitem')).toHaveLength(2)
 
   resolveStag(list([STAGING[0]!]))
@@ -216,4 +216,131 @@ it('announces the count politely, and the button goes back', async () => {
 
   fireEvent.click(screen.getByRole('button', { name: messages.notes.back }))
   expect(onBack).toHaveBeenCalledTimes(1)
+})
+
+const tagged = (n: number, title: string, ...slugs: string[]): NoteListItem => ({
+  ...item(n, title),
+  tags: slugs.map((slug) => ({ slug, name: slug })),
+})
+const ALL = [
+  tagged(1, 'Staging URL', 'client-b'),
+  tagged(2, 'Standup', 'client-a'),
+  tagged(3, 'Glossary', 'client-a', 'personal'),
+]
+const byTag = vi.fn<Load>((_term, tag) =>
+  Promise.resolve(list(tag ? ALL.filter((n) => n.tags.some((t) => t.slug === tag)) : ALL)),
+)
+const bar = () => screen.findByRole('group', { name: messages.filter.label })
+const chips = () => screen.getAllByRole('button', { name: /^#/ }).map((b) => b.textContent)
+
+it('# opens the slice 3 tag bar with the tags of the list, also from the search input', async () => {
+  renderNotes(byTag)
+  expect(await input()).toHaveFocus()
+  fireEvent.keyDown(await input(), { key: '#' })
+
+  await bar()
+  expect(chips()).toEqual(['#client-a', '#client-b', '#personal'])
+  expect(footer()).toHaveTextContent(messages.notes.hints.tags)
+})
+
+it('applies a tag: the load carries it, the list narrows and the statusline shows it', async () => {
+  byTag.mockClear()
+  renderNotes(byTag)
+  await screen.findAllByRole('listitem')
+  fireEvent.keyDown(await input(), { key: '#' })
+  fireEvent.click(await screen.findByRole('button', { name: '#client-a' }))
+
+  await waitFor(() => expect(screen.getAllByRole('listitem')).toHaveLength(2))
+  expect(byTag).toHaveBeenLastCalledWith('', 'client-a')
+  expect(screen.queryByRole('group', { name: messages.filter.label })).toBeNull()
+  expect(footer()).toHaveTextContent('SEARCH · all notes · #client-a · 2 of 15')
+  // The bar still offers every tag seen, not only the narrowed list's.
+  fireEvent.keyDown(await input(), { key: '#' })
+  await bar()
+  expect(chips()).toEqual(['#client-a', '#client-b', '#personal'])
+})
+
+it('combines the tag with the typed term in one request', async () => {
+  byTag.mockClear()
+  renderNotes(byTag)
+  await screen.findAllByRole('listitem')
+  fireEvent.keyDown(await input(), { key: '#' })
+  fireEvent.click(await screen.findByRole('button', { name: '#client-b' }))
+  await type('stag')
+  await waitFor(() => expect(byTag).toHaveBeenLastCalledWith('stag', 'client-b'))
+})
+
+it('with a tag active the first esc clears it and closes the bar, the next esc leaves', async () => {
+  byTag.mockClear()
+  const onBack = vi.fn()
+  renderNotes(byTag, { onBack })
+  await screen.findAllByRole('listitem')
+  fireEvent.keyDown(await input(), { key: '#' })
+  fireEvent.click(await screen.findByRole('button', { name: '#client-a' }))
+  await waitFor(() => expect(screen.getAllByRole('listitem')).toHaveLength(2))
+  expect(footer()).toHaveTextContent(messages.notes.hints.clear)
+
+  fireEvent.keyDown(document.body, { key: 'Escape' })
+  expect(onBack).not.toHaveBeenCalled()
+  await waitFor(() => expect(screen.getAllByRole('listitem')).toHaveLength(3))
+  expect(byTag).toHaveBeenLastCalledWith('', null)
+  expect(footer()).not.toHaveTextContent('#client-a')
+
+  fireEvent.keyDown(document.body, { key: 'Escape' })
+  expect(onBack).toHaveBeenCalledTimes(1)
+})
+
+it('esc inside the open bar with a tag active clears the tag and closes the bar; without one it only closes', async () => {
+  const onBack = vi.fn()
+  renderNotes(byTag, { onBack })
+  await screen.findAllByRole('listitem')
+  fireEvent.keyDown(await input(), { key: '#' })
+  fireEvent.keyDown(await bar(), { key: 'Escape' })
+  expect(screen.queryByRole('group', { name: messages.filter.label })).toBeNull()
+  expect(onBack).not.toHaveBeenCalled()
+
+  fireEvent.keyDown(await input(), { key: '#' })
+  fireEvent.click(await screen.findByRole('button', { name: '#client-b' }))
+  await waitFor(() => expect(screen.getAllByRole('listitem')).toHaveLength(1))
+  fireEvent.keyDown(await input(), { key: '#' })
+  fireEvent.keyDown(await bar(), { key: 'Escape' })
+  await waitFor(() => expect(screen.getAllByRole('listitem')).toHaveLength(3))
+  expect(screen.queryByRole('group', { name: messages.filter.label })).toBeNull()
+  expect(onBack).not.toHaveBeenCalled()
+})
+
+it('ignores # when no note has a tag, and / stays unavailable while the bar is open', async () => {
+  renderNotes(() => Promise.resolve(list(STAGING)))
+  fireEvent.keyDown(await input(), { key: '#' })
+  expect(screen.queryByRole('group', { name: messages.filter.label })).toBeNull()
+  expect(footer()).not.toHaveTextContent(messages.notes.hints.tags)
+
+  cleanup()
+  renderNotes(byTag)
+  await screen.findAllByRole('listitem')
+  fireEvent.keyDown(await input(), { key: '#' })
+  const group = await bar()
+  expect(group).toHaveFocus()
+  fireEvent.keyDown(group, { key: '/' })
+  expect(await input()).not.toHaveFocus()
+})
+
+it('on a phone a Tags button opens the same chips, with Clear while filtered', async () => {
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: true,
+    media: query,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+  }))
+  renderNotes(byTag)
+  await screen.findAllByRole('listitem')
+  fireEvent.click(screen.getByRole('button', { name: messages.mobile.tags }))
+  expect(chips()).toEqual(['#client-a', '#client-b', '#personal'])
+  fireEvent.click(screen.getByRole('button', { name: '#client-b' }))
+  await waitFor(() => expect(screen.getAllByRole('listitem')).toHaveLength(1))
+
+  fireEvent.click(screen.getByRole('button', { name: messages.mobile.tags }))
+  fireEvent.click(screen.getByRole('button', { name: messages.filter.clear('client-b') }))
+  await waitFor(() => expect(screen.getAllByRole('listitem')).toHaveLength(3))
+  vi.unstubAllGlobals()
 })

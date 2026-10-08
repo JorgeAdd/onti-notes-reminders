@@ -12,11 +12,19 @@ export interface SearchNotesDeps {
 }
 
 export function makeSearchNotes({ clock, notes, profiles }: SearchNotesDeps) {
-  return async function searchNotes(identity: Identity, q?: string): Promise<NotesListResponse> {
+  return async function searchNotes(
+    identity: Identity,
+    q?: string,
+    tag?: string,
+  ): Promise<NotesListResponse> {
     const now = clock.now()
     const [profile, page] = await Promise.all([
       profiles.findOwn(identity),
-      notes.searchOwn(identity, { terms: searchTerms(q), limit: SEARCH_LIMITS.resultsMax }),
+      notes.searchOwn(identity, {
+        terms: searchTerms(q),
+        limit: SEARCH_LIMITS.resultsMax,
+        ...(tag === undefined ? {} : { tag }),
+      }),
     ])
     return {
       now,

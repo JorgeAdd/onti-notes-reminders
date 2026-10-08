@@ -67,3 +67,18 @@ describe('notesQuerySchema', () => {
     expect(notesQuerySchema.safeParse({ q: ['a', 'b'] }).success).toBe(false)
   })
 })
+
+describe('notesQuerySchema tag', () => {
+  it('accepts a tag slug, alone or with q, and no tag at all', () => {
+    expect(notesQuerySchema.safeParse({ tag: 'client-b' }).success).toBe(true)
+    expect(notesQuerySchema.safeParse({ q: 'staging', tag: 'client-b' }).success).toBe(true)
+    expect(notesQuerySchema.parse({}).tag).toBeUndefined()
+  })
+
+  it('rejects anything that is not a tag slug, a slug over 40 characters and a repeated tag', () => {
+    for (const tag of ['', 'Client B', 'client_b', '-a', 'a--b', 'a'.repeat(41), '#client-b']) {
+      expect(notesQuerySchema.safeParse({ tag }).success).toBe(false)
+    }
+    expect(notesQuerySchema.safeParse({ tag: ['a', 'b'] }).success).toBe(false)
+  })
+})
