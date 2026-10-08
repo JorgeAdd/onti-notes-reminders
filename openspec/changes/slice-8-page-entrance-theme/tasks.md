@@ -59,11 +59,11 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 4: `feat(web):` theme module and inline script (~130 lines)
 
-- [ ] 4.1 RED: `apps/web/test/theme.test.ts`: `themeFromStored` (light, dark, null, `''`, `sepia`, `LIGHT`); `applyTheme` set/remove; `storeTheme` writes, removes, swallows throwing `setItem`/`removeItem`/null storage; `appliedTheme`.
-- [ ] 4.2 RED: `apps/web/test/theme-script.test.ts`: script in `<head>`, classic, before entry script; run for light, dark, none, invalid, throwing `getItem`, throwing getter, undefined storage; parity with `themeFromStored`; contains `THEME_KEY` value.
-- [ ] 4.3 GREEN: create `apps/web/src/features/theme/theme.ts` (design Interfaces).
-- [ ] 4.4 GREEN: `apps/web/index.html`: inline script exactly as in design.
-- [ ] 4.5 `npm run verify`; commit.
+- [x] 4.1 RED: `apps/web/test/theme.test.ts`: `themeFromStored` (light, dark, null, `''`, `sepia`, `LIGHT`); `applyTheme` set/remove; `storeTheme` writes, removes, swallows throwing `setItem`/`removeItem`/null storage; `appliedTheme`.
+- [x] 4.2 RED: `apps/web/test/theme-script.test.ts`: script in `<head>`, classic, before entry script; run for light, dark, none, invalid, throwing `getItem`, throwing getter, undefined storage; parity with `themeFromStored`; contains `THEME_KEY` value.
+- [x] 4.3 GREEN: create `apps/web/src/features/theme/theme.ts` (design Interfaces).
+- [x] 4.4 GREEN: `apps/web/index.html`: inline script exactly as in design.
+- [x] 4.5 `npm run verify`; commit.
 
 ## Commit 5: `feat(web):` ThemeControl and placements (~200 lines)
 
