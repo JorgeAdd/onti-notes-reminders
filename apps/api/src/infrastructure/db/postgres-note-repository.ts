@@ -1,6 +1,6 @@
 import type { Reminder } from '@onti/shared'
 import type { Kysely } from 'kysely'
-import type { NoteRepository } from '../../application/ports'
+import type { NewNote, NoteRepository } from '../../application/ports'
 import type { Identity } from '../../domain/identity'
 import type { NoteRecord } from '../../domain/note'
 import { asUser } from './as-user'
@@ -50,6 +50,70 @@ export class PostgresNoteRepository implements NoteRepository {
         doneAt: row.done_at,
         notifiedDueAt: row.notified_due_at,
       }))
+    })
+  }
+
+  createOwn(identity: Identity, input: NewNote): Promise<NoteRecord> {
+    return asUser(this.db, identity, async (trx) => {
+      // Sorted so two concurrent captures take tag row locks in the same order.
+      const wanted = [...input.tags].sort((a, b) => a.slug.localeCompare(b.slug))
+
+      // `do update set slug = tags.slug` is a no-op write that makes RETURNING yield the existing
+      // row too, so a known slug keeps its stored name (e.g. "Client A") and gets reused.
+      const tags =
+        wanted.length === 0
+          ? []
+          : await trx
+              .insertInto('tags')
+              .values(wanted.map(({ slug, name }) => ({ user_id: identity.userId, slug, name })))
+              .onConflict((conflict) =>
+                conflict
+                  .columns(['user_id', 'slug'])
+                  .doUpdateSet({ slug: (eb) => eb.ref('tags.slug') }),
+              )
+              .returning(['id', 'name', 'slug'])
+              .execute()
+
+      const note = await trx
+        .insertInto('notes')
+        .values({
+          user_id: identity.userId,
+          title: input.title,
+          due_at: input.dueAt,
+          original_due_at: input.dueAt,
+        })
+        .returning([
+          'id',
+          'title',
+          'due_at',
+          'original_due_at',
+          'snooze_count',
+          'done_at',
+          'notified_due_at',
+        ])
+        .executeTakeFirstOrThrow()
+
+      if (tags.length > 0) {
+        await trx
+          .insertInto('note_tags')
+          .values(
+            tags.map((tag) => ({ user_id: identity.userId, note_id: note.id, tag_id: tag.id })),
+          )
+          .execute()
+      }
+
+      return {
+        id: note.id,
+        title: note.title,
+        tags: tags
+          .map(({ name, slug }) => ({ name, slug }))
+          .sort((a, b) => a.slug.localeCompare(b.slug)),
+        dueAt: note.due_at,
+        originalDueAt: note.original_due_at,
+        snoozeCount: note.snooze_count,
+        doneAt: note.done_at,
+        notifiedDueAt: note.notified_due_at,
+      }
     })
   }
 

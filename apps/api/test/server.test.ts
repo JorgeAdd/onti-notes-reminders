@@ -9,6 +9,7 @@ import { describe, expect, it } from 'vitest'
 import { UnauthorizedError } from '../src/application/errors'
 import { makeGetMe } from '../src/application/get-me'
 import { makeGetToday } from '../src/application/get-today'
+import { makeCaptureNote } from '../src/application/capture-note'
 import { makeMarkDone } from '../src/application/mark-done'
 import { makeSetTimezone } from '../src/application/set-timezone'
 import { makeSnoozeNote } from '../src/application/snooze-note'
@@ -53,6 +54,7 @@ const freshNotes = () =>
   new InMemoryNotes(JORGE_NOTES.map((note) => ({ ownerId: JORGE.userId, note })))
 
 const failingNotes: NoteRepository = {
+  createOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
   listOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
   mutateReminder: () => Promise.reject(new Error('connection refused: postgres://secret')),
 }
@@ -80,6 +82,7 @@ function server(
     setTimezone: makeSetTimezone(profiles),
     getToday: makeGetToday({ clock, notes: noteRepository, profiles }),
     actions: {
+      captureNote: makeCaptureNote({ notes: noteRepository }),
       snoozeNote: makeSnoozeNote({ clock, notes: noteRepository, profiles }),
       markDone: makeMarkDone({ clock, notes: noteRepository }),
       undoDone: makeUndoDone({ notes: noteRepository }),
@@ -458,6 +461,119 @@ describe('reminder actions', () => {
 
   it('hides internal errors', async () => {
     const res = await post(server(undefined, failingNotes), `/notes/${N2_ID}/done`)
+    expect(res.statusCode).toBe(500)
+    expect(res.body).not.toContain('secret')
+    expect(res.json()).toEqual({ error: 'internal_error' })
+  })
+})
+
+describe('POST /notes', () => {
+  const capture = { title: 'Call back', tags: ['client-a'], dueAt: '2026-10-07T22:00:00.000Z' }
+  const post = (
+    app: ReturnType<typeof server>,
+    payload: unknown,
+    authorization: string | null = 'Bearer valid-token',
+  ) =>
+    app.inject({
+      method: 'POST',
+      url: '/notes',
+      headers: authorization ? { authorization } : {},
+      payload: payload as object,
+    })
+
+  it.each([
+    ['no Authorization header', null],
+    ['a non-bearer scheme', 'Basic abc'],
+    ['a forged token', 'Bearer forged'],
+  ])('returns 401 with %s (R15)', async (_label, authorization) => {
+    const notes = freshNotes()
+    const res = await post(server(undefined, notes), capture, authorization)
+    expect(res.statusCode).toBe(401)
+    expect(res.json()).toEqual({ error: 'unauthorized' })
+    expect(notes.created).toEqual([])
+  })
+
+  it('C1 · returns 201 with the saved note: due = original due, count 0, tag Client A', async () => {
+    const notes = freshNotes()
+    const res = await post(server(undefined, notes), {
+      title: 'Notify Ana: move repo permissions from me to Luis',
+      tags: ['client-a'],
+      dueAt: '2026-10-06T23:00:00.000Z',
+    })
+    expect(res.statusCode).toBe(201)
+    const body = res.json<Record<string, unknown>>()
+    expect(body).not.toHaveProperty('notifiedDueAt')
+    const note = noteResponseSchema.parse(body)
+    expect(note.title).toBe('Notify Ana: move repo permissions from me to Luis')
+    expect(note.tags).toEqual([{ slug: 'client-a', name: 'Client A' }])
+    expect(note.dueAt).toEqual(new Date('2026-10-06T23:00:00.000Z'))
+    expect(note.originalDueAt).toEqual(note.dueAt)
+    expect(note.snoozeCount).toBe(0)
+    expect(note.doneAt).toBeNull()
+    expect(notes.created).toHaveLength(1)
+    expect(notes.created[0]?.ownerId).toBe(JORGE.userId)
+  })
+
+  it('saves a plain note (dueAt null, no tags) as 201 with null dates', async () => {
+    const res = await post(server(), { title: 'Buy cable', tags: [], dueAt: null })
+    expect(res.statusCode).toBe(201)
+    const note = noteResponseSchema.parse(res.json())
+    expect(note.dueAt).toBeNull()
+    expect(note.originalDueAt).toBeNull()
+    expect(note.tags).toEqual([])
+  })
+
+  it('truncates seconds and derives the tag name on the server, never from the client', async () => {
+    const res = await post(server(), {
+      ...capture,
+      dueAt: '2026-10-07T22:00:41.000Z',
+      tags: ['home'],
+    })
+    expect(res.statusCode).toBe(201)
+    const note = noteResponseSchema.parse(res.json())
+    expect(note.dueAt).toEqual(new Date('2026-10-07T22:00:00.000Z'))
+    expect(note.tags).toEqual([{ slug: 'home', name: 'Home' }])
+  })
+
+  it.each([
+    ['an empty title', { title: '' }],
+    ['a blank title', { title: '   ' }],
+    ['a 201-character title', { title: 'a'.repeat(201) }],
+    ['a malformed slug', { tags: ['Client A'] }],
+    ['a 41-character slug', { tags: ['a'.repeat(41)] }],
+    ['11 tags', { tags: Array.from({ length: 11 }, (_, i) => `tag-${i}`) }],
+    ['duplicate slugs', { tags: ['home', 'home'] }],
+    ['an unparsable due', { dueAt: 'tomorrow' }],
+    ['a client-supplied tag name', { tags: [{ slug: 'home', name: 'Casa' }] }],
+    ['a missing title', { title: undefined }],
+  ])('returns 400 for %s and stores nothing', async (_label, patch) => {
+    const notes = freshNotes()
+    const res = await post(server(undefined, notes), { ...capture, ...patch })
+    expect(res.statusCode).toBe(400)
+    expect(res.json()).toEqual({ error: 'validation_error' })
+    expect(notes.created).toEqual([])
+  })
+
+  it('returns 400 for malformed JSON and for no body', async () => {
+    const malformed = await server().inject({
+      method: 'POST',
+      url: '/notes',
+      headers: { authorization: 'Bearer valid-token', 'content-type': 'application/json' },
+      payload: '{"title":',
+    })
+    expect(malformed.statusCode).toBe(400)
+    expect(malformed.json()).toEqual({ error: 'validation_error' })
+
+    const empty = await server().inject({
+      method: 'POST',
+      url: '/notes',
+      headers: { authorization: 'Bearer valid-token' },
+    })
+    expect(empty.statusCode).toBe(400)
+  })
+
+  it('hides internal errors', async () => {
+    const res = await post(server(undefined, failingNotes), capture)
     expect(res.statusCode).toBe(500)
     expect(res.body).not.toContain('secret')
     expect(res.json()).toEqual({ error: 'internal_error' })

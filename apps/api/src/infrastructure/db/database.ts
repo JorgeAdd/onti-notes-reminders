@@ -1,4 +1,4 @@
-import { Kysely, PostgresDialect, type ColumnType } from 'kysely'
+import { Kysely, PostgresDialect, type ColumnType, type Generated } from 'kysely'
 import pg from 'pg'
 
 /** Columns read by the API so far. Source of truth: supabase/migrations/. */
@@ -10,17 +10,18 @@ export interface Database {
     updated_at: ColumnType<Date, never, never>
   }
   notes: {
-    id: string
+    id: Generated<string>
     user_id: string
     title: string
     due_at: Date | null
     original_due_at: Date | null
-    snooze_count: number
+    /** Defaults to 0 on insert. */
+    snooze_count: Generated<number>
     done_at: Date | null
     notified_due_at: Date | null
   }
   tags: {
-    id: string
+    id: Generated<string>
     user_id: string
     name: string
     slug: string

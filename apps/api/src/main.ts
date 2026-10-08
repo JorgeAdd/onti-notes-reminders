@@ -1,3 +1,4 @@
+import { makeCaptureNote } from './application/capture-note'
 import { makeGetMe } from './application/get-me'
 import { makeGetToday } from './application/get-today'
 import { makeMarkDone } from './application/mark-done'
@@ -24,6 +25,7 @@ const app = buildServer({
   setTimezone: makeSetTimezone(profiles),
   getToday: makeGetToday({ clock, notes, profiles }),
   actions: {
+    captureNote: makeCaptureNote({ notes }),
     snoozeNote: makeSnoozeNote({ clock, notes, profiles }),
     markDone: makeMarkDone({ clock, notes }),
     undoDone: makeUndoDone({ notes }),

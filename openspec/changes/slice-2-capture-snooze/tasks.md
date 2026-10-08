@@ -73,10 +73,10 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 3: Capture API (~340 lines)
 
-- [ ] 3.1 RED: `notes.test.ts` `captureRequestSchema` (title 200/201, slug 40/41, 11 tags, duplicate slugs, seconds truncated, past `dueAt`); GREEN schema.
-- [ ] 3.2 RED: `apps/api/test/capture-note.test.ts` (names via `tagNameFromSlug`, dedupe, `due_at = original_due_at`, null due, C1 preview equals save); GREEN `capture-note.ts`, `ports.ts` `createOwn`.
-- [ ] 3.3 RED then GREEN: `server.test.ts` `POST /notes`: 401, 400 (bad slug, empty/oversize title), 201 shape; route.
-- [ ] 3.4 GREEN: `createOwn` adapter (one `asUser` transaction: tag upsert `do update set slug = tags.slug`, note, `note_tags`); `Database` insert shapes (`ColumnType`); wire `main.ts`.
+- [x] 3.1 RED: `notes.test.ts` `captureRequestSchema` (title 200/201, slug 40/41, 11 tags, duplicate slugs, seconds truncated, past `dueAt`); GREEN schema.
+- [x] 3.2 RED: `apps/api/test/capture-note.test.ts` (names via `tagNameFromSlug`, dedupe, `due_at = original_due_at`, null due, C1 preview equals save); GREEN `capture-note.ts`, `ports.ts` `createOwn`.
+- [x] 3.3 RED then GREEN: `server.test.ts` `POST /notes`: 401, 400 (bad slug, empty/oversize title), 201 shape; route.
+- [x] 3.4 GREEN: `createOwn` adapter (one `asUser` transaction: tag upsert `do update set slug = tags.slug`, note, `note_tags`); `Database` insert shapes (`ColumnType`); wire `main.ts`.
 - [ ] 3.5 Manual checklist (record in PR): `#client-a` reuses existing tag and keeps "Client A"; failed insert leaves no tag.
 
 ## Commit 4: Mutation layer (~360 lines, High)

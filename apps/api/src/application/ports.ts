@@ -26,10 +26,23 @@ export interface Clock {
   now(): Date
 }
 
-/** Reads notes as the caller (RLS applies). */
+/** What capture stores: tag names are already derived, due and original due are equal. */
+export interface NewNote {
+  title: string
+  dueAt: Date | null
+  tags: { slug: string; name: string }[]
+}
+
+/** Reads and writes notes as the caller (RLS applies). */
 export interface NoteRepository {
   /** Every note of the caller, without bodies, with its tags. */
   listOwn(identity: Identity): Promise<NoteRecord[]>
+  /**
+   * Creates a note with its tags in ONE transaction: tags are upserted on (user_id, slug) keeping
+   * an existing name, then the note (`due_at = original_due_at = dueAt`) and its links. A failure
+   * leaves nothing behind.
+   */
+  createOwn(identity: Identity, input: NewNote): Promise<NoteRecord>
   /**
    * Runs `decide` on the caller's note under a row lock, in one transaction, and stores the
    * reminder it returns when it differs. Returns the stored note, or null when the id is unknown

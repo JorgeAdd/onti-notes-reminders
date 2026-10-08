@@ -1,5 +1,6 @@
 import cors from '@fastify/cors'
 import {
+  captureRequestSchema,
   meResponseSchema,
   noteResponseSchema,
   snoozeRequestSchema,
@@ -14,6 +15,7 @@ import {
   UnauthorizedError,
   ValidationError,
 } from '../../application/errors'
+import type { CaptureNote } from '../../application/capture-note'
 import type { GetMe } from '../../application/get-me'
 import type { GetToday } from '../../application/get-today'
 import type { MarkDone } from '../../application/mark-done'
@@ -29,7 +31,12 @@ export interface ServerDeps {
   getMe: GetMe
   setTimezone: SetTimezone
   getToday: GetToday
-  actions: { snoozeNote: SnoozeNote; markDone: MarkDone; undoDone: UndoDone }
+  actions: {
+    captureNote: CaptureNote
+    snoozeNote: SnoozeNote
+    markDone: MarkDone
+    undoDone: UndoDone
+  }
   corsOrigins: string[]
   logger?: boolean
 }
@@ -114,6 +121,13 @@ export function buildServer({
     const body = timezoneRequestSchema.safeParse(request.body)
     if (!body.success) throw new ValidationError('Body must be {timezone: string}')
     return { timezone: await setTimezone(identity, body.data.timezone) }
+  })
+
+  app.post('/notes', async (request, reply) => {
+    const identity = await authenticate(request)
+    const body = captureRequestSchema.safeParse(request.body)
+    if (!body.success) throw new ValidationError('Invalid capture request')
+    return reply.code(201).send(noteBody(await actions.captureNote(identity, body.data)))
   })
 
   app.post('/notes/:id/snooze', async (request) => {

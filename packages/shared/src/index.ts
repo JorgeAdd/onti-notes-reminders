@@ -7,8 +7,10 @@ export {
 } from './me'
 export { instant } from './instant'
 export {
+  captureRequestSchema,
   noteResponseSchema,
   snoozeRequestSchema,
+  type CaptureRequest,
   type NoteResponse,
   type SnoozePreset,
   type SnoozeRequest,

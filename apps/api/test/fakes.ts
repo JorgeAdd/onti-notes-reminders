@@ -1,6 +1,6 @@
 import type { Reminder } from '@onti/shared'
 import type { Identity } from '../src/domain/identity'
-import type { NoteRepository, Profile, ProfileRepository } from '../src/application/ports'
+import type { NewNote, NoteRepository, Profile, ProfileRepository } from '../src/application/ports'
 import type { NoteRecord } from '../src/domain/note'
 
 export const JORGE: Identity = {
@@ -74,6 +74,8 @@ export function noteRecord(n: number, overrides: Partial<NoteRecord> = {}): Note
  */
 export class InMemoryNotes implements NoteRepository {
   readonly writes: string[] = []
+  readonly created: { ownerId: string; input: NewNote }[] = []
+  private nextId = 1000
   private readonly rows = new Map<string, { ownerId: string; note: NoteRecord }>()
 
   constructor(owned: { ownerId: string; note: NoteRecord }[] = []) {
@@ -82,6 +84,19 @@ export class InMemoryNotes implements NoteRepository {
 
   get(id: string): NoteRecord | undefined {
     return this.rows.get(id)?.note
+  }
+
+  createOwn(identity: Identity, input: NewNote): Promise<NoteRecord> {
+    const note: NoteRecord = {
+      ...noteRecord(this.nextId++),
+      title: input.title,
+      tags: input.tags.map(({ slug, name }) => ({ slug, name })),
+      dueAt: input.dueAt,
+      originalDueAt: input.dueAt,
+    }
+    this.rows.set(note.id, { ownerId: identity.userId, note })
+    this.created.push({ ownerId: identity.userId, input })
+    return Promise.resolve(note)
   }
 
   listOwn(identity: Identity): Promise<NoteRecord[]> {
