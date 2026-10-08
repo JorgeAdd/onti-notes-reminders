@@ -8,6 +8,7 @@ import {
   relativeTo,
   reschedule,
   snoozeOneHour,
+  undoDone,
 } from '../src'
 import { at, TZ } from './fixtures/jorge-week'
 
@@ -112,6 +113,11 @@ describe('R8–R9 · lifecycle', () => {
     const first = at('2026-10-06 17:00')
     const done = markDone(reschedule(NO_REMINDER, at('2026-10-06 16:00')), first)
     expect(markDone(done, at('2026-10-06 18:30')).doneAt).toEqual(first)
+  })
+
+  it('undo on an open note changes nothing', () => {
+    const open = reschedule(NO_REMINDER, at('2026-10-06 16:00'))
+    expect(undoDone(open)).toEqual(open)
   })
 
   it('done never touches due_at', () => {

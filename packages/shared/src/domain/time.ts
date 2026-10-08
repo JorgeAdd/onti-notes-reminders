@@ -48,11 +48,12 @@ export function localTimeOn(
     hours,
     minutes,
   )
-  const dayEnd = addDays(dayStart, 1)
 
-  // Candidate instants: the wall time read with each UTC offset in force that day.
+  // Candidate instants: the wall time read with each UTC offset in force around it.
   const offsets = new Set(
-    [dayStart, dayEnd].map((d) => new TZDate(d.getTime(), timeZone).getTimezoneOffset()),
+    [wall - 24 * 60 * MINUTE, wall + 24 * 60 * MINUTE].map((t) =>
+      new TZDate(t, timeZone).getTimezoneOffset(),
+    ),
   )
   const candidates = [...offsets].map((offset) => wall + offset * MINUTE).sort((a, b) => a - b)
   const valid = candidates.find((t) => wallClock(t, timeZone) === wall)

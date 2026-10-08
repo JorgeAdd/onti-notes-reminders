@@ -55,6 +55,13 @@ describe('R16 · overlap (fall back): an ambiguous local time resolves to the FI
     expect(iso(localTimeOn(now, NY, 0, 2, 0))).toBe('2026-11-01T07:00:00.000Z')
   })
 
+  it('an overlap that starts at local midnight (America/Havana 2026-11-01 00:30) is the first occurrence, 04:30Z', () => {
+    const day = new Date('2026-11-01T17:00:00Z')
+    expect(iso(localTimeOn(day, 'America/Havana', 0, 0, 30))).toBe('2026-11-01T04:30:00.000Z')
+    const eve = new Date('2026-10-31T17:00:00Z')
+    expect(iso(localTimeOn(eve, 'America/Havana', 1, 0, 30))).toBe('2026-11-01T04:30:00.000Z')
+  })
+
   it('capture "today 01:30" on the overlap day is 05:30Z', () => {
     expect(iso(parseCapture('Call today 01:30', now, NY).dueAt)).toBe('2026-11-01T05:30:00.000Z')
   })
