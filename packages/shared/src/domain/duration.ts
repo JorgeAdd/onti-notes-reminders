@@ -14,7 +14,8 @@ export type RelativeTime = { kind: 'in'; duration: string } | { kind: 'late'; du
 /** "in 25 min" / "late 15h05". The words come from the UI messages; this returns the parts. */
 export function relativeTo(dueAt: Date, now: Date): RelativeTime {
   const delta = dueAt.getTime() - now.getTime()
-  return delta > 0
+  // R2 is strict (due_at < now), so at exactly the due time it is not late yet.
+  return delta >= 0
     ? { kind: 'in', duration: formatDuration(delta) }
     : { kind: 'late', duration: formatDuration(delta) }
 }
