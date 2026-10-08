@@ -1,16 +1,23 @@
 import cors from '@fastify/cors'
-import { meResponseSchema, todayResponseSchema } from '@onti/shared'
+import { meResponseSchema, timezoneRequestSchema, todayResponseSchema } from '@onti/shared'
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify'
 import { z } from 'zod'
-import { UnauthorizedError } from '../../application/errors'
+import {
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from '../../application/errors'
 import type { GetMe } from '../../application/get-me'
 import type { GetToday } from '../../application/get-today'
 import type { TokenVerifier } from '../../application/ports'
+import type { SetTimezone } from '../../application/set-timezone'
 import type { Identity } from '../../domain/identity'
 
 export interface ServerDeps {
   verifier: TokenVerifier
   getMe: GetMe
+  setTimezone: SetTimezone
   getToday: GetToday
   corsOrigins: string[]
   logger?: boolean
@@ -18,9 +25,15 @@ export interface ServerDeps {
 
 const BEARER = /^Bearer\s+(\S+)$/i
 
+function isFastifyClientError(error: unknown): boolean {
+  const status = (error as { statusCode?: unknown }).statusCode
+  return typeof status === 'number' && status >= 400 && status < 500
+}
+
 export function buildServer({
   verifier,
   getMe,
+  setTimezone,
   getToday,
   corsOrigins,
   logger = false,
@@ -39,6 +52,19 @@ export function buildServer({
     if (error instanceof UnauthorizedError) {
       return reply.code(401).send({ error: 'unauthorized' })
     }
+    if (error instanceof ValidationError) {
+      return reply.code(400).send({ error: 'validation_error' })
+    }
+    if (error instanceof NotFoundError) {
+      return reply.code(404).send({ error: 'not_found' })
+    }
+    if (error instanceof ConflictError) {
+      return reply.code(409).send({ error: 'conflict', reason: error.reason })
+    }
+    // Fastify's own 4xx (malformed JSON, wrong content type) are the client's fault, not ours.
+    if (isFastifyClientError(error)) {
+      return reply.code(400).send({ error: 'validation_error' })
+    }
     request.log.error(error)
     return reply.code(500).send({ error: 'internal_error' })
   })
@@ -48,6 +74,13 @@ export function buildServer({
   app.get('/me', async (request) => {
     const identity = await authenticate(request)
     return meResponseSchema.parse(await getMe(identity))
+  })
+
+  app.patch('/me', async (request) => {
+    const identity = await authenticate(request)
+    const body = timezoneRequestSchema.safeParse(request.body)
+    if (!body.success) throw new ValidationError('Body must be {timezone: string}')
+    return { timezone: await setTimezone(identity, body.data.timezone) }
   })
 
   app.get('/today', async (request) => {

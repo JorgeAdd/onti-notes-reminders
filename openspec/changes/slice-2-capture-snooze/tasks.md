@@ -38,28 +38,28 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 0: Branch
 
-- [ ] 0.1 Create `feat/slice-2-capture-snooze` from `main` (rule 6). PR targets `main`.
+- [x] 0.1 Create `feat/slice-2-capture-snooze` from `main` (rule 6). PR targets `main`.
 
 ## Commit 1a: `docs:` SG9 (~10 lines)
 
-- [ ] 1a.1 `docs/design/style-guide-decisions.md`: SG9 "5h48m" -> "5h48" (rule 14, own commit). Run `npm run verify`.
+- [x] 1a.1 `docs/design/style-guide-decisions.md`: SG9 "5h48m" -> "5h48" (rule 14, own commit). Run `npm run verify`.
 
 ## Commit 1b: `docs:`+`test:` CONTRACT first (~130 lines)
 
-- [ ] 1b.1 RED: `packages/shared/test/dst.test.ts` per Decision 18: gap `02:30`, `today 02:30`, `tomorrow 02:30` on Sun 2026-03-08 America/New_York -> 07:00Z; Tomorrow 9:00 across spring and fall; overlap `01:30` on 2026-11-01 -> 05:30Z (first occurrence, EDT). Record red or green before touching `time.ts`.
-- [ ] 1b.2 RED: tests for R9 (done-on-done keeps first `done_at`; done without reminder is an error), R11 (`today HH:MM` accepted when past; `+Nm`) in `packages/shared/test/`.
-- [ ] 1b.3 `docs/CONTRACT.md`: update R9, R11, R16 text first (rule 23).
-- [ ] 1b.4 GREEN: fix `packages/shared/src/domain/time.ts` `localTimeOn` (offsets at day start/end, earliest round-trip, bisect gap) only if 1b.1 is red; adjust `parseCapture`/`markDone` only if 1b.2 is red.
+- [x] 1b.1 RED: `packages/shared/test/dst.test.ts` per Decision 18: gap `02:30`, `today 02:30`, `tomorrow 02:30` on Sun 2026-03-08 America/New_York -> 07:00Z; Tomorrow 9:00 across spring and fall; overlap `01:30` on 2026-11-01 -> 05:30Z (first occurrence, EDT). Record red or green before touching `time.ts`.
+- [x] 1b.2 RED: tests for R9 (done-on-done keeps first `done_at`; done without reminder is an error), R11 (`today HH:MM` accepted when past; `+Nm`) in `packages/shared/test/`.
+- [x] 1b.3 `docs/CONTRACT.md`: update R9, R11, R16 text first (rule 23).
+- [x] 1b.4 GREEN: fix `packages/shared/src/domain/time.ts` `localTimeOn` (offsets at day start/end, earliest round-trip, bisect gap) only if 1b.1 is red; adjust `parseCapture`/`markDone` only if 1b.2 is red.
 
 ## Commit 1c: Timezone, errors, PATCH /me (~200 lines)
 
-- [ ] 1c.1 RED: `packages/shared/test/timezone.test.ts` (`isValidTimeZone`, `CAPTURE_LIMITS`); GREEN `packages/shared/src/timezone.ts`, export in `index.ts`.
-- [ ] 1c.2 RED: `apps/api/test/set-timezone.test.ts` (UTC -> zone; non-UTC no-op returns stored; bad zone 400; missing profile 404) with fakes in `test/fakes.ts`.
-- [ ] 1c.3 GREEN: `application/errors.ts` (`ValidationError`, `NotFoundError`, `ConflictError(reason)`), `ports.ts` `setTimezoneIfDefault`, `set-timezone.ts`.
-- [ ] 1c.4 RED: `server.test.ts` for `PATCH /me` (200/400/401/404, preflight allows PATCH, malformed JSON 400, 500 hides internals); GREEN error handler and route in `http/server.ts`.
-- [ ] 1c.5 GREEN: `postgres-profile-repository.ts` single-statement conditional update; wire `main.ts`.
-- [ ] 1c.6 RED then GREEN: `apps/web/src/lib/api.ts` `request/patch` (401 typed, `Content-Type` only with body); `lib/browser-timezone.ts`.
-- [ ] 1c.7 RED then GREEN: `TodayContainer` tz sync (only from UTC, once per mount, silent failure, 401 -> `onSessionExpired`, invalidate `['today']`).
+- [x] 1c.1 RED: `packages/shared/test/timezone.test.ts` (`isValidTimeZone`, `CAPTURE_LIMITS`); GREEN `packages/shared/src/timezone.ts`, export in `index.ts`.
+- [x] 1c.2 RED: `apps/api/test/set-timezone.test.ts` (UTC -> zone; non-UTC no-op returns stored; bad zone 400; missing profile 404) with fakes in `test/fakes.ts`.
+- [x] 1c.3 GREEN: `application/errors.ts` (`ValidationError`, `NotFoundError`, `ConflictError(reason)`), `ports.ts` `setTimezoneIfDefault`, `set-timezone.ts`.
+- [x] 1c.4 RED: `server.test.ts` for `PATCH /me` (200/400/401/404, preflight allows PATCH, malformed JSON 400, 500 hides internals); GREEN error handler and route in `http/server.ts`.
+- [x] 1c.5 GREEN: `postgres-profile-repository.ts` single-statement conditional update; wire `main.ts`.
+- [x] 1c.6 RED then GREEN: `apps/web/src/lib/api.ts` `request/patch` (401 typed, `Content-Type` only with body); `lib/browser-timezone.ts`.
+- [x] 1c.7 RED then GREEN: `TodayContainer` tz sync (only from UTC, once per mount, silent failure, 401 -> `onSessionExpired`, invalidate `['today']`).
 - [ ] 1c.8 Manual checklist (record in PR): conditional timezone update on local Supabase (UTC -> zone; second call is a no-op).
 
 ## Commit 2: Reminder actions API (~340 lines)

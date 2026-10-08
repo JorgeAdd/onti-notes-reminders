@@ -17,4 +17,25 @@ export class PostgresProfileRepository implements ProfileRepository {
       return row ?? null
     })
   }
+
+  /** One conditional statement, so "only while UTC" cannot race between two tabs (Decision 1). */
+  setTimezoneIfDefault(identity: Identity, timezone: string): Promise<string | null> {
+    return asUser(this.db, identity, async (trx) => {
+      const updated = await trx
+        .updateTable('profiles')
+        .set({ timezone })
+        .where('id', '=', identity.userId)
+        .where('timezone', '=', 'UTC')
+        .returning('timezone')
+        .executeTakeFirst()
+      if (updated) return updated.timezone
+
+      const current = await trx
+        .selectFrom('profiles')
+        .select('timezone')
+        .where('id', '=', identity.userId)
+        .executeTakeFirst()
+      return current?.timezone ?? null
+    })
+  }
 }

@@ -2,7 +2,7 @@ import type { Session } from '@supabase/supabase-js'
 import { useCallback, useEffect, useState } from 'react'
 import { AuthContainer } from './features/auth/AuthContainer'
 import { TodayContainer } from './features/today/TodayContainer'
-import { fetchToday } from './lib/api'
+import { fetchToday, patchTimezone } from './lib/api'
 import { supabase } from './lib/supabase'
 
 export function App() {
@@ -25,6 +25,10 @@ export function App() {
 
   const accessToken = session?.access_token
   const load = useCallback(() => fetchToday(accessToken ?? ''), [accessToken])
+  const syncTimezone = useCallback(
+    (timezone: string) => patchTimezone(accessToken ?? '', timezone),
+    [accessToken],
+  )
   // The screen never waits on the network: the local session is cleared first,
   // and a failed sign-out call is ignored (the token is unusable anyway).
   const signOut = useCallback(() => {
@@ -38,7 +42,12 @@ export function App() {
 
   if (!ready) return null
   return session ? (
-    <TodayContainer load={load} onSessionExpired={onSessionExpired} onSignOut={signOut} />
+    <TodayContainer
+      load={load}
+      onSessionExpired={onSessionExpired}
+      onSignOut={signOut}
+      syncTimezone={syncTimezone}
+    />
   ) : (
     <AuthContainer expired={expired} />
   )

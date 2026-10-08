@@ -120,6 +120,14 @@
       "sessions": 0,
       "memories": 8,
       "prompts": 0
+    },
+    {
+      "id": "ab4c0657",
+      "created_by": "jdd",
+      "created_at": "2026-10-08T14:48:55Z",
+      "sessions": 0,
+      "memories": 1,
+      "prompts": 0
     }
   ]
 }

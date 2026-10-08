@@ -1,5 +1,5 @@
-import { afterEach, expect, it, vi } from 'vitest'
-import { fetchToday, UnauthorizedError } from '../src/lib/api'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { ApiError, fetchToday, patchTimezone, request, UnauthorizedError } from '../src/lib/api'
 
 const ID = '11111111-1111-4111-8111-111111111111'
 const body = {
@@ -66,4 +66,59 @@ it.each([403, 404, 500, 503])(
 it('rejects a body that does not match the shared schema', async () => {
   respond(200, { ...body, openCount: 'many' })
   await expect(fetchToday('t')).rejects.toThrow()
+})
+
+describe('request', () => {
+  it('sends no Content-Type when there is no body (Fastify rejects an empty JSON body)', async () => {
+    const fetchMock = respond(200, {})
+    await request('POST', '/notes/x/done', 'token-1')
+
+    const [, init] = fetchMock.mock.calls[0]!
+    expect(init?.method).toBe('POST')
+    expect(init?.headers).toEqual({ Authorization: 'Bearer token-1' })
+    expect(init?.body).toBeUndefined()
+  })
+
+  it('sends the JSON body with its Content-Type when there is one', async () => {
+    const fetchMock = respond(200, {})
+    await request('PATCH', '/me', 'token-1', { timezone: 'America/Mexico_City' })
+
+    const [, init] = fetchMock.mock.calls[0]!
+    expect(init?.headers).toEqual({
+      Authorization: 'Bearer token-1',
+      'Content-Type': 'application/json',
+    })
+    expect(init?.body).toBe('{"timezone":"America/Mexico_City"}')
+  })
+
+  it('turns 401 into UnauthorizedError and other failures into ApiError with the status', async () => {
+    respond(401)
+    expect(await request('PATCH', '/me', 't', {}).catch((e: unknown) => e)).toBeInstanceOf(
+      UnauthorizedError,
+    )
+
+    respond(409, { error: 'conflict' })
+    const error = await request('POST', '/notes/x/snooze', 't', {}).catch((e: unknown) => e)
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error).not.toBeInstanceOf(UnauthorizedError)
+    expect((error as ApiError).status).toBe(409)
+  })
+})
+
+describe('patchTimezone', () => {
+  it('calls PATCH /me and returns the stored zone', async () => {
+    const fetchMock = respond(200, { timezone: 'America/New_York' })
+    const stored = await patchTimezone('token-1', 'America/Mexico_City')
+
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect((url as URL).href).toBe('http://localhost:3000/me')
+    expect(init?.method).toBe('PATCH')
+    expect(init?.body).toBe('{"timezone":"America/Mexico_City"}')
+    expect(stored).toBe('America/New_York')
+  })
+
+  it('rejects a body that is not {timezone}', async () => {
+    respond(200, { timezone: 7 })
+    await expect(patchTimezone('t', 'UTC')).rejects.toThrow()
+  })
 })

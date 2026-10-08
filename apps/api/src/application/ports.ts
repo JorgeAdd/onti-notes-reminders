@@ -13,6 +13,11 @@ export interface Profile {
 /** Reads profiles as the caller (RLS applies). */
 export interface ProfileRepository {
   findOwn(identity: Identity): Promise<Profile | null>
+  /**
+   * Sets the timezone only while it is still the default `UTC`, atomically (a second call
+   * changes nothing). Returns the stored timezone, or null when the profile row is missing.
+   */
+  setTimezoneIfDefault(identity: Identity, timezone: string): Promise<string | null>
 }
 
 /** Time comes only from here (CLAUDE.md rule 16). */

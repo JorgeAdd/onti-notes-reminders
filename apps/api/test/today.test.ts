@@ -10,9 +10,10 @@ import {
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import { makeGetToday } from '../src/application/get-today'
-import type { Clock, NoteRepository, Profile, ProfileRepository } from '../src/application/ports'
+import type { Clock, NoteRepository, Profile } from '../src/application/ports'
 import type { NoteRecord } from '../src/domain/note'
 import type { Identity } from '../src/domain/identity'
+import { profileReturning } from './fakes'
 
 const IDENTITY: Identity = { userId: 'jorge', email: null, claims: {} }
 const UUID = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
@@ -37,7 +38,7 @@ function today(
 ) {
   const clock: Clock = { now: () => at(nowLocal) }
   const repo: NoteRepository = { listOwn: () => Promise.resolve(notes.map(toRecord)) }
-  const profiles: ProfileRepository = { findOwn: () => Promise.resolve(profile) }
+  const profiles = profileReturning(profile)
   return makeGetToday({ clock, notes: repo, profiles })(IDENTITY)
 }
 
@@ -113,7 +114,7 @@ describe('getToday', () => {
     const page = await makeGetToday({
       clock,
       notes: { listOwn: () => Promise.resolve([]) },
-      profiles: { findOwn: () => Promise.resolve({ timezone: 'America/New_York' }) },
+      profiles: profileReturning({ timezone: 'America/New_York' }),
     })(IDENTITY)
     expect(page.window.end.getTime() - page.window.start.getTime()).toBe(25 * 3_600_000)
   })
@@ -123,7 +124,7 @@ describe('getToday', () => {
     const page = await makeGetToday({
       clock,
       notes: { listOwn: () => Promise.resolve([]) },
-      profiles: { findOwn: () => Promise.resolve({ timezone: 'America/New_York' }) },
+      profiles: profileReturning({ timezone: 'America/New_York' }),
     })(IDENTITY)
     expect(page.window.end.getTime() - page.window.start.getTime()).toBe(23 * 3_600_000)
   })

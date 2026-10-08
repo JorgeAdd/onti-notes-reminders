@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { UnauthorizedError } from '../src/application/errors'
 import { makeGetMe } from '../src/application/get-me'
 import { makeGetToday } from '../src/application/get-today'
+import { makeSetTimezone } from '../src/application/set-timezone'
 import type {
   Clock,
   NoteRepository,
@@ -12,14 +13,7 @@ import type {
 } from '../src/application/ports'
 import type { NoteRecord } from '../src/domain/note'
 import { buildServer } from '../src/infrastructure/http/server'
-
-const JORGE = {
-  userId: '7b0c5a2e-3f4d-4c1a-9e8b-2d6f0a1b3c4d',
-  email: 'jorge@example.com',
-  claims: {},
-}
-
-const ANA = { userId: '1d2e3f40-5a6b-4c7d-8e9f-0a1b2c3d4e5f', email: 'ana@example.com', claims: {} }
+import { ANA, InMemoryProfiles, JORGE } from './fakes'
 
 const verifier: TokenVerifier = {
   verify(token) {
@@ -51,15 +45,22 @@ const notes: NoteRepository = {
   listOwn: (identity) => Promise.resolve(identity.userId === JORGE.userId ? JORGE_NOTES : []),
 }
 
+/** Profile stub for read-only tests: reads answer, writes are never expected. */
+const readOnly = (findOwn: ProfileRepository['findOwn']): ProfileRepository => ({
+  findOwn,
+  setTimezoneIfDefault: () => Promise.reject(new Error('unexpected write')),
+})
+
 function server(
-  profiles: ProfileRepository = {
-    findOwn: () => Promise.resolve({ timezone: 'America/Mexico_City' }),
-  },
+  profiles: ProfileRepository = readOnly(() =>
+    Promise.resolve({ timezone: 'America/Mexico_City' }),
+  ),
   noteRepository: NoteRepository = notes,
 ) {
   return buildServer({
     verifier,
     getMe: makeGetMe(profiles),
+    setTimezone: makeSetTimezone(profiles),
     getToday: makeGetToday({ clock, notes: noteRepository, profiles }),
     corsOrigins: ['https://app.example'],
   })
@@ -103,7 +104,7 @@ describe('GET /me', () => {
   })
 
   it('falls back to UTC when the profile is missing', async () => {
-    const res = await server({ findOwn: () => Promise.resolve(null) }).inject({
+    const res = await server(readOnly(() => Promise.resolve(null))).inject({
       method: 'GET',
       url: '/me',
       headers: { authorization: 'Bearer valid-token' },
@@ -112,9 +113,9 @@ describe('GET /me', () => {
   })
 
   it('hides internal errors', async () => {
-    const res = await server({
-      findOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
-    }).inject({
+    const res = await server(
+      readOnly(() => Promise.reject(new Error('connection refused: postgres://secret'))),
+    ).inject({
       method: 'GET',
       url: '/me',
       headers: { authorization: 'Bearer valid-token' },
@@ -131,6 +132,112 @@ describe('GET /me', () => {
       headers: { origin: 'https://app.example' },
     })
     expect(res.headers['access-control-allow-origin']).toBe('https://app.example')
+  })
+})
+
+describe('PATCH /me', () => {
+  const patch = (
+    app: ReturnType<typeof server>,
+    payload: unknown,
+    authorization = 'Bearer valid-token',
+  ) =>
+    app.inject({
+      method: 'PATCH',
+      url: '/me',
+      headers: { authorization },
+      payload: payload as object,
+    })
+
+  it.each([
+    ['no Authorization header', undefined],
+    ['a non-bearer scheme', 'Basic abc'],
+    ['a forged token', 'Bearer forged'],
+  ])('returns 401 with %s (R15)', async (_label, authorization) => {
+    const res = await server().inject({
+      method: 'PATCH',
+      url: '/me',
+      headers: authorization ? { authorization } : {},
+      payload: { timezone: 'America/Mexico_City' },
+    })
+    expect(res.statusCode).toBe(401)
+    expect(res.json()).toEqual({ error: 'unauthorized' })
+  })
+
+  it('stores the zone while the profile is on UTC and returns it', async () => {
+    const profiles = InMemoryProfiles.of({ [JORGE.userId]: 'UTC' })
+    const res = await patch(server(profiles), { timezone: 'America/Mexico_City' })
+    expect(res.statusCode).toBe(200)
+    expect(res.json()).toEqual({ timezone: 'America/Mexico_City' })
+    expect(profiles.writes).toHaveLength(1)
+  })
+
+  it('answers 200 with the stored zone when the profile is already set (no-op)', async () => {
+    const profiles = InMemoryProfiles.of({ [JORGE.userId]: 'America/New_York' })
+    const res = await patch(server(profiles), { timezone: 'Asia/Kolkata' })
+    expect(res.statusCode).toBe(200)
+    expect(res.json()).toEqual({ timezone: 'America/New_York' })
+    expect(profiles.writes).toEqual([])
+  })
+
+  it.each([
+    ['an unknown zone', { timezone: 'Mars/Olympus' }],
+    ['an empty zone', { timezone: '' }],
+    ['a non-string zone', { timezone: 42 }],
+    ['a missing field', {}],
+  ])('returns 400 for %s and writes nothing', async (_label, payload) => {
+    const profiles = InMemoryProfiles.of({ [JORGE.userId]: 'UTC' })
+    const res = await patch(server(profiles), payload)
+    expect(res.statusCode).toBe(400)
+    expect(res.json()).toEqual({ error: 'validation_error' })
+    expect(profiles.writes).toEqual([])
+  })
+
+  it('returns 400 for malformed JSON without leaking parser text', async () => {
+    const res = await server().inject({
+      method: 'PATCH',
+      url: '/me',
+      headers: { authorization: 'Bearer valid-token', 'content-type': 'application/json' },
+      payload: '{"timezone":',
+    })
+    expect(res.statusCode).toBe(400)
+    expect(res.json()).toEqual({ error: 'validation_error' })
+  })
+
+  it('returns 400 when there is no body at all', async () => {
+    const res = await server().inject({
+      method: 'PATCH',
+      url: '/me',
+      headers: { authorization: 'Bearer valid-token' },
+    })
+    expect(res.statusCode).toBe(400)
+    expect(res.json()).toEqual({ error: 'validation_error' })
+  })
+
+  it('returns 404 when the caller has no profile row', async () => {
+    const profiles = InMemoryProfiles.of({ [ANA.userId]: 'UTC' })
+    const res = await patch(server(profiles), { timezone: 'America/Mexico_City' })
+    expect(res.statusCode).toBe(404)
+    expect(res.json()).toEqual({ error: 'not_found' })
+  })
+
+  it('hides internal errors', async () => {
+    const profiles = new InMemoryProfiles()
+    profiles.setTimezoneIfDefault = () =>
+      Promise.reject(new Error('connection refused: postgres://secret'))
+    const res = await patch(server(profiles), { timezone: 'America/Mexico_City' })
+    expect(res.statusCode).toBe(500)
+    expect(res.body).not.toContain('secret')
+    expect(res.json()).toEqual({ error: 'internal_error' })
+  })
+
+  it('allows PATCH in the CORS preflight', async () => {
+    const res = await server().inject({
+      method: 'OPTIONS',
+      url: '/me',
+      headers: { origin: 'https://app.example', 'access-control-request-method': 'PATCH' },
+    })
+    expect(res.statusCode).toBe(204)
+    expect(res.headers['access-control-allow-methods']).toContain('PATCH')
   })
 })
 

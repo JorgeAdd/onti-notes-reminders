@@ -1,5 +1,6 @@
 import { makeGetMe } from './application/get-me'
 import { makeGetToday } from './application/get-today'
+import { makeSetTimezone } from './application/set-timezone'
 import { loadConfig } from './config'
 import { JwksTokenVerifier } from './infrastructure/auth/jwks-token-verifier'
 import { SystemClock } from './infrastructure/clock/system-clock'
@@ -15,6 +16,7 @@ const profiles = new PostgresProfileRepository(db)
 const app = buildServer({
   verifier: JwksTokenVerifier.forSupabase(config.SUPABASE_URL),
   getMe: makeGetMe(profiles),
+  setTimezone: makeSetTimezone(profiles),
   getToday: makeGetToday({
     clock: new SystemClock(),
     notes: new PostgresNoteRepository(db),
