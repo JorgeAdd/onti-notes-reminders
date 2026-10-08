@@ -179,13 +179,13 @@ export class PostgresNoteRepository implements NoteRepository {
     })
   }
 
-  searchOwn(
+  async searchOwn(
     identity: Identity,
     query: { terms: string[]; limit: number },
   ): Promise<{ rows: NoteListRow[]; total: number }> {
-    // Built before the transaction: a hostile term fails without touching the database.
+    // Built before the transaction: a hostile term rejects without touching the database.
     const tsquery = tsqueryOf(query.terms)
-    return asUser(this.db, identity, async (trx) => {
+    return await asUser(this.db, identity, async (trx) => {
       let select = trx
         .selectFrom('notes')
         .select([

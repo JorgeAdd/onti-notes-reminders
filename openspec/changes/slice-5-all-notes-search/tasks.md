@@ -67,12 +67,12 @@ Global checks for every commit:
 
 ### Commit 3: `test(api):` real-Postgres characterization (~183 lines)
 
-- [ ] 3.1 Create a THROWAWAY local Postgres 16 database using the scripts in `/private/tmp/claude-501/-Users-jdd-Projects/4da8b503-aa94-4d3f-b0a2-0740dac2259d/scratchpad/db-checks/`. Never the hosted database, never `apps/api/.env`.
-- [ ] 3.2 `apps/api/test/postgres/standins.sql` (roles, `auth.users`, `auth.uid`; migration commands in header).
-- [ ] 3.3 RED/characterize: `apps/api/test/postgres/search.pg.test.ts` with `describe.skipIf(!process.env.ONTI_TEST_DATABASE_URL)`: C9 with Ana's decoy, case, prefix, body-only `collaborators`/`release` give N1, AND, `created_at desc`, 60 rows give 50 and total 60, total counts only caller's notes, `body_head` <= 400, hostile term array rejected, RLS path via `asUser`.
-- [ ] 3.4 Pin the measured tokenizing table: host `staging.client-b.example` one token; `client-a` -> `client`, `a`; `/web` file token (`web` no match on N1); `collab:*`/`COLLAB:*` match; `'client':* & 'b':*`, `example:*`, `web:*` no match; `²`/`Ⅻ` give 200 empty list, no error.
-- [ ] 3.5 Run once with `ONTI_TEST_DATABASE_URL` set (paste output for the PR) and once unset (skipped). Update the design limits only if a row differs.
-- [ ] 3.6 `npm run verify` (test skipped without the variable); commit.
+- [x] 3.1 Create a THROWAWAY local Postgres 16 database using the scripts in `/private/tmp/claude-501/-Users-jdd-Projects/4da8b503-aa94-4d3f-b0a2-0740dac2259d/scratchpad/db-checks/`. Never the hosted database, never `apps/api/.env`.
+- [x] 3.2 `apps/api/test/postgres/standins.sql` (roles, `auth.users`, `auth.uid`; migration commands in header).
+- [x] 3.3 RED/characterize: `apps/api/test/postgres/search.pg.test.ts` with `describe.skipIf(!process.env.ONTI_TEST_DATABASE_URL)`: C9 with Ana's decoy, case, prefix, body-only `collaborators`/`release` give N1, AND, `created_at desc`, 60 rows give 50 and total 60, total counts only caller's notes, `body_head` <= 400, hostile term array rejected, RLS path via `asUser`.
+- [x] 3.4 Pin the measured tokenizing table: host `staging.client-b.example` one token; `client-a` -> `client`, `a`; `/web` file token (`web` no match on N1); `collab:*`/`COLLAB:*` match; `'client':* & 'b':*`, `example:*`, `web:*` no match; `²`/`Ⅻ` give 200 empty list, no error.
+- [x] 3.5 Run once with `ONTI_TEST_DATABASE_URL` set (paste output for the PR) and once unset (skipped). Update the design limits only if a row differs.
+- [x] 3.6 `npm run verify` (test skipped without the variable); commit.
 
 ### Commit 4: `feat(api):` GET /notes route (~140 lines)
 
