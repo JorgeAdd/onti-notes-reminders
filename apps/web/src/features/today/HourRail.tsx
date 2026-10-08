@@ -4,12 +4,14 @@ import { clockTime } from './format'
 import styles from './HourRail.module.css'
 import { ItemRow } from './ItemRow'
 import { buildRail } from './rail-model'
+import type { RowsState } from './rows'
 
 interface Props {
   items: TodayItem[]
   /** Ticking display time (use-now); the only clock the rail reads. */
   now: Date
   timezone: string
+  rows?: RowsState | undefined
 }
 
 const hourText = (hour: number) => String(hour).padStart(2, '0')
@@ -20,7 +22,7 @@ const hourText = (hour: number) => String(hour).padStart(2, '0')
  * rail-model; empty-hour runs render as per-hour lines (desktop) and one gap row (mobile), CSS
  * shows one of them. Above the compact threshold it is a plain time list with the now line.
  */
-export function HourRail({ items, now, timezone }: Props) {
+export function HourRail({ items, now, timezone, rows: rowState }: Props) {
   const { compact, rows } = buildRail(items, now, timezone)
   if (rows.length === 0) return null
   return (
@@ -55,7 +57,15 @@ export function HourRail({ items, now, timezone }: Props) {
             )
           }
           case 'item':
-            return <ItemRow key={row.item.id} item={row.item} now={now} timezone={timezone} />
+            return (
+              <ItemRow
+                key={row.item.id}
+                item={row.item}
+                now={now}
+                timezone={timezone}
+                rows={rowState}
+              />
+            )
         }
       })}
     </ol>

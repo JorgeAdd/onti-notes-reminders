@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { at, TZ } from '@onti/shared/fixtures/jorge-week'
-import { clockTime, dateBlock, dayLabel, relativeLabel } from '../src/features/today/format'
+import {
+  clockTime,
+  dateBlock,
+  dayLabel,
+  originalLabel,
+  relativeLabel,
+  weekdayTime,
+} from '../src/features/today/format'
 import { messages } from '../src/messages'
 
 describe('relativeLabel (R2, R6)', () => {
@@ -68,5 +75,21 @@ describe('dateBlock', () => {
       weekday: 'Thursday',
       month: 'October 2026',
     })
+  })
+})
+
+describe('weekdayTime', () => {
+  it('reads "Thu 09:00" in the profile timezone', () => {
+    expect(weekdayTime(at('2026-10-08 09:00'), TZ)).toBe('Thu 09:00')
+  })
+})
+
+describe('originalLabel (SG11)', () => {
+  it('is the time alone when the original was on the same day as the due time', () => {
+    expect(originalLabel(at('2026-10-07 09:30'), at('2026-10-07 10:05'), TZ)).toBe('09:30')
+  })
+
+  it('adds the weekday when the original was on another day', () => {
+    expect(originalLabel(at('2026-10-06 18:00'), at('2026-10-07 10:05'), TZ)).toBe('Tue 18:00')
   })
 })

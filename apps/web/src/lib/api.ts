@@ -1,4 +1,12 @@
-import { todayResponseSchema, type TodayResponse } from '@onti/shared'
+import {
+  noteResponseSchema,
+  type CaptureRequest,
+  timezoneResponseSchema,
+  todayResponseSchema,
+  type NoteResponse,
+  type SnoozePreset,
+  type TodayResponse,
+} from '@onti/shared'
 import { env } from './env'
 
 /** The API rejected the token: the session is over (Decision 12). Other failures stay generic. */
@@ -9,15 +17,73 @@ export class UnauthorizedError extends Error {
   }
 }
 
-async function get(path: string, accessToken: string): Promise<unknown> {
+/** Any other non-2xx answer; the status tells the caller what to say (409, 404, 5xx). */
+export class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    description: string,
+  ) {
+    super(`${description} failed with ${status}`)
+    this.name = 'ApiError'
+  }
+}
+
+/**
+ * One authenticated call. `Content-Type` is sent only with a body: Fastify answers 400 to an
+ * empty body declared as JSON, and the done/undo actions send none (Decision 10).
+ */
+export async function request(
+  method: 'GET' | 'POST' | 'PATCH',
+  path: string,
+  accessToken: string,
+  body?: unknown,
+): Promise<unknown> {
+  const headers: Record<string, string> = { Authorization: `Bearer ${accessToken}` }
+  if (body !== undefined) headers['Content-Type'] = 'application/json'
   const response = await fetch(new URL(path, env.VITE_API_URL), {
-    headers: { Authorization: `Bearer ${accessToken}` },
+    method,
+    headers,
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   })
   if (response.status === 401) throw new UnauthorizedError()
-  if (!response.ok) throw new Error(`GET ${path} failed with ${response.status}`)
+  if (!response.ok) throw new ApiError(response.status, `${method} ${path}`)
   return response.json()
 }
 
+export const post = (path: string, accessToken: string, body?: unknown) =>
+  request('POST', path, accessToken, body)
+
 export async function fetchToday(accessToken: string): Promise<TodayResponse> {
-  return todayResponseSchema.parse(await get('/today', accessToken))
+  return todayResponseSchema.parse(await request('GET', '/today', accessToken))
+}
+
+/** Sends the browser zone once; resolves to the zone the server stored. */
+export async function patchTimezone(accessToken: string, timezone: string): Promise<string> {
+  const stored = await request('PATCH', '/me', accessToken, { timezone })
+  return timezoneResponseSchema.parse(stored).timezone
+}
+
+/** R7 · the server stamps the time; the client sends only the preset. */
+export async function snoozeNote(
+  accessToken: string,
+  id: string,
+  preset: SnoozePreset,
+): Promise<NoteResponse> {
+  return noteResponseSchema.parse(await post(`/notes/${id}/snooze`, accessToken, { preset }))
+}
+
+export async function markNoteDone(accessToken: string, id: string): Promise<NoteResponse> {
+  return noteResponseSchema.parse(await post(`/notes/${id}/done`, accessToken))
+}
+
+export async function undoNoteDone(accessToken: string, id: string): Promise<NoteResponse> {
+  return noteResponseSchema.parse(await post(`/notes/${id}/undo`, accessToken))
+}
+
+/** R11 · the structured result of the preview: title, tag slugs and a minute-aligned due instant. */
+export async function captureNote(
+  accessToken: string,
+  capture: CaptureRequest,
+): Promise<NoteResponse> {
+  return noteResponseSchema.parse(await post('/notes', accessToken, capture))
 }

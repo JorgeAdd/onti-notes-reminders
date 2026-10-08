@@ -1,6 +1,4 @@
 .bar {
-  position: sticky;
-  bottom: 0;
   display: flex;
   align-items: center;
   gap: var(--space-lg);
@@ -21,6 +19,12 @@
   margin-left: auto;
 }
 
+.hints {
+  display: flex;
+  gap: var(--space-md);
+  color: var(--color-ink-muted);
+}
+
 .day {
   font: var(--text-meta-strong);
 }
@@ -35,7 +39,8 @@
   }
 
   /* Board 05: no mode label, the day sits first and the clock closes the bar. */
-  .mode {
+  .mode,
+  .hints {
     display: none;
   }
 

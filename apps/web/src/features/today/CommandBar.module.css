@@ -1,0 +1,80 @@
+.bar {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-panel);
+  border-top: 1px solid var(--color-rule);
+}
+
+.input {
+  min-height: var(--size-target);
+  padding: 0 var(--space-md);
+  background: var(--color-page);
+  color: var(--color-ink);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  font: var(--text-body);
+}
+
+.input:focus-visible {
+  outline: var(--focus-ring);
+}
+
+/* SG14: presets insert tokens; every chip is a 44 px target. */
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.preset {
+  min-height: var(--size-target);
+  padding: 0 var(--space-lg);
+  background: var(--color-page);
+  color: var(--color-ink);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  font: var(--text-meta);
+  cursor: pointer;
+}
+
+.preset:focus-visible {
+  outline: var(--focus-ring);
+}
+
+/* Touch cancel: a 44 px target that closes without saving. */
+.close {
+  justify-self: start;
+  min-height: var(--size-target);
+  padding: 0 var(--space-lg);
+  background: transparent;
+  color: var(--color-ink-muted);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  font: var(--text-meta);
+  cursor: pointer;
+}
+
+.close:focus-visible {
+  outline: var(--focus-ring);
+}
+
+/* SG9/SG15: the unsaved preview is italic and fades in; reduced motion makes the token instant. */
+.preview {
+  margin: 0;
+  font: var(--text-preview);
+  color: var(--color-ink-muted);
+  animation: reveal var(--motion-fade) var(--ease-paper) backwards;
+}
+
+.hint {
+  margin: 0;
+  font: var(--text-meta);
+  color: var(--color-ink);
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+  }
+}

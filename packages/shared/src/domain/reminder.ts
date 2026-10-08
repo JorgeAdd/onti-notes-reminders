@@ -39,12 +39,19 @@ function assertOpen(reminder: Reminder): asserts reminder is ScheduledReminder {
   if (!isOpen(reminder)) throw new Error('Only open reminders can be snoozed')
 }
 
+/** R7 · the due time a snooze preset leads to: "+1 h" = now + 1 h (to the minute), "Tomorrow" = next local day 09:00. */
+export function snoozeDue(preset: 'hour' | 'tomorrow', now: Date, timeZone: string): Date {
+  return preset === 'hour'
+    ? new Date(truncateToMinute(now).getTime() + HOUR)
+    : localTimeOn(now, timeZone, 1, 9, 0)
+}
+
 /** R7 · "+1 h" = now + 1 h, truncated to the minute. */
 export function snoozeOneHour(reminder: Reminder, now: Date): ScheduledReminder {
   assertOpen(reminder)
   return {
     ...reminder,
-    dueAt: new Date(truncateToMinute(now).getTime() + HOUR),
+    dueAt: snoozeDue('hour', now, 'UTC'),
     snoozeCount: reminder.snoozeCount + 1,
   }
 }
@@ -54,7 +61,7 @@ export function snoozeTomorrow(reminder: Reminder, now: Date, timeZone: string):
   assertOpen(reminder)
   return {
     ...reminder,
-    dueAt: localTimeOn(now, timeZone, 1, 9, 0),
+    dueAt: snoozeDue('tomorrow', now, timeZone),
     snoozeCount: reminder.snoozeCount + 1,
   }
 }
@@ -64,9 +71,10 @@ export function reschedule(reminder: Reminder, dueAt: Date): ScheduledReminder {
   return { ...reminder, dueAt, originalDueAt: dueAt, snoozeCount: 0, doneAt: null }
 }
 
-/** R9 */
+/** R9 · done on a done note keeps the first `doneAt`. */
 export function markDone(reminder: Reminder, now: Date): Reminder {
   if (!hasReminder(reminder)) throw new Error('A note without a reminder cannot be done')
+  if (reminder.doneAt !== null) return reminder
   return { ...reminder, doneAt: now }
 }
 

@@ -21,7 +21,18 @@ export function todayWindow(now: Date, timeZone: string): Window {
   return { start: startOfLocalDay(now, timeZone), end: startOfLocalDayPlus(now, timeZone, 1) }
 }
 
-/** `hours:minutes` local time on the local day of `instant` plus `days`. */
+const MINUTE = 60_000
+
+/** Wall-clock reading of `instant` in `timeZone`, as a UTC-based timestamp. */
+function wallClock(instant: number, timeZone: string): number {
+  return instant - new TZDate(instant, timeZone).getTimezoneOffset() * MINUTE
+}
+
+/**
+ * `hours:minutes` local time on the local day of `instant` plus `days` (R16).
+ * An ambiguous time (DST overlap) resolves to its FIRST occurrence; a
+ * nonexistent time (DST gap) resolves to the first valid instant after it.
+ */
 export function localTimeOn(
   instant: Date,
   timeZone: string,
@@ -29,9 +40,34 @@ export function localTimeOn(
   hours: number,
   minutes: number,
 ): Date {
-  const day = addDays(startOfDay(new TZDate(instant, timeZone)), days)
-  day.setHours(hours, minutes, 0, 0)
-  return new Date(day.getTime())
+  const dayStart = addDays(startOfDay(new TZDate(instant, timeZone)), days)
+  const wall = Date.UTC(
+    dayStart.getFullYear(),
+    dayStart.getMonth(),
+    dayStart.getDate(),
+    hours,
+    minutes,
+  )
+
+  // Candidate instants: the wall time read with each UTC offset in force around it.
+  const offsets = new Set(
+    [wall - 24 * 60 * MINUTE, wall + 24 * 60 * MINUTE].map((t) =>
+      new TZDate(t, timeZone).getTimezoneOffset(),
+    ),
+  )
+  const candidates = [...offsets].map((offset) => wall + offset * MINUTE).sort((a, b) => a - b)
+  const valid = candidates.find((t) => wallClock(t, timeZone) === wall)
+  if (valid !== undefined) return new Date(valid)
+
+  // Gap: bisect (minute resolution) for the earliest instant whose wall time reaches `wall`.
+  let lo = (candidates[0] as number) - 24 * 60 * MINUTE
+  let hi = (candidates[candidates.length - 1] as number) + 24 * 60 * MINUTE
+  while (hi - lo > MINUTE) {
+    const mid = lo + Math.floor((hi - lo) / MINUTE / 2) * MINUTE
+    if (wallClock(mid, timeZone) >= wall) hi = mid
+    else lo = mid
+  }
+  return new Date(hi)
 }
 
 export function truncateToMinute(instant: Date): Date {

@@ -44,8 +44,10 @@ timezone; `start(d)` is local midnight of day `d`.
 - **R8 · Manual reschedule.** Setting a due time by hand sets `due_at` and
   `original_due_at` to the new value and `snooze_count := 0`. Removing the
   reminder clears all reminder fields.
-- **R9 · Done / undo.** Done: `done_at := now`. Undo: `done_at := null`.
-  Done never touches `due_at`.
+- **R9 · Done / undo.** Done: `done_at := now`. Done on an already-done
+  note keeps the first `done_at`. Done on a note without a reminder is a
+  conflict (an error, `409` over HTTP). Undo: `done_at := null`; undo on an
+  open note changes nothing. Done never touches `due_at`.
 - **R10 · Notification.** Sent once per `due_at` value, when
   `due_at <= now`, `done_at is null` and
   `notified_due_at is distinct from due_at`; then
@@ -57,7 +59,10 @@ timezone; `start(d)` is local midnight of day `d`.
   - `#slug` tokens become tags (created if missing; display name derived
     from the slug, "client-a" → "Client A").
   - `HH:MM` → today at that time if it is still ahead of `now`, otherwise
-    tomorrow at that time. `tomorrow HH:MM` and `+{n}h` are also accepted.
+    tomorrow at that time. `today HH:MM` is accepted even when that time
+    has already passed (the note is then overdue). `tomorrow HH:MM`,
+    `+{n}h` and `+{n}m` are also accepted; relative times are truncated to
+    the minute.
   - The remaining text, trimmed, is the title (1–200 chars).
   - Until ↵, the parse is shown as an italic preview; nothing is saved.
   - Mobile presets produce the same values (R7 math for "+1 h" and
@@ -79,7 +84,10 @@ timezone; `start(d)` is local midnight of day `d`.
   Missing or invalid token → `401`.
 - **R16 · Time storage.** Instants are stored in UTC; everything shown or
   computed "per day" uses the profile timezone. A nonexistent local time
-  (DST gap) resolves to the first valid instant after it.
+  (DST gap) resolves to the first valid instant after it (02:30 on
+  2026-03-08 in America/New_York is 03:00 EDT). An ambiguous local time
+  (DST fall-back overlap) resolves to its first occurrence (01:30 on
+  2026-11-01 in America/New_York is 01:30 EDT, 05:30Z).
 - **R17 · Missed (v2, documented now).** A reminder is missed when
   `done_at is null` and `now >= original_due_at + 24 h`. Snoozing does not
   reset it; that is why `original_due_at` exists.
@@ -127,6 +135,15 @@ Page-level proof (slice 1, the Today page):
 | C1, C3, C4, C7  | `apps/api/test/today.test.ts`: `getToday` with an injected `Clock` and a fake repository built from the dataset (membership, counts, N1 absent, 09:31 still on the page).                                                                                                                                       |
 | C3, C4, C7      | `apps/web/test/day-page.test.tsx`, `hour-rail.test.tsx`, `rail-model.test.ts`: the page at Wed 09:05 (header, carried group, rail with the now line between the 09 hour and the 09:30 item, statusline counts), the done strike, and the minute tick (`in 25 min` to `in 24 min`, now line `09:05` to `09:06`). |
 | C4 on real data | The demo seed plus `GET /today` returns the C4 page for Jorge's account; the seed plan is unit-tested in `apps/api/test/seed-plan.test.ts` and `seed-demo.test.ts`.                                                                                                                                             |
+
+Slice 2 (capture, snooze, done and undo) adds the write-side proof:
+
+| Rows               | Proven by                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1 (capture)       | `apps/web/test/capture-preview.test.ts`: the preview "→ Client A · today 17:00 · in 5h48" at Tue 6 11:12. `apps/api/test/capture-note.test.ts` and `server.test.ts` (`POST /notes`): what the preview parses is what is saved (3 items, 12 other notes). `apps/web/test/capture-flow.test.tsx`: `c`, pending row, swap for the server note, rollback, plain note.                     |
+| C3 (done mutation) | `apps/api/test/reminder-actions.test.ts` and `server.test.ts` (`POST /notes/:id/done`): `done_at` stamped by the clock. `packages/shared/test/today-patch.test.ts`: the optimistic page equals the next `GET /today`. `apps/web/test/keyboard.test.tsx` (`x`, `z`) and `reminder-actions.test.tsx`: optimistic done, rollback and refetch. `mobile-flow.test.tsx`: Done in the sheet. |
+| C5 (`s h`)         | `apps/api/test/reminder-actions.test.ts` and `server.test.ts`: +1 h from 09:05 is 10:05, count 1, original due unchanged. `apps/web/test/keyboard.test.tsx` (`s h`), `which-key.test.tsx` and `action-sheet.test.tsx`: the resulting time shown is the one saved.                                                                                                                     |
+| C6 (`s t`)         | `apps/api/test/reminder-actions.test.ts` and `server.test.ts`: Tomorrow 9:00 is Thu 09:00, count 1. `packages/shared/test/dst.test.ts` (D4): the same rule across DST. `apps/web/test/keyboard.test.tsx` (`s t`): the item leaves the page and joins the other notes.                                                                                                                 |
 
 Still `todo` in that suite, asserted elsewhere when the feature lands:
 C9 (search, API + Postgres), C10 (markdown rendering, web), C11 (`404`

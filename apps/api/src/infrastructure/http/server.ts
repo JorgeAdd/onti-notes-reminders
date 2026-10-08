@@ -1,27 +1,80 @@
 import cors from '@fastify/cors'
-import { meResponseSchema, todayResponseSchema } from '@onti/shared'
+import {
+  captureRequestSchema,
+  meResponseSchema,
+  noteResponseSchema,
+  snoozeRequestSchema,
+  timezoneRequestSchema,
+  todayResponseSchema,
+} from '@onti/shared'
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify'
 import { z } from 'zod'
-import { UnauthorizedError } from '../../application/errors'
+import {
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+  ValidationError,
+} from '../../application/errors'
+import type { CaptureNote } from '../../application/capture-note'
 import type { GetMe } from '../../application/get-me'
 import type { GetToday } from '../../application/get-today'
+import type { MarkDone } from '../../application/mark-done'
 import type { TokenVerifier } from '../../application/ports'
+import type { SetTimezone } from '../../application/set-timezone'
+import type { SnoozeNote } from '../../application/snooze-note'
+import type { UndoDone } from '../../application/undo-done'
 import type { Identity } from '../../domain/identity'
+import type { NoteRecord } from '../../domain/note'
 
 export interface ServerDeps {
   verifier: TokenVerifier
   getMe: GetMe
+  setTimezone: SetTimezone
   getToday: GetToday
+  actions: {
+    captureNote: CaptureNote
+    snoozeNote: SnoozeNote
+    markDone: MarkDone
+    undoDone: UndoDone
+  }
   corsOrigins: string[]
   logger?: boolean
 }
 
 const BEARER = /^Bearer\s+(\S+)$/i
 
+function isFastifyClientError(error: unknown): boolean {
+  const status = (error as { statusCode?: unknown }).statusCode
+  return typeof status === 'number' && status >= 400 && status < 500
+}
+
+/** `{note}` on the wire: the reminder state without the notification bookkeeping. */
+function noteBody(note: NoteRecord) {
+  const { id, title, tags, dueAt, originalDueAt, snoozeCount, doneAt } = note
+  return z.encode(noteResponseSchema, {
+    id,
+    title,
+    tags,
+    dueAt,
+    originalDueAt,
+    snoozeCount,
+    doneAt,
+  })
+}
+
+/** A non-UUID id cannot exist, so it is the same 404 as an unknown one (R15). */
+function noteIdOf(params: unknown): string {
+  const parsed = z.object({ id: z.uuid() }).safeParse(params)
+  if (!parsed.success) throw new NotFoundError('Note not found')
+  return parsed.data.id
+}
+
 export function buildServer({
   verifier,
   getMe,
+  setTimezone,
   getToday,
+  actions,
   corsOrigins,
   logger = false,
 }: ServerDeps) {
@@ -39,6 +92,19 @@ export function buildServer({
     if (error instanceof UnauthorizedError) {
       return reply.code(401).send({ error: 'unauthorized' })
     }
+    if (error instanceof ValidationError) {
+      return reply.code(400).send({ error: 'validation_error' })
+    }
+    if (error instanceof NotFoundError) {
+      return reply.code(404).send({ error: 'not_found' })
+    }
+    if (error instanceof ConflictError) {
+      return reply.code(409).send({ error: 'conflict', reason: error.reason })
+    }
+    // Fastify's own 4xx (malformed JSON, wrong content type) are the client's fault, not ours.
+    if (isFastifyClientError(error)) {
+      return reply.code(400).send({ error: 'validation_error' })
+    }
     request.log.error(error)
     return reply.code(500).send({ error: 'internal_error' })
   })
@@ -48,6 +114,38 @@ export function buildServer({
   app.get('/me', async (request) => {
     const identity = await authenticate(request)
     return meResponseSchema.parse(await getMe(identity))
+  })
+
+  app.patch('/me', async (request) => {
+    const identity = await authenticate(request)
+    const body = timezoneRequestSchema.safeParse(request.body)
+    if (!body.success) throw new ValidationError('Body must be {timezone: string}')
+    return { timezone: await setTimezone(identity, body.data.timezone) }
+  })
+
+  app.post('/notes', async (request, reply) => {
+    const identity = await authenticate(request)
+    const body = captureRequestSchema.safeParse(request.body)
+    if (!body.success) throw new ValidationError('Invalid capture request')
+    return reply.code(201).send(noteBody(await actions.captureNote(identity, body.data)))
+  })
+
+  app.post('/notes/:id/snooze', async (request) => {
+    const identity = await authenticate(request)
+    const id = noteIdOf(request.params)
+    const body = snoozeRequestSchema.safeParse(request.body)
+    if (!body.success) throw new ValidationError('Body must be {preset: "hour" | "tomorrow"}')
+    return noteBody(await actions.snoozeNote(identity, id, body.data.preset))
+  })
+
+  app.post('/notes/:id/done', async (request) => {
+    const identity = await authenticate(request)
+    return noteBody(await actions.markDone(identity, noteIdOf(request.params)))
+  })
+
+  app.post('/notes/:id/undo', async (request) => {
+    const identity = await authenticate(request)
+    return noteBody(await actions.undoDone(identity, noteIdOf(request.params)))
   })
 
   app.get('/today', async (request) => {

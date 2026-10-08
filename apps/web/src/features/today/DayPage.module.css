@@ -38,3 +38,15 @@
     padding: 0 var(--space-lg) var(--space-lg);
   }
 }
+
+/* One bottom dock for every bar and the statusline: it stays in view on short viewports and
+   scrolls inside itself instead of covering the page. Padding keeps focus rings unclipped. */
+.dock {
+  position: sticky;
+  bottom: 0;
+  max-height: 60dvh;
+  overflow-y: auto;
+  padding-top: var(--space-xs);
+  background: var(--color-panel);
+  border-top: 1px solid var(--color-rule);
+}

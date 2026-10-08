@@ -7,7 +7,10 @@ import {
   parseCapture,
   relativeTo,
   reschedule,
+  snoozeDue,
   snoozeOneHour,
+  snoozeTomorrow,
+  undoDone,
 } from '../src'
 import { at, TZ } from './fixtures/jorge-week'
 
@@ -53,6 +56,23 @@ describe('R11 · capture parsing', () => {
     expect(parseCapture('Ping Luis +2h', now, TZ).dueAt).toEqual(at('2026-10-06 13:12'))
   })
 
+  it('accepts "today HH:MM" even when it is already past', () => {
+    expect(parseCapture('Retro today 09:00', now, TZ)).toMatchObject({
+      title: 'Retro',
+      dueAt: at('2026-10-06 09:00'),
+    })
+    expect(parseCapture('Retro today 17:00', now, TZ).dueAt).toEqual(at('2026-10-06 17:00'))
+  })
+
+  it('accepts "+Nm", truncated to the minute', () => {
+    expect(parseCapture('Ping Luis +45m', now, TZ).dueAt).toEqual(at('2026-10-06 11:57'))
+    expect(parseCapture('Ping Luis +5M', now, TZ).dueAt).toEqual(at('2026-10-06 11:17'))
+  })
+
+  it('does not treat "today" without a time as a time expression', () => {
+    expect(parseCapture('Plan today', now, TZ)).toMatchObject({ title: 'Plan today', dueAt: null })
+  })
+
   it('keeps a second time expression in the title', () => {
     expect(parseCapture('Move 15:00 call 16:00', now, TZ)).toMatchObject({
       title: 'Move call 16:00',
@@ -89,5 +109,40 @@ describe('R8–R9 · lifecycle', () => {
 
   it('a note without a reminder cannot be done', () => {
     expect(() => markDone(NO_REMINDER, at('2026-10-06 17:00'))).toThrow()
+  })
+
+  it('done on an already-done note keeps the first done_at', () => {
+    const first = at('2026-10-06 17:00')
+    const done = markDone(reschedule(NO_REMINDER, at('2026-10-06 16:00')), first)
+    expect(markDone(done, at('2026-10-06 18:30')).doneAt).toEqual(first)
+  })
+
+  it('undo on an open note changes nothing', () => {
+    const open = reschedule(NO_REMINDER, at('2026-10-06 16:00'))
+    expect(undoDone(open)).toEqual(open)
+  })
+
+  it('done never touches due_at', () => {
+    const open = reschedule(NO_REMINDER, at('2026-10-06 16:00'))
+    expect(markDone(open, at('2026-10-06 17:00')).dueAt).toEqual(at('2026-10-06 16:00'))
+  })
+})
+
+describe('R7 · snoozeDue previews what a snooze will do', () => {
+  const now = at('2026-10-07 09:05')
+  const open = reschedule(NO_REMINDER, at('2026-10-06 18:00'))
+
+  it('+1 h is now + 1 h, truncated to the minute', () => {
+    expect(snoozeDue('hour', now, TZ)).toEqual(at('2026-10-07 10:05'))
+    expect(snoozeDue('hour', new Date(now.getTime() + 59_000), TZ)).toEqual(at('2026-10-07 10:05'))
+  })
+
+  it('Tomorrow is the next local day at 09:00', () => {
+    expect(snoozeDue('tomorrow', now, TZ)).toEqual(at('2026-10-08 09:00'))
+  })
+
+  it('equals the due time the snooze functions produce', () => {
+    expect(snoozeDue('hour', now, TZ)).toEqual(snoozeOneHour(open, now).dueAt)
+    expect(snoozeDue('tomorrow', now, TZ)).toEqual(snoozeTomorrow(open, now, TZ).dueAt)
   })
 })

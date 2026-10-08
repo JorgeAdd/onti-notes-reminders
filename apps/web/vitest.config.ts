@@ -6,7 +6,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['test/**/*.test.{ts,tsx}'],
-    setupFiles: ['test/setup.ts'],
+    setupFiles: ['test/polyfills.ts', 'test/setup.ts'],
     // Dummy values so modules that parse `env` can load; tests never hit the network.
     env: {
       VITE_SUPABASE_URL: 'http://localhost:54321',

@@ -3,8 +3,53 @@
   grid-template-columns: var(--size-time-col) minmax(0, 1fr) auto;
   align-items: baseline;
   column-gap: var(--space-lg);
+  min-height: var(--size-target);
   padding: var(--space-md) var(--space-row-x);
   list-style: none;
+}
+
+/* SG9: a capture the server has not confirmed yet sits on a dashed line; the confirmed row is solid. */
+.row[data-pending='true'] {
+  border-block-end: 1px dashed var(--color-ink-muted);
+  color: var(--color-ink-muted);
+}
+
+/* SG13: the focused line is a 2 px ink outline. */
+.row[data-focused='true'] {
+  outline: var(--focus-ring);
+  background: var(--color-soft);
+}
+
+/* SG15/SG16: only the row an action just changed moves; tokens remap for reduced motion. */
+.row[data-changed='snooze'] {
+  animation: settle var(--motion-snooze) var(--ease-paper) backwards;
+}
+
+.row[data-changed='done'] .done {
+  position: relative;
+  text-decoration-line: none;
+}
+
+.row[data-changed='done'] .done::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  border-top: 1px solid var(--color-ink);
+  transform-origin: left;
+  animation: strike var(--motion-strike) var(--ease-paper) backwards;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes strike {
+  from {
+    transform: scaleX(0);
+  }
 }
 
 .time {
