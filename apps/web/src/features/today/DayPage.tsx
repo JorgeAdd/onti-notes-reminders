@@ -6,7 +6,10 @@ import styles from './DayPage.module.css'
 import { EmptyState } from './EmptyState'
 import { HourRail } from './HourRail'
 import { PageHeader } from './PageHeader'
+import type { KeyHint } from './keys'
+import type { RowsState } from './rows'
 import { Statusline } from './Statusline'
+import { WhichKey } from './WhichKey'
 
 const noop = () => undefined
 
@@ -18,10 +21,24 @@ interface Props {
   /** A failed action, in one line above the statusline (Decision 11). */
   message?: string | null
   onDismissMessage?: () => void
+  /** Row focus and animation (Decision 13). */
+  rows?: RowsState | undefined
+  /** `s` was pressed on an open item: show the which-key menu. */
+  snoozeMenu?: boolean
+  hints?: KeyHint[] | undefined
 }
 
 /** The page frame: date column, header and the area the day's items fill. */
-export function DayPage({ today, now, onSignOut, message = null, onDismissMessage }: Props) {
+export function DayPage({
+  today,
+  now,
+  onSignOut,
+  message = null,
+  onDismissMessage,
+  rows,
+  snoozeMenu = false,
+  hints,
+}: Props) {
   const carriedCount = today.carried.reduce((sum, group) => sum + group.items.length, 0)
   // Decision 13: total notes derive from the page itself, no extra wire field.
   const totalCount = carriedCount + today.rail.length + today.otherCount
@@ -47,13 +64,15 @@ export function DayPage({ today, now, onSignOut, message = null, onDismissMessag
                   group={group}
                   now={now}
                   timezone={today.timezone}
+                  rows={rows}
                 />
               ))}
-              <HourRail items={today.rail} now={now} timezone={today.timezone} />
+              <HourRail items={today.rail} now={now} timezone={today.timezone} rows={rows} />
             </>
           )}
         </main>
       </div>
+      {snoozeMenu ? <WhichKey now={now} timezone={today.timezone} /> : null}
       {message === null ? null : (
         <ActionMessage message={message} onDismiss={onDismissMessage ?? noop} />
       )}
@@ -63,6 +82,7 @@ export function DayPage({ today, now, onSignOut, message = null, onDismissMessag
         todayCount={today.openCount}
         carriedCount={carriedCount}
         totalCount={totalCount}
+        hints={hints}
       />
     </div>
   )

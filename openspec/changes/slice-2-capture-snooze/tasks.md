@@ -89,11 +89,11 @@ Global checks for every commit: `npm run verify` green (rule 22, never `--no-ver
 
 ## Commit 5: Keyboard and row actions (~400 lines, High)
 
-- [ ] 5.1 RED then GREEN: `focus.ts` (`orderedIds`, `step`, `afterRemoval`); `keys.ts` reducer (`s`, `s h`, `s t`, `s x`, `esc`, typing ignored) and `availableKeys`.
-- [ ] 5.2 RED then GREEN: `use-keyboard-layer.ts` with `user-event` (ignored in inputs, with modifiers, or while bar/sheet open).
-- [ ] 5.3 RED then GREEN: `format.originalLabel`; `ItemRow` "{time} · was {original} · {count}×", row `aria-label` from `messages.today.rowLabel`, roving tabindex.
-- [ ] 5.4 RED then GREEN: `WhichKey` (resulting times, `--motion-whichkey-delay`); `Statusline` `hints` for working keys only.
-- [ ] 5.5 CSS: strike/fade only for `justChanged` id, tokens only; focus ring; messages. Run `npm run build -w @onti/web`; record bundle size.
+- [x] 5.1 RED then GREEN: `focus.ts` (`orderedIds`, `step`, `afterRemoval`); `keys.ts` reducer (`s`, `s h`, `s t`, `s x`, `esc`, typing ignored) and `availableKeys`.
+- [x] 5.2 RED then GREEN: `use-keyboard-layer.ts` with `user-event` (ignored in inputs, with modifiers, or while bar/sheet open).
+- [x] 5.3 RED then GREEN: `format.originalLabel`; `ItemRow` "{time} · was {original} · {count}×", row `aria-label` from `messages.today.rowLabel`, roving tabindex.
+- [x] 5.4 RED then GREEN: `WhichKey` (resulting times, `--motion-whichkey-delay`); `Statusline` `hints` for working keys only.
+- [x] 5.5 CSS: strike/fade only for `justChanged` id, tokens only; focus ring; messages. Run `npm run build -w @onti/web`; record bundle size.
 
 ## Commit 6: Command bar (~360 lines)
 

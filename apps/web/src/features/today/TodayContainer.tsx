@@ -6,6 +6,7 @@ import { browserTimeZone as readBrowserTimeZone } from '../../lib/browser-timezo
 import { skewOf } from '../../lib/clock'
 import { DayPage } from './DayPage'
 import { useReminderActions, type ReminderApi } from './mutations/use-reminder-actions'
+import { useTodayRows } from './use-today-rows'
 import { TodayStatus } from './TodayStatus'
 import { useNow } from './use-now'
 
@@ -39,11 +40,8 @@ export function TodayContainer({
   const query = useQuery({ queryKey: ['today'], queryFn: load })
   const { data, dataUpdatedAt, refetch } = query
   const now = useNow(data ? skewOf(data.now, dataUpdatedAt) : 0)
-  const { message, dismiss } = useReminderActions({
-    api: reminders,
-    now,
-    onSessionExpired,
-  })
+  const actions = useReminderActions({ api: reminders, now, onSessionExpired })
+  const { rows, armed, hints } = useTodayRows(data, actions)
   const windowEnd = data?.window.end.getTime()
   const expired = query.error instanceof UnauthorizedError
 
@@ -76,8 +74,11 @@ export function TodayContainer({
         today={data}
         now={now}
         onSignOut={onSignOut}
-        message={message}
-        onDismissMessage={dismiss}
+        message={actions.message}
+        onDismissMessage={actions.dismiss}
+        rows={rows}
+        snoozeMenu={armed}
+        hints={hints}
       />
     )
   }

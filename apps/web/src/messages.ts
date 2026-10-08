@@ -28,11 +28,31 @@ export const messages = {
     signOut: 'Sign out',
     nothingToday: 'Nothing today',
     noNotes: 'No notes yet',
+    snoozedFrom: (original: string) => `was ${original}`,
+    snoozeCount: (count: number) => `${count}×`,
+    rowLabel: (title: string, time: string, state: string) => `${title}, ${time}, ${state}`,
+    stateOpen: 'open',
+    stateDone: 'done',
+    stateSnoozed: (count: number) => `snoozed ${count}×`,
+  },
+  whichKey: {
+    label: 'Snooze to',
+    hour: (time: string) => `+1 h → ${time}`,
+    tomorrow: (time: string) => `Tomorrow → ${time}`,
   },
   statusline: {
     mode: 'NORMAL',
     counts: (today: number, carried: number, total: number) =>
       `${today} today · ${carried} carried · ${total} ${total === 1 ? 'note' : 'notes'}`,
+    keys: {
+      move: 'j/k move',
+      done: 'x done',
+      undo: 'z undo',
+      snooze: 's snooze',
+      hour: 'h +1 h',
+      tomorrow: 't tomorrow',
+      cancel: 'esc cancel',
+    },
   },
   errors: {
     generic: 'Something went wrong. Please try again.',
