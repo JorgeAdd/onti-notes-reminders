@@ -39,10 +39,12 @@ export function DateColumn({
       <p className={styles.muted}>{timezone}</p>
       {note === null ? null : <p className={styles.muted}>{note}</p>}
       {nav ? <DayNav {...nav} /> : null}
-      {showTheme ? <ThemeControl /> : null}
-      <button className={styles.signOut} type="button" onClick={onSignOut}>
-        {messages.today.signOut}
-      </button>
+      <div className={styles.account}>
+        {showTheme ? <ThemeControl /> : null}
+        <button className={styles.signOut} type="button" onClick={onSignOut}>
+          {messages.today.signOut}
+        </button>
+      </div>
     </aside>
   )
 }

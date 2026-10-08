@@ -140,6 +140,15 @@ describe('placement', () => {
     expect(screen.queryByRole('radiogroup')).not.toBeInTheDocument()
   })
 
+  it('keeps the control and Sign out in one stack, Sign out last', () => {
+    render(<DayPage today={c4Response()} now={now} onSignOut={() => undefined} />)
+    const column = screen.getByRole('complementary')
+    const group = within(column).getByRole('radiogroup')
+    const signOut = within(column).getByRole('button', { name: messages.today.signOut })
+    expect(group.parentElement).toBe(signOut.parentElement)
+    expect(group.nextElementSibling).toBe(signOut)
+  })
+
   it('is not passed by NotesPage [static]', () => {
     expect(readFileSync('src/features/notes/NotesPage.tsx', 'utf8')).not.toMatch(/showTheme/)
   })
@@ -162,5 +171,48 @@ describe('copy and style [static]', () => {
     expect(css).toMatch(/:focus-visible[^{]*\{[^}]*var\(--focus-ring\)/)
     expect(css).toMatch(/:checked[^{]*\{[^}]*background:\s*var\(--color-ink\)/)
     expect(css).not.toMatch(/--color-date|--core-|transition|animation/)
+  })
+})
+
+describe('segmented layout [static]', () => {
+  const rule = (css: string, selector: string) =>
+    css.match(
+      new RegExp(`(^|\\n)${selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\{([^}]*)\\}`),
+    )?.[2] ?? ''
+  const css = readFileSync('src/features/theme/ThemeControl.module.css', 'utf8')
+  const column = readFileSync('src/features/today/DateColumn.module.css', 'utf8')
+
+  it('lays the three options out as one row of equal segments', () => {
+    render(<ThemeControl />)
+    expect(screen.getAllByRole('radio').map((r) => r.closest('label')?.textContent)).toEqual([
+      messages.theme.system,
+      messages.theme.light,
+      messages.theme.dark,
+    ])
+    const group = rule(css, '.group')
+    expect(group).toMatch(/display:\s*grid/)
+    expect(group).toMatch(/grid-template-columns:\s*repeat\(3,\s*1fr\)/)
+    expect(group).toMatch(/width:\s*100%/)
+    expect(group).toMatch(/gap:\s*0/)
+    expect(group).not.toMatch(/flex-wrap/)
+  })
+
+  it('joins the segments: one outer border, inner dividers only, a lifted focus ring', () => {
+    expect(rule(css, '.group')).toMatch(/border:\s*1px solid var\(--color-ink\)/)
+    expect(rule(css, '.group')).toMatch(/border-radius:\s*var\(--radius-control\)/)
+    expect(rule(css, '.face')).not.toMatch(/(^|\s)border:/)
+    expect(rule(css, '.option + .option .face')).toMatch(
+      /border-inline-start:\s*1px solid var\(--color-ink\)/,
+    )
+    expect(rule(css, '.face')).toMatch(/padding:\s*0;/)
+    expect(rule(css, '.input:focus-visible + .face')).toMatch(/z-index:\s*1/)
+    expect(rule(css, '.input:focus-visible + .face')).toMatch(/outline-offset:\s*var\(--space-xs\)/)
+  })
+
+  it('stretches Sign out to the column width, one space token above it', () => {
+    expect(rule(column, '.account')).toMatch(/display:\s*grid/)
+    expect(rule(column, '.account')).toMatch(/gap:\s*var\(--space-sm\)/)
+    const signOut = rule(column, '.signOut')
+    expect(signOut).not.toMatch(/justify-self:\s*start|margin-top/)
   })
 })

@@ -1,8 +1,11 @@
+/* A segmented control: one row of three equal segments that fits the 200 px date column. */
 .group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-  justify-self: start;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  gap: 0;
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-control);
 }
 
 /* The real radio covers the whole target, so a tap anywhere on it counts. */
@@ -26,12 +29,16 @@
 .face {
   display: grid;
   place-items: center;
-  padding: 0 var(--space-md);
-  border: 1px solid var(--color-ink);
-  border-radius: var(--radius-control);
+  padding: 0;
   background: var(--color-page);
   color: var(--color-ink);
-  font: var(--text-meta-strong);
+  /* The label size leaves air around "System" in a 50 px segment. */
+  font: var(--text-label);
+}
+
+/* Inner dividers only: the group draws the outer border, so no edge is doubled. */
+.option + .option .face {
+  border-inline-start: 1px solid var(--color-ink);
 }
 
 /* Selected is ink on ink, never the date accent (SG2). */
@@ -40,6 +47,10 @@
   color: var(--color-ink-inverse);
 }
 
+/* Lifted above the neighbouring segments so the joined edges never cover the ring. */
 .input:focus-visible + .face {
+  position: relative;
+  z-index: 1;
   outline: var(--focus-ring);
+  outline-offset: var(--space-xs);
 }
