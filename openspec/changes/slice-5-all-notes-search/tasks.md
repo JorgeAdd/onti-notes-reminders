@@ -131,12 +131,13 @@ Global checks for every commit:
 - [x] 9.2 `docs/CONTRACT.md`: All-notes tag filter text first (rule 23); C9/C11 status if not done.
 - [x] 9.3 RED: shared schema (`tag` validated with `TAG_SLUG`), fake and use case (filter before the 50 cap; unknown tag gives empty list, 200), route (`?q=&tag=`), real-Postgres `exists` over `note_tags` -> `tags.slug`.
 - [x] 9.4 RED: web `notes-view.test.tsx`: `#` opens the bar; tag filters results; with a tag active the first `esc` clears the tag and closes the bar, the next `esc` leaves; `#` hint in notes statusline.
-- [x] 9.5 GREEN: `notes-list.ts`, port, `search-notes.ts`, `postgres-note-repository.ts` SQL `exists`, fake; web reuses `TagBar` and `filterByTag`, tag state in `NotesContainer`, bar tags = current result plus active tag.
+- [x] 9.5 GREEN: `notes-list.ts`, port, `search-notes.ts`, `postgres-note-repository.ts` SQL `exists`, fake; web reuses `TagBar` and `filterByTag`, tag state in `NotesContainer`, bar tags = every tag seen in answers since the view opened, plus the active tag.
 - [x] 9.6 `npm run verify`; run the Postgres test with `ONTI_TEST_DATABASE_URL` (throwaway DB); record bundle size; commit.
 
 ## PR
 
 - [ ] 10.1 Save the session prompts in `prompts/durante/` (rule 7), numbered with an intent header.
-- [ ] 10.2 Manual smoke again at 1280x720 and 375x667 including the tag filter; paste the Postgres output and bundle sizes.
+- [x] 10.2 Manual smoke again at 1280x720 and 375x667 including the tag filter; paste the Postgres output and bundle sizes.
+  - Post-rebase smoke 2026-10-08 (a2ad9d2, Playwright, real keys and taps, mocked data): 10/10 scenarios pass — `/` from Today and from Fri 9 with Esc returning to the same day; `staging` 2 of 15; `#` tag filter in All notes with Esc clearing the tag then leaving; `/` inert while Today's tag bar is open; mobile bar Search · Tags · + Capture at 44 px; All-notes chips and Clear; slice 3 backdrop keeps the filter with 0 dialogs; dark and reduced motion; 0 POSTs from x/s/z. Found: `/` hint shown while the notes tag bar is open (fixed in aa0566e) and the tag truncated to `#c…` in the 375 px statusline (cosmetic, follow-up).
 - [ ] 10.3 ASK the human before pushing (rule 6; approval covers that one push). Then open the PR to `main`, label `size:exception`.
 - [ ] 10.4 PR description: commit-by-commit reading guide (order 1 to 9, risk per commit, "API first"), the smoke checklist, the documented tokenizing limits, and the follow-up for a CI Postgres job.

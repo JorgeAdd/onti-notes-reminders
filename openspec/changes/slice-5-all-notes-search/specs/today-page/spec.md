@@ -21,9 +21,9 @@ A statusline fixed at the bottom MUST show the weekday, day, today/carried/total
 
 #### Scenario: Search hint, no unshipped hints
 
-- GIVEN any state of the day page in which `/` works (no capture bar or sheet open, no `s` armed), including when there are no rows
+- GIVEN any state of the day page in which `/` works (no capture bar, tag bar or sheet open, no `s` armed, no page loading), including when there are no rows
 - WHEN the statusline renders
-- THEN `/` is hinted, and no hint for tag filter or day navigation shows unless that feature has shipped
+- THEN `/` is hinted only in those states, and never while the tag bar is open or a page is loading
 
 ### Requirement: Layout and theme
 
