@@ -52,12 +52,12 @@ PR body: `GET /today` end to end behind JWT, C1/C3/C4/C7 proven with fixed Clock
 
 PR body: `seed:demo` loads the 15-note scenario with RLS-scoped writes. Out: web. Prior: PR1.
 
-- [ ] 2.1 RED: `apps/api/test/demo-scenario.test.ts`: scenario->rows for Mon 12 Jan (2 carried, 2 today, 1 tomorrow, N1 done Tue 17:00, 11 others), deterministic UUIDv5, offsets match `jorge-week`. Decision 11; demo-seed "Relative dates".
-- [ ] 2.2 GREEN: `apps/api/scripts/demo-scenario.ts` (pure, `localTimeOn`). Decisions 8, 11.
-- [ ] 2.3 RED: `planSeed` tests: 15 created/0, then 0 created/15 unchanged; user scope; refusal on 0 or 2 users; no target = non-zero exit. Decision 10; "Idempotency", "User scope", "Explicit target".
-- [ ] 2.4 GREEN: `planSeed` plus `scripts/seed-demo.ts` (`--email`/`--user-id`, dry-run default, `--yes`, `--timezone`, `--remove`, report). Add `seed:demo` to `apps/api/package.json`; include `scripts` in `tsconfig.json`. Decisions 8-10; "Report".
-- [ ] 2.5 Docs: seed usage in README or `docs/` (prerequisites, flags, `--remove`, UTC-timezone risk). Schema docs untouched (no migration).
-- [ ] 2.6 Manual: dry-run then `--yes` then repeat against real Postgres, then GET /today at C4; record result in the PR. Run `npm run verify`.
+- [x] 2.1 RED: `apps/api/test/demo-scenario.test.ts`: scenario->rows for Mon 12 Jan (2 carried, 2 today, 1 tomorrow, N1 done Tue 17:00, 11 others), deterministic UUIDv5, offsets match `jorge-week`. Decision 11; demo-seed "Relative dates".
+- [x] 2.2 GREEN: `apps/api/scripts/demo-scenario.ts` (pure, `localTimeOn`). Decisions 8, 11.
+- [x] 2.3 RED: `planSeed` tests: 15 created/0, then 0 created/15 unchanged; user scope; refusal on 0 or 2 users; no target = non-zero exit. Decision 10; "Idempotency", "User scope", "Explicit target".
+- [x] 2.4 GREEN: `planSeed` plus `scripts/seed-demo.ts` (`--email`/`--user-id`, dry-run default, `--yes`, `--timezone`, `--remove`, report). Add `seed:demo` to `apps/api/package.json`; include `scripts` in `tsconfig.json`. Decisions 8-10; "Report".
+- [x] 2.5 Docs: seed usage in README or `docs/` (prerequisites, flags, `--remove`, UTC-timezone risk). Schema docs untouched (no migration).
+- [x] 2.6 Manual: dry-run then `--yes` then repeat against real Postgres, then GET /today at C4; record result in the PR. Run `npm run verify`.
 
 ## PR 3: Web foundation (~380 lines)
 

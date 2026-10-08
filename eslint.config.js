@@ -33,7 +33,7 @@ export default tseslint.config(
   },
   {
     // Time comes from the Clock port (CLAUDE.md rule 16).
-    files: ['apps/api/src/**/*.ts', 'packages/shared/src/**/*.ts'],
+    files: ['apps/api/src/**/*.ts', 'apps/api/scripts/**/*.ts', 'packages/shared/src/**/*.ts'],
     ignores: ['apps/api/src/infrastructure/clock/**'],
     rules: {
       'no-restricted-syntax': [
