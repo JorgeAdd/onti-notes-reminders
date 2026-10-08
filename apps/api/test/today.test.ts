@@ -1,4 +1,9 @@
-import { tagNameFromSlug, todayResponseSchema, type TodayResponse } from '@onti/shared'
+import {
+  tagNameFromSlug,
+  todayResponseSchema,
+  type DayQuery,
+  type TodayResponse,
+} from '@onti/shared'
 import {
   at,
   BEFORE_CAPTURE,
@@ -10,6 +15,7 @@ import {
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import { makeGetToday } from '../src/application/get-today'
+import { ValidationError } from '../src/application/errors'
 import type { Clock, Profile } from '../src/application/ports'
 import type { NoteRecord } from '../src/domain/note'
 import type { Identity } from '../src/domain/identity'
@@ -35,13 +41,14 @@ function today(
   notes: FixtureNote[],
   nowLocal: string,
   profile: Profile | null = { timezone: 'America/Mexico_City' },
+  query?: DayQuery,
 ) {
   const clock: Clock = { now: () => at(nowLocal) }
   const repo = new InMemoryNotes(
     notes.map((note, index) => ({ ownerId: IDENTITY.userId, note: toRecord(note, index) })),
   )
   const profiles = profileReturning(profile)
-  return makeGetToday({ clock, notes: repo, profiles })(IDENTITY)
+  return makeGetToday({ clock, notes: repo, profiles })(IDENTITY, query)
 }
 
 const titles = (items: { title: string }[]) => items.map((i) => i.title)
@@ -135,5 +142,87 @@ describe('getToday', () => {
     const page: TodayResponse = await today(n1Done, '2026-10-07 09:05')
     const wire = z.encode(todayResponseSchema, page)
     expect(todayResponseSchema.parse(wire)).toEqual(page)
+  })
+})
+
+describe('getToday · viewed day', () => {
+  const week = [...BEFORE_CAPTURE]
+  const view = (date: string, nowLocal = '2026-10-08 14:30') =>
+    today(week, nowLocal, undefined, { date })
+
+  it('a past day shows only what was due that day, no carried, no NOW (R18)', async () => {
+    const page = await view('2026-10-06')
+    expect(page.isToday).toBe(false)
+    expect(page.date).toBe('2026-10-06')
+    expect(page.carried).toEqual([])
+    expect(titles(page.rail)).toEqual([byId(week, 'N2').title, byId(week, 'N3').title])
+    expect(page.window).toEqual({ start: at('2026-10-06 00:00'), end: at('2026-10-07 00:00') })
+  })
+
+  it('a future day lists its reminders and counts the rest as other', async () => {
+    const page = await view('2026-10-09')
+    expect(page.rail).toEqual([])
+    expect(page.openCount).toBe(0)
+    expect(page.otherCount).toBe(week.length)
+  })
+
+  it("today's own date is the same page as no query", async () => {
+    expect(await view('2026-10-08')).toEqual(await today(week, '2026-10-08 14:30'))
+  })
+
+  it('uses the profile timezone for the day window (NY DST dates)', async () => {
+    const ny = { timezone: 'America/New_York' }
+    const fall = await today([], '2026-10-30 12:00', ny, { date: '2026-11-01' })
+    expect(fall.window.end.getTime() - fall.window.start.getTime()).toBe(25 * 3_600_000)
+    const spring = await today([], '2026-03-01 12:00', ny, { date: '2026-03-08' })
+    expect(spring.window.end.getTime() - spring.window.start.getTime()).toBe(23 * 3_600_000)
+  })
+})
+
+describe('getToday · tag filter (C8, Thu 8 14:30, #client-b)', () => {
+  const filtered = () => today(afterCapture, '2026-10-08 14:30', undefined, { tag: 'client-b' })
+
+  it('C8 · rail 1, others 4, hidden 10, other count 4', async () => {
+    const page = await filtered()
+    expect(titles(page.rail)).toEqual([byId(BEFORE_CAPTURE, 'N6').title])
+    expect(page.others).toHaveLength(4)
+    expect(page.hiddenCount).toBe(10)
+    expect(page.otherCount).toBe(4)
+    expect(page.tag).toBe('client-b')
+    expect(page.tags.map((t) => t.slug)).toEqual(['client-a', 'client-b', 'client-c', 'personal'])
+  })
+
+  it('date and tag combine: Fri 9 filtered has an empty rail and the same others', async () => {
+    const page = await today(afterCapture, '2026-10-08 14:30', undefined, {
+      date: '2026-10-09',
+      tag: 'client-b',
+    })
+    expect(page.rail).toEqual([])
+    expect(page.date).toBe('2026-10-09')
+    expect(page.others.map((o) => o.title)).toContain(byId(BEFORE_CAPTURE, 'N6').title)
+    expect(page.hiddenCount).toBe(10)
+  })
+
+  it('an unknown tag is a validation error', async () => {
+    await expect(
+      today(BEFORE_CAPTURE, '2026-10-08 14:30', undefined, { tag: 'nope' }),
+    ).rejects.toBeInstanceOf(ValidationError)
+  })
+
+  it('a tag only another user has is a validation error (R15)', async () => {
+    const clock: Clock = { now: () => at('2026-10-08 14:30') }
+    const repo = new InMemoryNotes([
+      { ownerId: 'ana', note: toRecord(byId(BEFORE_CAPTURE, 'N6'), 1) },
+      { ownerId: IDENTITY.userId, note: toRecord(byId(BEFORE_CAPTURE, 'N4'), 2) },
+    ])
+    const getToday = makeGetToday({ clock, notes: repo, profiles: profileReturning(null) })
+    await expect(getToday(IDENTITY, { tag: 'client-b' })).rejects.toBeInstanceOf(ValidationError)
+    expect((await getToday(IDENTITY, { tag: 'client-a' })).tag).toBe('client-a')
+  })
+
+  it('a tag with no notes at all is a validation error', async () => {
+    await expect(today([], '2026-10-08 14:30', undefined, { tag: 'client-b' })).rejects.toThrow(
+      ValidationError,
+    )
   })
 })

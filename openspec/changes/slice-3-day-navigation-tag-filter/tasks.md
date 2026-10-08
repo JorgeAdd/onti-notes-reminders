@@ -46,39 +46,39 @@ Ownership gate (slice 5): the branch MUST NOT modify `apps/api/src/application/p
 
 ## Commit 0: Branch
 
-- [ ] 0.1 Confirm branch `feat/slice-3-day-navigation-tag-filter` from `main`; PR targets `main`.
+- [x] 0.1 Confirm branch `feat/slice-3-day-navigation-tag-filter` from `main`; PR targets `main`.
 
 ## Commit 1: `docs:` housekeeping (~20 lines)
 
-- [ ] 1.1 `openspec/changes/archive/2026-10-08-slice-2-capture-snooze/archive-report.md:107`: fix stale "#10 -> onboarding slice 3" line.
-- [ ] 1.2 `openspec/config.yaml:6,23`: web tests are jsdom + RTL + user-event, 244 tests.
-- [ ] 1.3 `docs/design/style-guide-decisions.md`: record Q4 board-04 deviations. Run `npm run verify`, commit (rule 14, own commit).
+- [x] 1.1 `openspec/changes/archive/2026-10-08-slice-2-capture-snooze/archive-report.md:107`: fix stale "#10 -> onboarding slice 3" line.
+- [x] 1.2 `openspec/config.yaml:6,23`: web tests are jsdom + RTL + user-event, 244 tests.
+- [x] 1.3 `docs/design/style-guide-decisions.md`: record Q4 board-04 deviations. Run `npm run verify`, commit (rule 14, own commit).
 
 ## Commit 2: `docs:`+`test:`+`feat(shared):` CONTRACT first (~370 lines)
 
-- [ ] 2.1 `docs/CONTRACT.md` first (rule 23): R1 any-day window, new R18 (other day: no carried, no NOW, time-only, viewed-day date block), R4 "{n} things on Wed 7", R5 other-notes count on other days and filtered views, R12 (known tag, Q2), D5/D6 navigation rows.
-- [ ] 2.2 RED: `packages/shared/test/calendar-date.test.ts`: Feb 30, `2026-1-5`, range 2000..2099, `addCalendarDays` across month/year/leap day, `localCalendarDate`, `dayWindow` 2026-03-08 NY = 23 h, 2026-11-01 = 25 h, Sat 7 -> Sun 8 -> Mon 9 no skip, windows tile over a year in NY, Mexico_City, Havana, 04:59Z/05:00Z on 2 Nov.
-- [ ] 2.3 RED: `day-page` tests (date arg: no carried off today, done stay, isToday; R18), `other-notes` tests (order dueAt, undated last, title, id; undated rows no date), `filterByTag` object tags with the C8 string test unchanged; R4/R5 wording cases.
-- [ ] 2.4 GREEN: `packages/shared/src/domain/calendar-date.ts`, `other-notes.ts`; modify `day-page.ts` (`date` calendar string), `tag.ts` (widening). If Havana tiling is red, fix `dayWindow` with `localTimeOn` gap rule.
-- [ ] 2.5 Run `npm run verify`; commit.
+- [x] 2.1 `docs/CONTRACT.md` first (rule 23): R1 any-day window, new R18 (other day: no carried, no NOW, time-only, viewed-day date block), R4 "{n} things on Wed 7", R5 other-notes count on other days and filtered views, R12 (known tag, Q2), D5/D6 navigation rows.
+- [x] 2.2 RED: `packages/shared/test/calendar-date.test.ts`: Feb 30, `2026-1-5`, range 2000..2099, `addCalendarDays` across month/year/leap day, `localCalendarDate`, `dayWindow` 2026-03-08 NY = 23 h, 2026-11-01 = 25 h, Sat 7 -> Sun 8 -> Mon 9 no skip, windows tile over a year in NY, Mexico_City, Havana, 04:59Z/05:00Z on 2 Nov.
+- [x] 2.3 RED: `day-page` tests (date arg: no carried off today, done stay, isToday; R18), `other-notes` tests (order dueAt, undated last, title, id; undated rows no date), `filterByTag` object tags with the C8 string test unchanged; R4/R5 wording cases.
+- [x] 2.4 GREEN: `packages/shared/src/domain/calendar-date.ts`, `other-notes.ts`; modify `day-page.ts` (`date` calendar string), `tag.ts` (widening). If Havana tiling is red, fix `dayWindow` with `localTimeOn` gap rule.
+- [x] 2.5 Run `npm run verify`; commit.
 
 ## Commit 3: `feat(shared):` schema, assembly, patch (~505 lines, High)
 
-- [ ] 3.1 RED: `today.test.ts`: `dayQuerySchema` (date range, repeated/empty, tag slug max 40), `todayResponseSchema` new required fields, nullable `others` dates.
-- [ ] 3.2 RED: `day-response.test.ts`: C8 (rail 1, others 4, hidden 10, otherCount 4), carried filtered, empty filtered "0 notes" with `hiddenCount = total`, `todayWindow` end as rollover instant.
-- [ ] 3.3 RED: `today-patch.test.ts`: views {today, today+tag, Tue 6, Fri 9} x {snooze h/t, done, undo}; snooze to another day (`otherCount+1`, filtered enters `others`); insert {matching, non-matching +1 hidden, other-day}; `replacesId` not counted twice; `tags` kept plus new slug.
-- [ ] 3.4 GREEN: `today.ts` (`dayQuerySchema`, `otherItemSchema`, response fields); create `day-response.ts` `buildDayResponse`; export in `index.ts` (append only).
-- [ ] 3.5 GREEN: generalize `today-patch.ts` `applyReminderChange` (view from page, universe = items + others, rebuild with `page.date`).
-- [ ] 3.6 Update web fixtures for the new required fields (`apps/web/test/*`); `npm run test -w @onti/web` green.
-- [ ] 3.7 Check: `git diff --name-only main...HEAD` plus staged contains none of the slice-5-owned files. `npm run verify`; commit.
+- [x] 3.1 RED: `today.test.ts`: `dayQuerySchema` (date range, repeated/empty, tag slug max 40), `todayResponseSchema` new required fields, nullable `others` dates.
+- [x] 3.2 RED: `day-response.test.ts`: C8 (rail 1, others 4, hidden 10, otherCount 4), carried filtered, empty filtered "0 notes" with `hiddenCount = total`, `todayWindow` end as rollover instant.
+- [x] 3.3 RED: `today-patch.test.ts`: views {today, today+tag, Tue 6, Fri 9} x {snooze h/t, done, undo}; snooze to another day (`otherCount+1`, filtered enters `others`); insert {matching, non-matching +1 hidden, other-day}; `replacesId` not counted twice; `tags` kept plus new slug.
+- [x] 3.4 GREEN: `today.ts` (`dayQuerySchema`, `otherItemSchema`, response fields); create `day-response.ts` `buildDayResponse`; export in `index.ts` (append only).
+- [x] 3.5 GREEN: generalize `today-patch.ts` `applyReminderChange` (view from page, universe = items + others, rebuild with `page.date`).
+- [x] 3.6 Update web fixtures for the new required fields (`apps/web/test/*`); `npm run test -w @onti/web` green.
+- [x] 3.7 Check: `git diff --name-only main...HEAD` plus staged contains none of the slice-5-owned files. `npm run verify`; commit.
 
 ## Commit 4: `feat(api):` `/today?date&tag` (~355 lines)
 
-- [ ] 4.1 RED: `apps/api/test/today.test.ts`: C8 on `jorge-week`; date past/future/today; date+tag; unknown tag, another user's tag, tag with zero notes -> `ValidationError`; NY DST dates; default `query = {}` keeps slice 1-2 tests green.
-- [ ] 4.2 RED: `server.test.ts`: 401 before 400; 400 for `date=2026-02-30`, `2026-1-5`, empty, repeated, `tag=Client-B`, empty, 41 chars, unknown, another user's, zero-notes; 200 valid known tag and today's own date; body round-trips schema.
-- [ ] 4.3 RED: `apps/api/test/day-parity.test.ts`: `applyReminderChange` equals real `makeGetToday` after the same change (same views x changes as 3.3).
-- [ ] 4.4 GREEN: `get-today.ts` (query, known-tag check from `listOwn`, `filterByTag`, `buildDayResponse`); `server.ts` one `dayQuerySchema` parse inside the existing route.
-- [ ] 4.5 Check slice-5 files untouched (`ports.ts`, `fakes.ts`, repo, `database.ts`). `npm run verify`; commit.
+- [x] 4.1 RED: `apps/api/test/today.test.ts`: C8 on `jorge-week`; date past/future/today; date+tag; unknown tag, another user's tag, tag with zero notes -> `ValidationError`; NY DST dates; default `query = {}` keeps slice 1-2 tests green.
+- [x] 4.2 RED: `server.test.ts`: 401 before 400; 400 for `date=2026-02-30`, `2026-1-5`, empty, repeated, `tag=Client-B`, empty, 41 chars, unknown, another user's, zero-notes; 200 valid known tag and today's own date; body round-trips schema.
+- [x] 4.3 RED: `apps/api/test/day-parity.test.ts`: `applyReminderChange` equals real `makeGetToday` after the same change (same views x changes as 3.3).
+- [x] 4.4 GREEN: `get-today.ts` (query, known-tag check from `listOwn`, `filterByTag`, `buildDayResponse`); `server.ts` one `dayQuerySchema` parse inside the existing route.
+- [x] 4.5 Check slice-5 files untouched (`ports.ts`, `fakes.ts`, repo, `database.ts`). `npm run verify`; commit.
 
 ## Commit 5: `feat(web):` data layer (~470 lines, High)
 
