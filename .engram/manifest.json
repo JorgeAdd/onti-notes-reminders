@@ -288,6 +288,14 @@
       "sessions": 0,
       "memories": 4,
       "prompts": 0
+    },
+    {
+      "id": "8c3b32e2",
+      "created_by": "jdd",
+      "created_at": "2026-10-08T19:18:36Z",
+      "sessions": 0,
+      "memories": 3,
+      "prompts": 0
     }
   ]
 }
