@@ -328,6 +328,14 @@
       "sessions": 0,
       "memories": 3,
       "prompts": 0
+    },
+    {
+      "id": "fe482224",
+      "created_by": "jdd",
+      "created_at": "2026-10-08T21:47:55Z",
+      "sessions": 0,
+      "memories": 1,
+      "prompts": 0
     }
   ]
 }

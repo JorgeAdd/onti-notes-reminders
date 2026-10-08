@@ -130,7 +130,7 @@ export function DayPage({
   const entrance = useEntrance()
   const empty = carriedCount === 0 && today.rail.length === 0
   return (
-    <div className={styles.desk} data-entrance={entrance}>
+    <div className={styles.desk} {...entrance}>
       <div className={styles.page}>
         <DateColumn
           date={date}

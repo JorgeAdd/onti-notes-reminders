@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { StrictMode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -78,6 +78,51 @@ describe('plays once per full page load', () => {
   })
 })
 
+describe('does not replay after it ends', () => {
+  const phone = (capture: boolean) => (
+    <DayPage
+      today={c4Response()}
+      now={now}
+      onSignOut={() => undefined}
+      mobile
+      capture={
+        capture
+          ? { draft: '', notice: null, onSubmit: () => undefined, onClose: () => undefined }
+          : null
+      }
+    />
+  )
+  const desk = (container: HTMLElement) => container.firstElementChild as HTMLElement
+
+  it('clears the attribute on animationend, so a remounted bar does not fade in again', async () => {
+    const { container, rerender } = render(phone(false))
+    expect(desk(container)).toHaveAttribute('data-entrance')
+    fireEvent.animationEnd(desk(container))
+    expect(desk(container)).not.toHaveAttribute('data-entrance')
+    rerender(phone(true))
+    rerender(phone(false))
+    expect(entranceNodes(container)).toHaveLength(0)
+    await act(() => Promise.resolve())
+  })
+
+  it('keeps the attribute while another entrance animation is still running', () => {
+    const { container } = render(phone(false))
+    const el = desk(container)
+    el.getAnimations = (() => [{ playState: 'running' }]) as unknown as typeof el.getAnimations
+    fireEvent.animationEnd(el)
+    expect(el).toHaveAttribute('data-entrance')
+    el.getAnimations = (() => [{ playState: 'finished' }]) as unknown as typeof el.getAnimations
+    fireEvent.animationEnd(el)
+    expect(el).not.toHaveAttribute('data-entrance')
+  })
+
+  it('does the same on the sign-in card', () => {
+    const { container } = render(auth)
+    fireEvent.animationEnd(container.querySelector('[data-entrance]')!)
+    expect(entranceNodes(container)).toHaveLength(0)
+  })
+})
+
 describe('interactive from the first frame', () => {
   it('signs out while the entrance is marked', () => {
     const onSignOut = vi.fn()
@@ -118,7 +163,7 @@ describe('entrance classes [static]', () => {
   })
 
   it('carries the flag on the desk, an ancestor of the sheet', () => {
-    expect(readSrc('features/today/DayPage.tsx')).toMatch(/data-entrance=\{entrance\}/)
-    expect(readSrc('features/auth/AuthForm.tsx')).toMatch(/data-entrance=\{entrance\}/)
+    expect(readSrc('features/today/DayPage.tsx')).toMatch(/\{\.\.\.entrance\}/)
+    expect(readSrc('features/auth/AuthForm.tsx')).toMatch(/\{\.\.\.entrance\}/)
   })
 })

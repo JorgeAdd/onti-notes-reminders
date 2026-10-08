@@ -31,7 +31,7 @@ export function AuthForm({ mode, busy, expired, notice, error, onSubmit, onToggl
   }
 
   return (
-    <main className={styles.desk} data-entrance={entrance}>
+    <main className={styles.desk} {...entrance}>
       <form className={styles.page} onSubmit={handleSubmit}>
         <p className={styles.eyebrow}>{messages.appName}</p>
         <h1 className={styles.title}>{mode === 'signIn' ? t.signInTitle : t.signUpTitle}</h1>
