@@ -1,6 +1,7 @@
 import cors from '@fastify/cors'
 import {
   captureRequestSchema,
+  dayQuerySchema,
   meResponseSchema,
   noteResponseSchema,
   snoozeRequestSchema,
@@ -150,7 +151,9 @@ export function buildServer({
 
   app.get('/today', async (request) => {
     const identity = await authenticate(request)
-    return z.encode(todayResponseSchema, await getToday(identity))
+    const query = dayQuerySchema.safeParse(request.query)
+    if (!query.success) throw new ValidationError('Invalid date or tag')
+    return z.encode(todayResponseSchema, await getToday(identity, query.data))
   })
 
   return app

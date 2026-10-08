@@ -11,6 +11,7 @@ import { useRef, useState } from 'react'
 import { ApiError, UnauthorizedError } from '../../../lib/api'
 import { messages } from '../../../messages'
 import type { CaptureSubmit } from '../capture-preview'
+import { DAY_KEYS, dayKey, type DayView } from '../day-view'
 
 /** The server calls the actions use (src/lib/api.ts binds them to the session token). */
 export interface ReminderApi {
@@ -35,18 +36,21 @@ interface Options {
   api: ReminderApi
   /** Display time (skewed device clock): the same input the server's stamp is predicted from. */
   now: Date
+  /** The viewed day and tag: the cache entry a write patches (Decision 7). */
+  view: DayView
   /** The API answered 401: the app ends the session (Decision 10). */
   onSessionExpired: () => void
   /** A capture failed: the bar reopens with the typed text and the one-line message. */
   onCaptureFailed?: ((text: string, message: string) => void) | undefined
 }
 
+/** The write and the cache entry it started on: a later navigation never moves it. */
+type Write = Action & { key: ReturnType<typeof dayKey> }
+
 interface Context {
   previous: TodayResponse | undefined
   title: string | undefined
 }
-
-const TODAY = ['today']
 
 const titleOf = (today: TodayResponse | undefined, id: string) =>
   [...(today?.carried.flatMap((group) => group.items) ?? []), ...(today?.rail ?? [])].find(
@@ -85,13 +89,13 @@ function change(action: Action): ReminderChange {
  * reach the server one at a time, in order; `retry: 0` because snooze is not idempotent. A failure
  * restores the snapshot and says so in one line; the page refetches when the last write settles.
  */
-export function useReminderActions({ api, now, onSessionExpired, onCaptureFailed }: Options) {
+export function useReminderActions({ api, now, view, onSessionExpired, onCaptureFailed }: Options) {
   const queryClient = useQueryClient()
   const [message, setMessage] = useState<string | null>(null)
   const expiredReported = useRef(false)
   const pendingCount = useRef(0)
 
-  const mutation = useMutation<NoteResponse, Error, Action, Context>({
+  const mutation = useMutation<NoteResponse, Error, Write, Context>({
     mutationKey: ['today-write'],
     scope: { id: 'today' },
     retry: 0,
@@ -114,10 +118,17 @@ export function useReminderActions({ api, now, onSessionExpired, onCaptureFailed
       }
     },
     onMutate: async (action) => {
-      await queryClient.cancelQueries({ queryKey: TODAY })
-      const previous = queryClient.getQueryData<TodayResponse>(TODAY)
-      if (previous) {
-        queryClient.setQueryData(TODAY, applyReminderChange(previous, change(action), now))
+      const { key } = action
+      // A capture while the viewed day still loads: no data under the key, so nothing to cancel
+      // (that would drop the load) or patch; settling refetches.
+      let previous: TodayResponse | undefined
+      if (queryClient.getQueryData(key) !== undefined) {
+        await queryClient.cancelQueries({ queryKey: key })
+        previous = queryClient.getQueryData<TodayResponse>(key)
+        if (previous)
+          queryClient.setQueryData(key, applyReminderChange(previous, change(action), now))
+        // A cached neighbour day would show the old position of the item for a moment.
+        queryClient.removeQueries({ queryKey: DAY_KEYS, type: 'inactive' })
       }
       return {
         previous,
@@ -126,18 +137,18 @@ export function useReminderActions({ api, now, onSessionExpired, onCaptureFailed
       }
     },
     onSuccess: (note, action) => {
-      const current = queryClient.getQueryData<TodayResponse>(TODAY)
+      const current = queryClient.getQueryData<TodayResponse>(action.key)
       if (current) {
         const settled = applyReminderChange(
           current,
           { type: 'insert', note, replacesId: action.type === 'capture' ? action.tempId : note.id },
           now,
         )
-        queryClient.setQueryData(TODAY, settled)
+        queryClient.setQueryData(action.key, settled)
       }
     },
     onError: (error, action, context) => {
-      if (context?.previous) queryClient.setQueryData(TODAY, context.previous)
+      if (context?.previous) queryClient.setQueryData(action.key, context.previous)
       if (error instanceof UnauthorizedError) {
         if (!expiredReported.current) onSessionExpired()
         expiredReported.current = true
@@ -150,20 +161,22 @@ export function useReminderActions({ api, now, onSessionExpired, onCaptureFailed
     onSettled: () => {
       // A refetch while another write is queued would overwrite its optimistic patch.
       if (queryClient.isMutating({ mutationKey: ['today-write'] }) === 1) {
-        void queryClient.invalidateQueries({ queryKey: TODAY })
+        void queryClient.invalidateQueries({ queryKey: DAY_KEYS })
       }
     },
   })
 
   return {
-    snooze: (id: string, preset: SnoozePreset) => mutation.mutate({ type: 'snooze', id, preset }),
-    done: (id: string) => mutation.mutate({ type: 'done', id }),
-    undo: (id: string) => mutation.mutate({ type: 'undo', id }),
+    snooze: (id: string, preset: SnoozePreset) =>
+      mutation.mutate({ type: 'snooze', id, preset, key: dayKey(view) }),
+    done: (id: string) => mutation.mutate({ type: 'done', id, key: dayKey(view) }),
+    undo: (id: string) => mutation.mutate({ type: 'undo', id, key: dayKey(view) }),
     capture: (submit: CaptureSubmit) =>
       mutation.mutate({
         type: 'capture',
         tempId: `${PENDING_PREFIX}${pendingCount.current++}`,
         submit,
+        key: dayKey(view),
       }),
     message,
     dismiss: () => setMessage(null),

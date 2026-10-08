@@ -323,6 +323,65 @@ describe('GET /today', () => {
   })
 })
 
+describe('GET /today · query (date, tag)', () => {
+  const get = (url: string, token: string | null = 'valid-token') =>
+    server().inject({
+      method: 'GET',
+      url,
+      headers: token ? { authorization: `Bearer ${token}` } : {},
+    })
+
+  it('answers 401 before it looks at a bad query', async () => {
+    const res = await get('/today?date=garbage&tag=Nope', null)
+    expect(res.statusCode).toBe(401)
+    expect(res.json()).toEqual({ error: 'unauthorized' })
+  })
+
+  it.each([
+    ['an impossible date', 'date=2026-02-30'],
+    ['an unpadded date', 'date=2026-1-5'],
+    ['a year out of range', 'date=1999-12-31'],
+    ['an empty date', 'date='],
+    ['a repeated date', 'date=2026-10-06&date=2026-10-07'],
+    ['an uppercase tag', 'tag=Client-B'],
+    ['an empty tag', 'tag='],
+    ['a 41 character tag', `tag=${'a'.repeat(41)}`],
+    ['an unknown tag', 'tag=nope'],
+    ['a tag with no notes of the caller', 'tag=staging-only'],
+  ])('answers 400 for %s', async (_label, query) => {
+    const res = await get(`/today?${query}`)
+    expect(res.statusCode).toBe(400)
+    expect(res.json()).toEqual({ error: 'validation_error' })
+  })
+
+  it("answers 400 for a tag that only another user's notes carry (R15)", async () => {
+    const res = await get('/today?tag=client-a', 'ana-token')
+    expect(res.statusCode).toBe(400)
+    expect(res.json()).toEqual({ error: 'validation_error' })
+  })
+
+  it('answers 200 for a known tag and round-trips the schema', async () => {
+    const res = await get('/today?tag=client-a')
+    expect(res.statusCode).toBe(200)
+    const page = todayResponseSchema.parse(res.json())
+    expect(page.tag).toBe('client-a')
+    expect(page.hiddenCount).toBe(JORGE_NOTES.filter((n) => n.tags[0]?.slug !== 'client-a').length)
+  })
+
+  it('answers 200 for a past day and for the date of today', async () => {
+    const past = todayResponseSchema.parse((await get('/today?date=2026-10-06')).json())
+    expect(past.isToday).toBe(false)
+    expect(past.date).toBe('2026-10-06')
+    const same = await get('/today?date=2026-10-07')
+    expect(same.statusCode).toBe(200)
+    expect(same.json()).toEqual((await get('/today')).json())
+  })
+
+  it('ignores unknown query keys', async () => {
+    expect((await get('/today?foo=bar')).statusCode).toBe(200)
+  })
+})
+
 describe('reminder actions', () => {
   const post = (
     app: ReturnType<typeof server>,

@@ -8,7 +8,13 @@ export function tagNameFromSlug(slug: string): string {
     .join(' ')
 }
 
-export function filterByTag<T extends { tags: string[] }>(notes: T[], slug: string) {
-  const matching = notes.filter((note) => note.tags.includes(slug))
+const slugOf = (tag: string | { slug: string }) => (typeof tag === 'string' ? tag : tag.slug)
+
+/** R12 · accepts slug strings and `{ slug }` objects (the stored note shape). */
+export function filterByTag<T extends { tags: (string | { slug: string })[] }>(
+  notes: T[],
+  slug: string,
+) {
+  const matching = notes.filter((note) => note.tags.some((tag) => slugOf(tag) === slug))
   return { matching, hiddenCount: notes.length - matching.length }
 }

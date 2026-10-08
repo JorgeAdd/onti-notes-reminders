@@ -1,5 +1,6 @@
 .bar {
   display: flex;
+  gap: var(--space-sm);
   padding: var(--space-sm) var(--space-lg);
   background: var(--color-panel);
   border-top: 1px solid var(--color-rule);
@@ -17,6 +18,23 @@
 }
 
 .capture:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--space-xs);
+}
+
+.secondary {
+  min-width: var(--size-target);
+  min-height: var(--size-target);
+  padding: 0 var(--space-lg);
+  background: var(--color-page);
+  color: var(--color-ink);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-control);
+  font: var(--text-meta-strong);
+  cursor: pointer;
+}
+
+.secondary:focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--space-xs);
 }

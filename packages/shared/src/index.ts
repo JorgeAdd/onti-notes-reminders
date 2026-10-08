@@ -16,10 +16,26 @@ export {
   type SnoozeRequest,
 } from './notes'
 export { applyReminderChange, type ReminderChange } from './today-patch'
-export { todayResponseSchema, type TodayItem, type TodayResponse } from './today'
+export {
+  buildDayResponse,
+  summarizeTags,
+  type DayNote,
+  type DayResponseInput,
+  type TagSummary,
+} from './day-response'
+export {
+  dayQuerySchema,
+  todayResponseSchema,
+  type DayQuery,
+  type OtherItem,
+  type TodayItem,
+  type TodayResponse,
+} from './today'
+export * from './domain/calendar-date'
 export * from './domain/capture'
 export * from './domain/day-page'
 export * from './domain/duration'
+export * from './domain/other-notes'
 export * from './domain/reminder'
 export * from './domain/tag'
 export * from './domain/time'

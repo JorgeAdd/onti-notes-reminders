@@ -1,9 +1,10 @@
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { NoteResponse, TodayItem, TodayResponse } from '@onti/shared'
 import { at } from '@onti/shared/fixtures/jorge-week'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
+import { dayKey, TODAY_VIEW, type DayView } from '../src/features/today/day-view'
 import {
   isPendingId,
   useReminderActions,
@@ -48,7 +49,7 @@ const toNote = (item: TodayItem, patch: Partial<NoteResponse> = {}): NoteRespons
 
 function setup(
   api: Partial<ReminderApi>,
-  load: () => Promise<TodayResponse>,
+  load: (view: DayView) => Promise<TodayResponse>,
   onCaptureFailed?: (text: string, message: string) => void,
 ) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
@@ -64,13 +65,29 @@ function setup(
     <QueryClientProvider client={client}>{children}</QueryClientProvider>
   )
   const view = renderHook(
-    () => ({
-      today: useQuery({ queryKey: ['today'], queryFn: load }).data,
-      ...useReminderActions({ api: fullApi, now: NOW, onSessionExpired, onCaptureFailed }),
-    }),
+    () => {
+      const [viewed, setViewed] = useState<DayView>(TODAY_VIEW)
+      const query = useQuery({
+        queryKey: dayKey(viewed),
+        queryFn: () => load(viewed),
+        placeholderData: keepPreviousData,
+      })
+      return {
+        today: query.data,
+        placeholder: query.isPlaceholderData,
+        goTo: setViewed,
+        ...useReminderActions({
+          api: fullApi,
+          now: NOW,
+          view: viewed,
+          onSessionExpired,
+          onCaptureFailed,
+        }),
+      }
+    },
     { wrapper },
   )
-  return { ...view, onSessionExpired, api: fullApi }
+  return { ...view, client, onSessionExpired, api: fullApi }
 }
 
 const standup = (today: TodayResponse | undefined) => itemNamed(today!, 'Standup')
@@ -389,5 +406,90 @@ describe('mutation 401 (Decision 10)', () => {
     await waitFor(() => expect(onSessionExpired).toHaveBeenCalledTimes(1))
     expect(result.current.message).toBeNull()
     expect(standup(result.current.today).doneAt).toBeNull()
+  })
+})
+
+const byTitle = { reply: 'Reply to Marta about the staging deploy window' }
+
+describe('viewed day (Decision 7)', () => {
+  const PAST: DayView = { date: '2026-10-06', tag: null }
+  const loadByView = (view: DayView) =>
+    Promise.resolve(view.date === null ? c4Response() : c4Response(view.date))
+  const named = (today: TodayResponse | undefined, title: string) =>
+    [...today!.carried.flatMap((g) => g.items), ...today!.rail].find((i) => i.title === title)!
+
+  it('the success patch lands on the key the write started on, even after navigating', async () => {
+    const truth = c4Response()
+    const request = deferred<NoteResponse>()
+    const { result, client } = setup({ done: vi.fn(() => request.promise) }, loadByView)
+    await waitFor(() => expect(result.current.today).toBeDefined())
+    act(() => result.current.done(standup(truth).id))
+    await waitFor(() => expect(standup(result.current.today).doneAt).toEqual(NOW))
+
+    act(() => result.current.goTo(PAST))
+    await waitFor(() => expect(result.current.today!.date).toBe('2026-10-06'))
+    const serverDoneAt = at('2026-10-07 09:06')
+    await act(() =>
+      Promise.resolve(request.resolve(toNote(standup(truth), { doneAt: serverDoneAt }))),
+    )
+
+    const stored = client.getQueryData<TodayResponse>(dayKey(TODAY_VIEW))
+    expect(standup(stored).doneAt).toEqual(serverDoneAt)
+    expect(client.getQueryData<TodayResponse>(dayKey(PAST))!.date).toBe('2026-10-06')
+    // Settling invalidates the whole ['day'] prefix: the day left behind is stale too.
+    expect(client.getQueryState(dayKey(TODAY_VIEW))?.isInvalidated).toBe(true)
+  })
+
+  it('a failure rolls back the key the write started on, not the one on screen', async () => {
+    const truth = c4Response()
+    const request = deferred<NoteResponse>()
+    const { result, client } = setup({ done: vi.fn(() => request.promise) }, loadByView)
+    await waitFor(() => expect(result.current.today).toBeDefined())
+    act(() => result.current.done(standup(truth).id))
+    await waitFor(() => expect(standup(result.current.today).doneAt).toEqual(NOW))
+    act(() => result.current.goTo(PAST))
+    await waitFor(() => expect(result.current.today!.date).toBe('2026-10-06'))
+
+    await act(() => Promise.resolve(request.reject(new ApiError(500, 'POST x'))))
+
+    const stored = client.getQueryData<TodayResponse>(dayKey(TODAY_VIEW))
+    expect(standup(stored).doneAt).toBeNull()
+    expect(result.current.today!.date).toBe('2026-10-06')
+  })
+
+  it('removes the inactive day caches when a row action patches the viewed one', async () => {
+    const request = deferred<NoteResponse>()
+    const { result, client } = setup({ done: vi.fn(() => request.promise) }, loadByView)
+    await waitFor(() => expect(result.current.today).toBeDefined())
+    act(() => result.current.goTo(PAST))
+    await waitFor(() => expect(result.current.today!.date).toBe('2026-10-06'))
+    expect(client.getQueryState(dayKey(TODAY_VIEW))).toBeDefined()
+
+    act(() => result.current.done(named(result.current.today, byTitle.reply).id))
+
+    await waitFor(() => expect(named(result.current.today, byTitle.reply).doneAt).toEqual(NOW))
+    expect(client.getQueryState(dayKey(TODAY_VIEW))).toBeUndefined()
+    expect(client.getQueryState(dayKey(PAST))).toBeDefined()
+  })
+
+  it('capture while the viewed day loads cancels nothing and skips the optimistic patch', async () => {
+    const pending = deferred<TodayResponse>()
+    const request = deferred<NoteResponse>()
+    const load = vi.fn((view: DayView) => (view.date === null ? loadByView(view) : pending.promise))
+    const { result, client, api } = setup({ capture: vi.fn(() => request.promise) }, load)
+    await waitFor(() => expect(result.current.today).toBeDefined())
+    act(() => result.current.goTo(PAST))
+    await waitFor(() => expect(result.current.placeholder).toBe(true))
+    const cancel = vi.spyOn(client, 'cancelQueries')
+
+    act(() => result.current.capture(CAPTURED))
+
+    await waitFor(() => expect(api.capture).toHaveBeenCalledTimes(1))
+    expect(cancel).not.toHaveBeenCalled()
+    expect(result.current.placeholder).toBe(true)
+    expect(client.getQueryData(dayKey(PAST))).toBeUndefined()
+    // The load of the viewed day was not cancelled: it still lands.
+    await act(() => Promise.resolve(pending.resolve(c4Response('2026-10-06'))))
+    await waitFor(() => expect(result.current.placeholder).toBe(false))
   })
 })

@@ -24,22 +24,26 @@ export function afterRemoval(before: string[], after: string[], removedId: strin
 }
 
 /** Focus by note id, so an optimistic patch that reorders rows cannot move it (Decision 13). */
-export function useFocus(ids: string[]) {
-  const [state, setState] = useState<{ focusedId: string | null; ids: string[] }>({
-    focusedId: null,
-    ids,
-  })
+export function useFocus(ids: string[], pageKey?: string) {
+  const [state, setState] = useState<{
+    focusedId: string | null
+    ids: string[]
+    pageKey: string | undefined
+  }>({ focusedId: null, ids, pageKey })
   let focusedId = state.focusedId
   // The page changed: adjust while rendering (same pattern as use-now) rather than in an effect.
-  if (state.ids !== ids) {
-    if (focusedId !== null && !ids.includes(focusedId)) {
+  if (state.ids !== ids || state.pageKey !== pageKey) {
+    if (state.pageKey !== undefined && pageKey !== state.pageKey) {
+      // Another day: the keys start again from its first row.
+      focusedId = ids[0] ?? null
+    } else if (focusedId !== null && !ids.includes(focusedId)) {
       focusedId = afterRemoval(state.ids, ids, focusedId)
     }
-    setState({ focusedId, ids })
+    setState({ focusedId, ids, pageKey })
   }
   return {
     focusedId,
     tabStopId: focusedId ?? ids[0] ?? null,
-    setFocusedId: (id: string | null) => setState({ focusedId: id, ids }),
+    setFocusedId: (id: string | null) => setState({ focusedId: id, ids, pageKey }),
   }
 }

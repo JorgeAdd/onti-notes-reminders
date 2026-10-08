@@ -1,16 +1,15 @@
-import { messages } from '../../messages'
 import styles from './PageHeader.module.css'
 
 interface Props {
-  openCount: number
-  anyDone: boolean
+  /** The words of the header, already decided (R4, R12): see `pageTitle`. */
+  title: string
 }
 
-/** The page's only h1: "4 things today" / "1 thing today" / "3 left today" (R4). */
-export function PageHeader({ openCount, anyDone }: Props) {
+/** The page's only h1. */
+export function PageHeader({ title }: Props) {
   return (
     <header className={styles.header}>
-      <h1 className={styles.title}>{messages.today.header(openCount, anyDone)}</h1>
+      <h1 className={styles.title}>{title}</h1>
     </header>
   )
 }

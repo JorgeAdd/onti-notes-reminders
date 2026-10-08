@@ -1,9 +1,14 @@
 import { expect, it } from 'vitest'
-import { UnauthorizedError } from '../src/lib/api'
+import { ApiError, UnauthorizedError } from '../src/lib/api'
 import { createQueryClient, shouldRetry } from '../src/lib/query-client'
 
 it('never retries an expired session (Decision 12)', () => {
   expect(shouldRetry(0, new UnauthorizedError())).toBe(false)
+})
+
+it('never retries a 400: the viewed day or tag was refused, retrying cannot fix it', () => {
+  expect(shouldRetry(0, new ApiError(400, 'GET /today'))).toBe(false)
+  expect(shouldRetry(0, new ApiError(503, 'GET /today'))).toBe(true)
 })
 
 it('retries other failures a couple of times, then gives up', () => {

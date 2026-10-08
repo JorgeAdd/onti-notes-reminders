@@ -13,3 +13,11 @@ it('reads "No notes yet" for an account with no notes, with no onboarding', () =
   expect(screen.queryByRole('button')).not.toBeInTheDocument()
   expect(screen.queryByRole('link')).not.toBeInTheDocument()
 })
+
+it('names the day off today, and keeps "No notes yet" when the account is empty', () => {
+  const { unmount } = render(<EmptyState hasNotes day="Fri 9" />)
+  expect(screen.getByText('Nothing on Fri 9')).toBeInTheDocument()
+  unmount()
+  render(<EmptyState hasNotes={false} day="Fri 9" />)
+  expect(screen.getByText('No notes yet')).toBeInTheDocument()
+})

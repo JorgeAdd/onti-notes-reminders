@@ -18,10 +18,19 @@ type Actions = Pick<ReturnType<typeof useReminderActions>, 'snooze' | 'done' | '
 export function useTodayRows(
   today: TodayResponse | undefined,
   actions: Actions,
-  bar: { open: boolean; onOpen: () => void; mobile: boolean },
+  bar: { open: boolean; onOpen: () => void; mobile: boolean; blocked: boolean },
+  days: {
+    offToday: boolean
+    filterActive: boolean
+    hasTags: boolean
+    onStep: (delta: 1 | -1) => void
+    onToday: () => void
+    onTags: () => void
+    onClearFilter: () => void
+  },
 ) {
   const ids = useMemo(() => (today ? orderedIds(today) : NO_IDS), [today])
-  const { focusedId, tabStopId, setFocusedId } = useFocus(ids)
+  const { focusedId, tabStopId, setFocusedId } = useFocus(ids, today?.date)
   const [keyState, setKeyState] = useState<KeyState>({ pending: null })
   const [changed, setChanged] = useState<RowsState['changed']>(null)
 
@@ -30,15 +39,26 @@ export function useTodayRows(
     [today],
   )
   const focused = items.find((item) => item.id === focusedId)
-  // A pending capture has no server id yet: no done, snooze or undo until it is confirmed.
+  // A pending capture has no server id yet: no done, snooze or undo until it is confirmed. While
+  // the viewed page loads, the rows on screen are the previous page's: no actions either.
   const target: Target =
-    focused && !isPendingId(focused.id) ? (focused.doneAt === null ? 'open' : 'done') : null
+    focused && !isPendingId(focused.id) && !bar.blocked
+      ? focused.doneAt === null
+        ? 'open'
+        : 'done'
+      : null
 
   const [sheetId, setSheetId] = useState<string | null>(null)
   const sheetItem = items.find((item) => item.id === sheetId)
 
   /** One path for keys and sheet buttons: same callbacks, same row animation. */
-  const run = (command: Exclude<KeyCommand, { type: 'move' | 'capture' }>, id: string) => {
+  const run = (
+    command: Exclude<
+      KeyCommand,
+      { type: 'move' | 'capture' | 'day' | 'today' | 'tags' | 'clearFilter' }
+    >,
+    id: string,
+  ) => {
     if (command.type === 'done') {
       setChanged({ id, kind: 'done' })
       actions.done(id)
@@ -52,11 +72,19 @@ export function useTodayRows(
   }
 
   const handle = (key: string): boolean => {
-    const next = reduceKey(keyState, key, target)
+    const next = reduceKey(keyState, key, target, {
+      filterActive: days.filterActive,
+      offToday: days.offToday,
+      hasTags: days.hasTags,
+    })
     setKeyState(next.state)
     const { command } = next
     if (command?.type === 'capture') bar.onOpen()
     else if (command?.type === 'move') setFocusedId(step(ids, focusedId, command.delta))
+    else if (command?.type === 'day') days.onStep(command.delta)
+    else if (command?.type === 'today') days.onToday()
+    else if (command?.type === 'tags') days.onTags()
+    else if (command?.type === 'clearFilter') days.onClearFilter()
     else if (command !== null && focusedId !== null) run(command, focusedId)
     return command !== null || next.state.pending !== keyState.pending
   }
@@ -71,7 +99,7 @@ export function useTodayRows(
     onFocusRow: (id: string) => {
       setFocusedId(id)
       // A tap on a phone opens the sheet; a pending capture has no actions yet.
-      if (bar.mobile && !isPendingId(id)) setSheetId(id)
+      if (bar.mobile && !bar.blocked && !isPendingId(id)) setSheetId(id)
     },
     onChangeSettled: () => setChanged(null),
   }
@@ -89,5 +117,18 @@ export function useTodayRows(
     if (sheetId !== null) run(command, sheetId)
     setSheetId(null)
   }
-  return { rows, armed, sheet, hints: availableKeys({ hasRows: ids.length > 0, target, armed }) }
+  return {
+    rows,
+    armed,
+    sheet,
+    hints: availableKeys({
+      hasRows: ids.length > 0,
+      target,
+      armed,
+      days: today !== undefined,
+      offToday: days.offToday,
+      tags: days.hasTags,
+      filterActive: days.filterActive,
+    }),
+  }
 }

@@ -1,6 +1,6 @@
 # CONTRACT — behavior rules
 
-This is the behavioral source of truth. The rules (R1–R17) are general and
+This is the behavioral source of truth. The rules (R1–R18) are general and
 apply to any user and any data. The matrix below proves them with the
 scenario in `docs/product/scenario-dataset.md` (Jorge, `America/Mexico_City`,
 Tue 6 – Thu 8 Oct 2026). Acceptance tests assert every row with an
@@ -13,8 +13,12 @@ timezone; `start(d)` is local midnight of day `d`.
 
 ### Time and the day page
 
-- **R1 · Today window.** `today = [start(now), start(now + 1 local day))`.
-  Computed with local-day arithmetic, so it is 23 h or 25 h on DST days.
+- **R1 · Day window.** For any local calendar date `d`,
+  `day(d) = [start(d), start(d + 1))`; today is `day(local date of now)`, so
+  `today = [start(now), start(now + 1 local day))`. Dates move by calendar
+  arithmetic (`2026-03-07 + 1 = 2026-03-08`), never by "+24 h", and the
+  window is computed from local midnights, so it is 23 h or 25 h on DST days.
+  Navigable dates run from 2000-01-01 to 2099-12-31.
 - **R2 · Overdue / late.** A reminder is overdue when `due_at < now` and
   `done_at is null`. It shows "late {duration}" (`now − due_at`).
 - **R3 · Today's page.** It contains every reminder that is either
@@ -23,12 +27,13 @@ timezone; `start(d)` is local midnight of day `d`.
     `due_at < start(now)`, grouped by local day, oldest first.
   - **Rail**: `due_at` inside today, in time order; done items stay,
     struck through.
-- **R4 · Page header.** Counts the open items on today's page.
-  Copy: "{n} things today"; once any item due today is done,
-  "{n} left today".
+- **R4 · Page header.** Counts the open items on the viewed page.
+  Copy on today: "{n} things today"; once any item due today is done,
+  "{n} left today". On another day: "{n} things on Wed 7" (never "left").
 - **R5 · Other notes.** "{n} other notes on the back of the pad", where
-  `n = total notes − items on today's page`. They are not "undated":
-  some have reminders on other days.
+  `n = total notes − items on the viewed page`, on today and on any other
+  day. Under a tag filter the other notes are the matching notes not on the
+  page (R12). They are not "undated": some have reminders on other days.
 - **R6 · Durations.** Under 1 h → "{m} min"; whole hours → "{h} h";
   otherwise "{h}h{mm}" (e.g. "15h05", "5h48"). Upcoming: "in {duration}";
   overdue: "late {duration}". Minutes are truncated, never rounded up. At exactly the due time an item is not late yet (R2 is strict) and
@@ -70,9 +75,15 @@ timezone; `start(d)` is local midnight of day `d`.
 
 ### Views and safety
 
-- **R12 · Tag filter.** `#slug` shows notes with that tag: timed items on
-  today's rail, the rest listed below. Header "{n} notes"; side note
-  "{total − n} notes hidden"; `esc` clears.
+- **R12 · Tag filter.** `#slug` shows notes with that tag: timed items of
+  the viewed day on the rail (carried items are filtered too), the rest
+  listed below under "Other notes with #slug", ordered by due time with
+  undated notes last (then title). Dated rows show date and time; undated
+  rows show no date text. Header "{n} notes" (`n` = page + other notes);
+  side note "{total − matching} notes hidden"; `esc` clears. The filter
+  persists across day navigation. The slug must be on at least one of the
+  user's own notes; any other slug is a validation error (R15: no
+  existence leak).
 - **R13 · Search.** Case-insensitive full-text match on title + body over
   all of the user's notes.
 - **R14 · Markdown safety.** Note bodies render the basic markdown subset
@@ -91,6 +102,12 @@ timezone; `start(d)` is local midnight of day `d`.
 - **R17 · Missed (v2, documented now).** A reminder is missed when
   `done_at is null` and `now >= original_due_at + 24 h`. Snoozing does not
   reset it; that is why `original_due_at` exists.
+
+- **R18 · Page of another day.** The page for a day other than today holds
+  the items due inside that day's window, open or done (done stay struck).
+  It has no carried group, no NOW line and no relative durations: rows show
+  the time only (no "late", no "in"). The date block shows the viewed day.
+  Done, snooze and undo work as on today (R7, R9); `t` returns to today.
 
 ## Matrix — EVENT → STATE BEFORE → CHANGE → STATE AFTER
 
@@ -114,12 +131,14 @@ and never appear in the UI.
 
 ### DST cases (timezone `America/New_York`)
 
-| #   | Event                                     | Change                                | State after                                | Rules   |
-| --- | ----------------------------------------- | ------------------------------------- | ------------------------------------------ | ------- |
-| D1  | Sun 8 Mar 2026 (spring forward)           | Today window.                         | 23 h long: `[05:00Z, 04:00Z next day)`.    | R1      |
-| D2  | Sun 1 Nov 2026 (fall back)                | Today window.                         | 25 h long.                                 | R1      |
-| D3  | Sun 8 Mar 2026 01:30 EST, "+1 h"          | `due_at := now + 1 h`.                | 03:30 EDT (07:30Z).                        | R7, R16 |
-| D4  | Sat 7 Mar 2026 22:00 EST, "Tomorrow 9:00" | `due_at := start(Sun 8) + 9 h` local. | Sun 8 Mar 09:00 EDT = 13:00Z (not 14:00Z). | R7, R16 |
+| #   | Event                                     | Change                                 | State after                                                                        | Rules   |
+| --- | ----------------------------------------- | -------------------------------------- | ---------------------------------------------------------------------------------- | ------- |
+| D1  | Sun 8 Mar 2026 (spring forward)           | Today window.                          | 23 h long: `[05:00Z, 04:00Z next day)`.                                            | R1      |
+| D2  | Sun 1 Nov 2026 (fall back)                | Today window.                          | 25 h long.                                                                         | R1      |
+| D3  | Sun 8 Mar 2026 01:30 EST, "+1 h"          | `due_at := now + 1 h`.                 | 03:30 EDT (07:30Z).                                                                | R7, R16 |
+| D4  | Sat 7 Mar 2026 22:00 EST, "Tomorrow 9:00" | `due_at := start(Sun 8) + 9 h` local.  | Sun 8 Mar 09:00 EDT = 13:00Z (not 14:00Z).                                         | R7, R16 |
+| D5  | Navigate Sat 7 → Sun 8 → Mon 9 Mar 2026   | Day window of each date.               | Sun 8 is 23 h; no day skipped or repeated; each window ends where the next starts. | R1, R18 |
+| D6  | Navigate to Sun 1 Nov 2026 and Mon 2 Nov  | Day window; item at 04:59Z and 05:00Z. | Sun 1 is 25 h; 04:59Z belongs to Sun 1, 05:00Z to Mon 2.                           | R1, R18 |
 
 ## Verification status
 
@@ -144,6 +163,19 @@ Slice 2 (capture, snooze, done and undo) adds the write-side proof:
 | C3 (done mutation) | `apps/api/test/reminder-actions.test.ts` and `server.test.ts` (`POST /notes/:id/done`): `done_at` stamped by the clock. `packages/shared/test/today-patch.test.ts`: the optimistic page equals the next `GET /today`. `apps/web/test/keyboard.test.tsx` (`x`, `z`) and `reminder-actions.test.tsx`: optimistic done, rollback and refetch. `mobile-flow.test.tsx`: Done in the sheet. |
 | C5 (`s h`)         | `apps/api/test/reminder-actions.test.ts` and `server.test.ts`: +1 h from 09:05 is 10:05, count 1, original due unchanged. `apps/web/test/keyboard.test.tsx` (`s h`), `which-key.test.tsx` and `action-sheet.test.tsx`: the resulting time shown is the one saved.                                                                                                                     |
 | C6 (`s t`)         | `apps/api/test/reminder-actions.test.ts` and `server.test.ts`: Tomorrow 9:00 is Thu 09:00, count 1. `packages/shared/test/dst.test.ts` (D4): the same rule across DST. `apps/web/test/keyboard.test.tsx` (`s t`): the item leaves the page and joins the other notes.                                                                                                                 |
+
+Slice 3 (day navigation and tag filter) adds the read-side proof:
+
+| Rows    | Proven by                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C8, R12 | `packages/shared/test/contract.test.ts`, `day-response.test.ts` and `other-notes.test.ts`: 1 rail row, 4 other notes, 10 hidden. `apps/api/test/today.test.ts` (`GET /today?tag`). `apps/web/test/tag-filter.test.tsx` and `filtered-page.test.tsx`: `#` and the tag bar, "5 notes", "10 notes hidden", the other-notes section. `apps/web/test/mobile-tags.test.tsx`: Tags button, chips, Clear chip, outside tap keeps the filter. |
+| R18     | `packages/shared/test/day-page.test.ts` and `apps/api/test/today.test.ts`: a past day has no carried group and no now line, done items stay. `apps/web/test/day-navigation.test.tsx`: time-only rows, viewed-day date block, header and statusline, per-day empty state.                                                                                                                                                             |
+| D5, D6  | `packages/shared/test/calendar-date.test.ts` (`dayWindow`): Sun 8 Mar is 23 h, Sun 1 Nov is 25 h, windows tile with no day skipped or repeated, 04:59Z and 05:00Z fall on Sun 1 and Mon 2. `apps/web/test/day-navigation.test.tsx`: `[` `]` `t` step through the days.                                                                                                                                                               |
+
+Manual smoke (viewport 1280x720 and 375x667) is recorded in the pull request
+of slice 3: Thu 8 14:30 `#client-b`, `[` to Wed 7, `t`, reload and back keep
+the view, `s t` then `]`, 2 Nov and 8 Mar with a New York profile, light and
+dark, reduced motion, no horizontal scroll.
 
 Still `todo` in that suite, asserted elsewhere when the feature lands:
 C9 (search, API + Postgres), C10 (markdown rendering, web), C11 (`404`

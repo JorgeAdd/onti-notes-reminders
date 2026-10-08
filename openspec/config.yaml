@@ -3,7 +3,7 @@ schema: spec-driven
 context: |
   Stack: npm workspaces monorepo (Node >=22, TypeScript ~6). apps/web = React 19 + Vite + CSS Modules + tokens; apps/api = Fastify + Kysely + jose; packages/shared = zod schemas + pure CONTRACT rules (no IO).
   Architecture: API is hexagonal (domain / application / infrastructure, imports point inward). Time only via the Clock port. Auth = Supabase JWT verified by the API; user queries run as `authenticated` (RLS).
-  Testing: Vitest in apps/api and packages/shared (no tests in apps/web yet). CONTRACT tests: packages/shared/test/contract.test.ts, one describe per matrix row of docs/CONTRACT.md.
+  Testing: Vitest in apps/api, packages/shared and apps/web; apps/web uses jsdom + React Testing Library + user-event (244 tests). CONTRACT tests: packages/shared/test/contract.test.ts, one describe per matrix row of docs/CONTRACT.md.
   Quality: prettier --check, eslint (type-aware), tsc --noEmit. `npm run verify` runs all four; CI "Verify and build" runs verify + build; the pre-commit hook runs verify.
   Sources of truth (cite, never restate): docs/product/brief.md, docs/product/scenario-dataset.md, docs/CONTRACT.md (R1-R17, C1-C12, D1-D4), docs/adr/ADR-001..003, docs/db/schema.md, supabase/migrations/, docs/design/style-guide-decisions.md (SG1-SG18), docs/design/chosen/*.png, apps/web/src/styles/tokens.css, CLAUDE.md (rules 1-23).
 
@@ -20,7 +20,11 @@ testing:
     unit: { available: true, tool: vitest }
     integration: { available: true, tool: 'vitest + Fastify inject (apps/api/test/server.test.ts)' }
     e2e: { available: false, tool: null }
-    component: { available: false, tool: 'none installed in apps/web (no testing-library / jsdom)' }
+    component:
+      {
+        available: true,
+        tool: 'vitest + jsdom + @testing-library/react + user-event (apps/web/test, 244 tests)',
+      }
   coverage: { available: false, command: null }
   quality:
     linter: 'npm run lint'

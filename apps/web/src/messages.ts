@@ -35,7 +35,31 @@ export const messages = {
     stateDone: 'done',
     stateSnoozed: (count: number) => `snoozed ${count}×`,
   },
-  mobile: { capture: '+ Capture' },
+  day: {
+    header: (open: number, day: string) => `${open} ${open === 1 ? 'thing' : 'things'} on ${day}`,
+    loading: (day: string) => `Opening ${day}…`,
+    nothing: (day: string) => `Nothing on ${day}`,
+    announce: (day: string, title: string) => `${day}, ${title}`,
+    hint: '[ ] prev / next day',
+    prev: 'Previous day',
+    next: 'Next day',
+    today: 'Today',
+  },
+  filter: {
+    label: 'Filter by tag',
+    hint: 'tab next · ↵ apply · esc close',
+    chip: (slug: string) => `#${slug}`,
+    clear: (slug: string) => `Clear #${slug}`,
+    header: (n: number) => `${n} ${n === 1 ? 'note' : 'notes'}`,
+    hidden: (n: number) => `${n} ${n === 1 ? 'note' : 'notes'} hidden`,
+    hiddenNamed: (n: number, slug: string) =>
+      `${n} ${n === 1 ? 'note' : 'notes'} hidden · #${slug}`,
+    others: (slug: string) => `Other notes with #${slug}`,
+    otherLabel: (title: string, when: string | null) =>
+      when === null ? title : `${title}, ${when}`,
+    hiddenNotice: (slug: string) => `Saved. It does not carry #${slug}, so the filter hides it.`,
+  },
+  mobile: { capture: '+ Capture', tags: 'Tags' },
   actionSheet: {
     label: (title: string) => `Actions for ${title}`,
     done: 'Done',
@@ -61,8 +85,11 @@ export const messages = {
   },
   statusline: {
     mode: 'NORMAL',
+    filterMode: (slug: string) => `FILTER · #${slug}`,
     counts: (today: number, carried: number, total: number) =>
       `${today} today · ${carried} carried · ${total} ${total === 1 ? 'note' : 'notes'}`,
+    dayCounts: (open: number, total: number) =>
+      `${open} open · ${total} ${total === 1 ? 'note' : 'notes'}`,
     keys: {
       move: 'j/k move',
       done: 'x done',
@@ -72,6 +99,10 @@ export const messages = {
       tomorrow: 't tomorrow',
       cancel: 'esc cancel',
       capture: 'c capture',
+      days: '[ ] day',
+      today: 't today',
+      tags: '# tag',
+      clear: 'esc clear filter',
     },
   },
   errors: {
@@ -83,5 +114,6 @@ export const messages = {
       `“${title}” changed on another device. It is back where it was.`,
     captureFailed: (title: string) => `Could not save “${title}”. Your text is back in the bar.`,
     actionMissing: (title: string) => `“${title}” no longer exists. It is back where it was.`,
+    viewUnavailable: 'That view is not available, so it was reset.',
   },
 } as const

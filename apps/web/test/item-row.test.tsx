@@ -139,3 +139,15 @@ describe('focus', () => {
     expect(screen.getByRole('listitem')).not.toHaveAttribute('data-changed')
   })
 })
+
+it('showRelative off (another day, R18): time only, no late label even for an overdue time', () => {
+  render(
+    <ul>
+      <ItemRow item={late!} now={today.now} timezone={today.timezone} showRelative={false} />
+    </ul>,
+  )
+  const row = screen.getByRole('listitem')
+  expect(row).toHaveTextContent('18:00')
+  expect(screen.queryByText(/^late /)).not.toBeInTheDocument()
+  expect(row).toHaveAccessibleName(/18:00, open$/)
+})

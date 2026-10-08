@@ -1,0 +1,71 @@
+.bar {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-panel);
+  border-top: 1px solid var(--color-rule);
+  animation: reveal var(--motion-fade) var(--ease-paper) backwards;
+}
+
+.bar:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: calc(-1 * var(--space-xs));
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.chip {
+  min-height: var(--size-target);
+  min-width: var(--size-target);
+  padding: 0 var(--space-lg);
+  background: var(--color-page);
+  color: var(--color-ink);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  font: var(--text-meta);
+  cursor: pointer;
+}
+
+/* The applied tag is underlined; the highlighted candidate is inverted ink. */
+.chip[aria-pressed='true'] {
+  border-color: var(--color-ink);
+  font: var(--text-meta-strong);
+}
+
+.chip[aria-current='true'] {
+  background: var(--color-ink);
+  color: var(--color-ink-inverse);
+}
+
+.chip:focus-visible {
+  outline: var(--focus-ring);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: transparent;
+}
+
+.hint {
+  margin: 0;
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation-duration: var(--motion-fade);
+  }
+}

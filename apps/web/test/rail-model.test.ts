@@ -138,3 +138,30 @@ describe('buildRail', () => {
     })
   })
 })
+
+describe('buildRail on another day (R18): no now', () => {
+  const items = [item('a', at('2026-10-08 15:00')), item('b', at('2026-10-08 09:00'))]
+
+  it('inserts no now row, keeping time order and the hour layout', () => {
+    expect(shape(buildRail(items, null, TZ).rows)).toEqual([
+      'hour:9',
+      'item:b',
+      'gap:10-14',
+      'empty:10',
+      'empty:11',
+      'empty:12',
+      'empty:13',
+      'empty:14',
+      'hour:15',
+      'item:a',
+    ])
+  })
+
+  it('the compact list has no now row either', () => {
+    const many = Array.from({ length: 7 }, (_, i) => item(`i${i}`, at(`2026-10-08 1${i}:00`)))
+    const model = buildRail(many, null, TZ)
+    expect(model.compact).toBe(true)
+    expect(shape(model.rows)).toHaveLength(7)
+    expect(shape(model.rows)).not.toContain('now')
+  })
+})

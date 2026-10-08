@@ -1,6 +1,7 @@
 import type { CaptureRequest, SnoozePreset } from '@onti/shared'
 import type { Session } from '@supabase/supabase-js'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import type { DayView } from './features/today/day-view'
 import { AuthContainer } from './features/auth/AuthContainer'
 import { TodayContainer } from './features/today/TodayContainer'
 import {
@@ -32,7 +33,7 @@ export function App() {
   }, [])
 
   const accessToken = session?.access_token
-  const load = useCallback(() => fetchToday(accessToken ?? ''), [accessToken])
+  const load = useCallback((view: DayView) => fetchToday(accessToken ?? '', view), [accessToken])
   const syncTimezone = useCallback(
     (timezone: string) => patchTimezone(accessToken ?? '', timezone),
     [accessToken],
