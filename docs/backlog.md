@@ -83,6 +83,13 @@ _Source: slice 8 verify report_
 The headless screenshots at 1280 and 375 px did not show the keyboard focus ring on the segmented theme control. Check Tab focus in a real browser, light and dark.
 _Source: slice 8 archive report_
 
+## Planned for Slice 4
+
+### "Without a reminder" list in the date column
+
+Notes with no reminder and not done, newest first, in the date column (desktop) or as a link (mobile), opening All notes. Defined by CONTRACT R19 (rows C13, C14); scope in `docs/roadmap.md`, Slice 4.
+_Source: product decision, 2026-10-08 (prompt `prompts/antes/21-slice-4-without-a-reminder.md`)_
+
 ## Suggestions
 
 ### Bundle size optimization
