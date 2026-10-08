@@ -121,8 +121,10 @@ Ownership gate (slice 5): the branch MUST NOT modify `apps/api/src/application/p
 
 - [x] 9.1 `docs/CONTRACT.md` verification status for C8, D5, D6, Q1; roadmap tick; smoke checklist text.
 - [x] 9.2 Final check: `git diff --name-only main...HEAD | grep -E "ports.ts|fakes.ts|packages/shared/src/notes.ts|domain/note.ts|database.ts|postgres-note"` returns nothing.
-- [ ] 9.3 Manual smoke (checklist below; the orchestrator runs it with real key presses) at 1280x720 and 375x667: seed Thu 8 14:30 `#client-b` (5 notes, 10 hidden), `[` to Wed 7, `t`, refresh and back keep view, `s t` then `]`, 2 Nov and 8 Mar with a New York profile, light/dark, reduced motion, no horizontal scroll. Record in PR with final bundle size.
+- [x] 9.3 Manual smoke (checklist below; the orchestrator runs it with real key presses) at 1280x720 and 375x667: seed Thu 8 14:30 `#client-b` (5 notes, 10 hidden), `[` to Wed 7, `t`, refresh and back keep view, `s t` then `]`, 2 Nov and 8 Mar with a New York profile, light/dark, reduced motion, no horizontal scroll. Record in PR with final bundle size.
+      Smoke 2026-10-08: 12/12 scenarios pass at 1280x720 and 375x667 with real key presses and taps on mocked data (C8 filter, day navigation, history, esc order, unknown tag, mobile ‹ › Today, Tags chips, Clear chip, backdrop swallows outside tap, dark, reduced motion); screenshots in the session scratchpad s3-shots/
 - [x] 9.4 `npm run verify`; commit.
+- [x] 9.5 Verify remediation: mobile controls test and partial-scenario tests
 
 Smoke checklist (record results in the PR; tick each when observed):
 

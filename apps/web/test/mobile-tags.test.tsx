@@ -75,7 +75,11 @@ it('keeps every mobile control at the 44 px target with tokens only', () => {
   const dayNav = readFileSync('src/features/today/DayNav.module.css', 'utf8')
   expect(dayNav).toMatch(/min-width:\s*var\(--size-target\)/)
   const tagBar = readFileSync('src/features/today/TagBar.module.css', 'utf8')
-  expect(tagBar).toMatch(/@media \(prefers-reduced-motion: reduce\)|var\(--motion-/)
+  const used = [...tagBar.matchAll(/var\((--motion-[a-z-]+)\)/g)].map((m) => m[1])
+  expect(used.length).toBeGreaterThan(0)
+  const tokens = readFileSync('src/styles/tokens.css', 'utf8')
+  const reduced = tokens.slice(tokens.indexOf('@media (prefers-reduced-motion: reduce)'))
+  for (const token of used) expect(reduced).toMatch(new RegExp(`${token}:\\s*var\\(--core-`))
 })
 
 it('Tags opens the chips in the dock; Clear #tag removes the filter', async () => {

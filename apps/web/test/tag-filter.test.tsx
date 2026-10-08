@@ -158,3 +158,35 @@ it('keys are off while the bar is open: ] changes nothing', async () => {
 
   expect(params().get('d')).toBeNull()
 })
+
+it('0 notes: a filter with nothing left shows the header, all hidden, calm copy, and esc clears', async () => {
+  window.history.replaceState(null, '', '/?tag=client-b')
+  const base = c4Response()
+  const empty = (view: DayView): Promise<TodayResponse> =>
+    Promise.resolve(
+      view.tag === null
+        ? base
+        : {
+            ...base,
+            tag: view.tag,
+            carried: [],
+            rail: [],
+            others: [],
+            otherCount: 0,
+            hiddenCount: 15,
+          },
+    )
+  const { user } = setup(empty)
+
+  expect(
+    await screen.findByRole('heading', { level: 1, name: messages.filter.header(0) }),
+  ).toBeVisible()
+  expect(screen.getByRole('main')).toHaveTextContent(messages.today.noNotes)
+  expect(screen.queryAllByRole('listitem')).toHaveLength(0)
+  expect(screen.getByRole('complementary')).toHaveTextContent(messages.filter.hidden(15))
+
+  await user.keyboard('{Escape}')
+
+  expect(await screen.findByRole('heading', { level: 1, name: '4 things today' })).toBeVisible()
+  expect(params().get('tag')).toBeNull()
+})

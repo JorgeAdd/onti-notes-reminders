@@ -9,7 +9,10 @@ import type { ReminderApi } from '../src/features/today/mutations/use-reminder-a
 import { messages } from '../src/messages'
 import { c4Response } from './today-fixture'
 
-afterEach(() => window.history.replaceState(null, '', '/'))
+afterEach(() => {
+  window.history.replaceState(null, '', '/')
+  vi.unstubAllGlobals()
+})
 
 const never = () => new Promise<never>(() => undefined)
 const reminders: ReminderApi = { snooze: never, done: never, undo: never, capture: never }
@@ -202,5 +205,80 @@ describe('focus and announcements', () => {
     await screen.findByRole('heading', { level: 1, name: '1 thing on Thu 8' })
 
     expect(document.querySelector('[aria-current="date"]')).toBeNull()
+  })
+})
+
+describe('mobile controls', () => {
+  const narrow = () =>
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: true,
+      media: query,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+    }))
+  const today = () => screen.queryByRole('button', { name: messages.day.today })
+
+  it('shows named ‹ › on today, steps with them, and Today returns then hides', async () => {
+    narrow()
+    const { user } = setup()
+    await heading()
+    expect(screen.getByRole('button', { name: messages.day.prev })).toHaveTextContent('‹')
+    expect(screen.getByRole('button', { name: messages.day.next })).toHaveTextContent('›')
+    expect(today()).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: messages.day.next }))
+    await screen.findByRole('heading', { level: 1, name: '1 thing on Thu 8' })
+    expect(today()).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: messages.day.next }))
+    await screen.findByRole('heading', { level: 1, name: /Fri 9/ })
+    await user.click(screen.getByRole('button', { name: messages.day.prev }))
+    await screen.findByRole('heading', { level: 1, name: '1 thing on Thu 8' })
+
+    await user.click(today()!)
+
+    expect(await screen.findByRole('heading', { level: 1, name: '4 things today' })).toBeVisible()
+    expect(window.location.search).toBe('')
+    expect(today()).not.toBeInTheDocument()
+  })
+})
+
+describe('partial scenarios', () => {
+  it('rapid ]]: a late superseded response is discarded; the page shows the last day', async () => {
+    const pending: Record<string, (page: TodayResponse) => void> = {}
+    const { user } = setup((view) =>
+      view.date === null
+        ? serve(view)
+        : new Promise<TodayResponse>((resolve) => (pending[view.date!] = resolve)),
+    )
+    await heading()
+
+    await user.keyboard(']]')
+    await waitFor(() => expect(Object.keys(pending)).toHaveLength(2))
+    pending['2026-10-09']!(c4Response('2026-10-09'))
+    await screen.findByText(messages.day.nothing('Fri 9'))
+    pending['2026-10-08']!(c4Response('2026-10-08'))
+
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('0 things on Fri 9')
+    expect(window.location.search).toBe('?d=2026-10-09')
+  })
+
+  it('a 5xx on a stepped day shows the error with retry, and retry loads the day', async () => {
+    let failed = false
+    const { user } = setup((view) => {
+      if (view.date === '2026-10-08' && !failed) {
+        failed = true
+        return Promise.reject(new Error('GET /today failed with 500'))
+      }
+      return serve(view)
+    })
+    await heading()
+
+    await user.keyboard(']')
+    expect(await screen.findByRole('alert')).toHaveTextContent(messages.today.loadError)
+    await user.click(screen.getByRole('button', { name: messages.today.retry }))
+
+    expect(await screen.findByRole('heading', { level: 1, name: '1 thing on Thu 8' })).toBeVisible()
   })
 })
