@@ -9,6 +9,27 @@ export interface Database {
     created_at: ColumnType<Date, never, never>
     updated_at: ColumnType<Date, never, never>
   }
+  notes: {
+    id: string
+    user_id: string
+    title: string
+    due_at: Date | null
+    original_due_at: Date | null
+    snooze_count: number
+    done_at: Date | null
+    notified_due_at: Date | null
+  }
+  tags: {
+    id: string
+    user_id: string
+    name: string
+    slug: string
+  }
+  note_tags: {
+    user_id: string
+    note_id: string
+    tag_id: string
+  }
 }
 
 export function createDatabase(connectionString: string): Kysely<Database> {
