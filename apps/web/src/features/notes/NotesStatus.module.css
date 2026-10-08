@@ -1,0 +1,21 @@
+.desk {
+  composes: desk from '../today/TodayStatus.module.css';
+}
+
+.page {
+  composes: page from '../today/TodayStatus.module.css';
+}
+
+.message {
+  composes: message from '../today/TodayStatus.module.css';
+}
+
+.retry {
+  composes: retry from '../today/TodayStatus.module.css';
+}
+
+.inline {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-row-x);
+}

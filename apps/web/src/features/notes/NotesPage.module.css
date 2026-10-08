@@ -1,0 +1,49 @@
+.desk {
+  composes: desk from '../today/DayPage.module.css';
+}
+
+.page {
+  composes: page from '../today/DayPage.module.css';
+}
+
+.main {
+  composes: main from '../today/DayPage.module.css';
+}
+
+.dock {
+  composes: dock from '../today/DayPage.module.css';
+}
+
+.header {
+  composes: header from '../today/PageHeader.module.css';
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.title {
+  composes: title from '../today/PageHeader.module.css';
+}
+
+.back {
+  min-height: var(--size-target);
+  padding: 0 var(--space-lg);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-control);
+  background: var(--color-page);
+  color: var(--color-ink);
+  font: var(--text-meta-strong);
+  cursor: pointer;
+}
+
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

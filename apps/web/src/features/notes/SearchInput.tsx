@@ -1,0 +1,39 @@
+import { SEARCH_LIMITS } from '@onti/shared'
+import { useEffect, useRef } from 'react'
+import { messages } from '../../messages'
+import styles from './SearchInput.module.css'
+
+interface Props {
+  value: string
+  onChange: (value: string) => void
+  onFocusChange: (focused: boolean) => void
+}
+
+/**
+ * The search field, the command line of this view (Decision 9): it lives in the dock and has no
+ * visible label, so the accessible name comes from the messages. It takes focus on mount.
+ */
+export function SearchInput({ value, onChange, onFocusChange }: Props) {
+  const input = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    input.current?.focus()
+  }, [])
+  return (
+    <form role="search" className={styles.bar} onSubmit={(event) => event.preventDefault()}>
+      <input
+        ref={input}
+        className={styles.input}
+        aria-label={messages.notes.searchLabel}
+        placeholder={messages.notes.searchPlaceholder}
+        maxLength={SEARCH_LIMITS.qMax}
+        value={value}
+        autoComplete="off"
+        spellCheck={false}
+        enterKeyHint="search"
+        onChange={(event) => onChange(event.target.value)}
+        onFocus={() => onFocusChange(true)}
+        onBlur={() => onFocusChange(false)}
+      />
+    </form>
+  )
+}

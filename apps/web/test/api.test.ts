@@ -7,6 +7,7 @@ import {
   patchTimezone,
   post,
   request,
+  searchNotes,
   snoozeNote,
   undoNoteDone,
   UnauthorizedError,
@@ -270,5 +271,59 @@ describe('captureNote (R11)', () => {
     await expect(captureNote('t', { title: 'x', tags: [], dueAt: null })).rejects.toMatchObject({
       status: 400,
     })
+  })
+})
+
+describe('searchNotes', () => {
+  const list = {
+    now: '2026-10-07T15:05:00.000Z',
+    timezone: 'America/Mexico_City',
+    total: 15,
+    notes: [
+      {
+        id: ID,
+        title: 'Staging URL',
+        tags: [],
+        dueAt: null,
+        doneAt: '2026-10-06T23:00:00.000Z',
+        excerpt: 'Body',
+      },
+    ],
+  }
+
+  it('calls GET /notes with no query for an empty term and decodes instants', async () => {
+    const fetchMock = respond(200, list)
+    const result = await searchNotes('token-1', '')
+
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect((url as URL).href).toBe('http://localhost:3000/notes')
+    expect(init?.headers).toEqual({ Authorization: 'Bearer token-1' })
+    expect(result.total).toBe(15)
+    expect(result.notes[0]!.doneAt).toBeInstanceOf(Date)
+  })
+
+  it('percent-encodes the term (spaces, &, #, quotes and non-ASCII stay one value)', async () => {
+    const fetchMock = respond(200, list)
+    await searchNotes('token-1', `a b&c=d#e "é"`)
+
+    const [url] = fetchMock.mock.calls[0]!
+    const { searchParams } = url as URL
+    expect([...searchParams.keys()]).toEqual(['q'])
+    expect(searchParams.get('q')).toBe(`a b&c=d#e "é"`)
+    expect((url as URL).href).not.toContain(' ')
+  })
+
+  it('turns a 401 into UnauthorizedError and keeps other failures generic', async () => {
+    respond(401)
+    await expect(searchNotes('expired', 'x')).rejects.toBeInstanceOf(UnauthorizedError)
+    respond(500)
+    const error = await searchNotes('t', 'x').catch((e: unknown) => e)
+    expect(error).not.toBeInstanceOf(UnauthorizedError)
+    expect((error as Error).message).toContain('500')
+  })
+
+  it('rejects a body that breaks the shared schema (a 51st note, a long excerpt)', async () => {
+    respond(200, { ...list, notes: [{ ...list.notes[0]!, excerpt: 'x'.repeat(121) }] })
+    await expect(searchNotes('t', '')).rejects.toThrow()
   })
 })

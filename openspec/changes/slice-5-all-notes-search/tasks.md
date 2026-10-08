@@ -97,10 +97,10 @@ Global checks for every commit:
 
 ### Commit 7: `feat(web):` container, page, input, statusline (~431 lines)
 
-- [ ] 7.1 RED: `apps/web/test/api.test.ts` (`searchNotes` URL encoding, 401 typed `UnauthorizedError`); `use-debounced-value` with fake timers.
-- [ ] 7.2 RED: `notes-container.test.tsx`: input found by accessible name `messages.notes.searchLabel`; loading `role="status"`; first-load error and Retry; error after success keeps input and text; 401 once; empty and no-match copy; debounce (one request per pause, previous list kept); statusline `SEARCH · term · n of 15` and `SEARCH · all notes · 15 of 15`; hints switch with focus; 70 notes/60 match gives `50 of 70`; polite hidden live line.
-- [ ] 7.3 GREEN: `lib/api.ts` `searchNotes` (appended), `use-debounced-value.ts`, `NotesContainer`, `NotesPage` (`composes` from `DayPage.module.css`), `NotesStatus`, `SearchInput` (`aria-label`, `maxLength` from `qMax`), `SearchStatusline`, CSS; optional `DateColumn.otherCount`.
-- [ ] 7.4 `npm run verify`; record bundle size; commit.
+- [x] 7.1 RED: `apps/web/test/api.test.ts` (`searchNotes` URL encoding, 401 typed `UnauthorizedError`); `use-debounced-value` with fake timers.
+- [x] 7.2 RED: `notes-container.test.tsx`: input found by accessible name `messages.notes.searchLabel`; loading `role="status"`; first-load error and Retry; error after success keeps input and text; 401 once; empty and no-match copy; debounce (one request per pause, previous list kept); statusline `SEARCH · term · n of 15` and `SEARCH · all notes · 15 of 15`; hints switch with focus; 70 notes/60 match gives `50 of 70`; polite hidden live line.
+- [x] 7.3 GREEN: `lib/api.ts` `searchNotes` (appended), `use-debounced-value.ts`, `NotesContainer`, `NotesPage` (`composes` from `DayPage.module.css`), `NotesStatus`, `SearchInput` (`aria-label`, `maxLength` from `qMax`), `SearchStatusline`, CSS; optional `DateColumn.otherCount`.
+- [x] 7.4 `npm run verify`; record bundle size; commit.
 
 ### Commit 8: `feat(web):` entry points (~221 lines, HIGH risk)
 

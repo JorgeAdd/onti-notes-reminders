@@ -119,5 +119,20 @@ export const messages = {
   /** Slice 5: the All notes and search view. */
   notes: {
     done: 'done',
+    title: 'All notes',
+    back: 'Back to today',
+    searchLabel: 'Search your notes',
+    searchPlaceholder: 'Search notes',
+    loading: 'Opening your notes…',
+    loadError: 'Your notes could not be loaded.',
+    retry: 'Try again',
+    empty: 'No notes yet',
+    noMatch: (term: string) => `No notes match “${term}”.`,
+    count: (n: number) => `${n} ${n === 1 ? 'note' : 'notes'}`,
+    allNotes: 'all notes',
+    /** `SEARCH · term` and `· n of total`: `n` is shown, `total` is every note the user has. */
+    statusHead: (term: string) => `SEARCH · ${term}`,
+    statusTail: (shown: number, total: number) => `· ${shown} of ${total}`,
+    hints: { search: '/ search', back: 'esc back' },
   },
 } as const
