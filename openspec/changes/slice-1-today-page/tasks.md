@@ -63,14 +63,14 @@ PR body: `seed:demo` loads the 15-note scenario with RLS-scoped writes. Out: web
 
 PR body: web test runner, clock ban, pure helpers, `fetchToday`. No UI change. Prior: PR2. Tasks before 3.2 cannot be test-first: the web runner does not exist yet.
 
-- [ ] 3.1 Non-TDD (no runner): `apps/web/vitest.config.ts` (react, jsdom, `test.env` VITE_*), `test/setup.ts`, dev deps, `test` script, tsconfig includes. Decision 7.
-- [ ] 3.2 Smoke test proving jsdom and jest-dom run; `npm run test` includes web.
-- [ ] 3.3 RED then GREEN: `lib/clock.ts` + web clock ban in `eslint.config.js` (exempt `lib/clock.ts`). Decision 4.
-- [ ] 3.4 RED: `test/format.test.ts` (relative labels "late 15h05", "in 25 min", C7 "late 1 min"; `Intl` date parts), then GREEN `features/today/format.ts` + `messages.today` functions, incl. singular "1 thing today". R4, R6, C7; Decision 2.
-- [ ] 3.5 RED then GREEN: `rail-model.ts` (compact >6, gap row, NOW placement, DST day). Decision 2, SG7.
-- [ ] 3.6 RED then GREEN: `useNow` (fake timers, skew = server now - dataUpdatedAt, 1-min tick). Decision 6; C7.
-- [ ] 3.7 RED then GREEN: `fetchToday` + `UnauthorizedError` in `lib/api.ts` (401 -> typed error, others generic). Decision 12.
-- [ ] 3.8 `npm run verify` and `vite build`; record bundle size.
+- [x] 3.1 Non-TDD (no runner): `apps/web/vitest.config.ts` (react, jsdom, `test.env` VITE_*), `test/setup.ts`, dev deps, `test` script, tsconfig includes. Decision 7.
+- [x] 3.2 Smoke test proving jsdom and jest-dom run; `npm run test` includes web.
+- [x] 3.3 RED then GREEN: `lib/clock.ts` + web clock ban in `eslint.config.js` (exempt `lib/clock.ts`). Decision 4.
+- [x] 3.4 RED: `test/format.test.ts` (relative labels "late 15h05", "in 25 min", C7 "late 1 min"; `Intl` date parts), then GREEN `features/today/format.ts` + `messages.today` functions, incl. singular "1 thing today". R4, R6, C7; Decision 2.
+- [x] 3.5 RED then GREEN: `rail-model.ts` (compact >6, gap row, NOW placement, DST day). Decision 2, SG7.
+- [x] 3.6 RED then GREEN: `useNow` (fake timers, skew = server now - dataUpdatedAt, 1-min tick). Decision 6; C7.
+- [x] 3.7 RED then GREEN: `fetchToday` + `UnauthorizedError` in `lib/api.ts` (401 -> typed error, others generic). Decision 12.
+- [x] 3.8 `npm run verify` and `vite build`; record bundle size.
 
 ## PR 4: Page shell + 401 flow (~390 lines; trim CSS first)
 
