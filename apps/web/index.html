@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
+    <!-- Applies the stored theme before first paint; keep in sync with src/features/theme/theme.ts. -->
+    <!-- prettier-ignore -->
+    <script>var d=document.documentElement,t;try{t=localStorage.getItem('onti.theme')}catch(e){}t==='light'||t==='dark'?d.setAttribute('data-theme',t):d.removeAttribute('data-theme')</script>
     <title>Notes + Reminders</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

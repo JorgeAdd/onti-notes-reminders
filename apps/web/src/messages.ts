@@ -117,6 +117,8 @@ export const messages = {
     actionMissing: (title: string) => `“${title}” no longer exists. It is back where it was.`,
     viewUnavailable: 'That view is not available, so it was reset.',
   },
+  /** Slice 8: the three-state theme override (SG18). */
+  theme: { label: 'Theme', system: 'System', light: 'Light', dark: 'Dark' },
   /** Slice 5: the All notes and search view. */
   notes: {
     done: 'done',

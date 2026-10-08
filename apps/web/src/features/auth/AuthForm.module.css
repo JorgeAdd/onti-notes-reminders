@@ -6,6 +6,7 @@
 }
 
 .page {
+  composes: sheet from '../../styles/entrance.module.css';
   width: min(100%, var(--size-card-max));
   display: grid;
   gap: var(--space-md);
