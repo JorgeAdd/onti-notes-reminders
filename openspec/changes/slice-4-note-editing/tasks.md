@@ -91,7 +91,7 @@ Global checks for every commit:
 
 ### PR1 verify and smoke
 
-- [ ] 1.9.1 `npm run verify` and `npm run build`; main-chunk gzip table vs `origin/main` (markdown only in the lazy chunk).
+- [x] 1.9.1 `npm run verify` and `npm run build`; main-chunk gzip table vs `origin/main` (markdown only in the lazy chunk).
 - [ ] 1.9.2 Manual smoke 1280x720 and 375x667, light/dark, reduced motion: C13 list, open/`esc`, C10 body, no horizontal scroll; screenshots in the PR (recorded deviation).
 - [ ] 1.9.3 Open PR1 (after asking), label `size:exception`. Deploy order: Railway before Vercel. Vercel deploys `main` on push and Railway after checks, so ask the human how to sequence before merging.
 
