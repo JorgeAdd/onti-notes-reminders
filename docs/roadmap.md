@@ -17,6 +17,7 @@ yet specified), **Proposed** (inferred from the v1 scope, not yet agreed).
 | 6     | Web Push notifications                  | Proposed |
 | 7     | Merged into slice 2                     | —        |
 | 8     | Page entrance and theme override        | Done     |
+| 9     | How it works help                       | Named    |
 
 ## Slice 1 — Read-only Today page
 
@@ -103,3 +104,36 @@ the start of slice 2 because capture and snooze depend on it.
 ## Slice 8 — Page entrance and theme override
 
 Done 2026-10-08. Archived at `openspec/changes/archive/2026-10-08-slice-8-page-entrance-theme/`. Deferred items in `docs/backlog.md`.
+
+## Slice 9 — How it works help
+
+Web only: no API, database or CONTRACT change.
+
+- Opens with `?` (SG10's "all keys") and with a visible "?" button in the
+  statusline (≥ 44 px). It never opens on its own. The Today empty state adds
+  the hint "Press ? to see how it works" (mobile: "Tap ? to see how it
+  works").
+- Desktop: a modal dialog. Mobile (≤ 640 px): a bottom sheet inside the
+  existing bottom dock.
+- Sections:
+  - **Capture:** `c`; `HH:MM` (today, or tomorrow if past); `today HH:MM`
+    (accepted even if past, shown late); `tomorrow HH:MM`; `+Nm` / `+Nh`;
+    `#tag`; no time is a note without a reminder; `esc` cancels.
+  - **Days:** `[` `]` previous/next day; `t` back to today.
+  - **On a note:** `j`/`k` move; `x` done; `z` undo; `s` then `h` (+1 h) or
+    `t` (tomorrow); `e` edit; `d` delete (↵ confirms, `esc` cancels).
+  - **Find:** `/` all notes and search; `#` filter by tag; `esc` clears the
+    filter.
+  - On mobile, the touch equivalents (presets, action sheet, Search and Tags
+    buttons) replace the keys.
+- One source of truth: the key rows come from the existing `KeyHint`
+  definitions (`apps/web/src/features/today/keys.ts`) and the statusline hint
+  copy in `messages.ts`. A test fails if a command key handled in `keys.ts`
+  (or the `/` and `#` layers) has no entry in the help, and another runs
+  every capture example through the shared R11 parser.
+- Accessibility: `role="dialog"`, `aria-modal`, a labelled title; focus moves
+  in, is trapped, and returns to the trigger; `esc` and a 44 px close button
+  close it; page keys don't fire while it is open.
+- Motion: a fade of at most 150 ms with `--motion-*` and `--ease-paper`;
+  reduced motion via the global token block. Tokens only; copy in the
+  messages module.
