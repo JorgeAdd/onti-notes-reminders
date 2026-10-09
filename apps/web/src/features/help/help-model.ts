@@ -57,7 +57,7 @@ export const HINT_ROWS: Record<KeyHint, RowDef> = {
   clear: { section: 'find', keys: ['Escape'], line: hints.clear },
 }
 
-/** Keys that have no statusline hint: the capture bar's esc and the note view's delete. */
+/** Keys that have no statusline hint: the capture bar's esc, the note view's delete and `?` itself (a button, not a hint). */
 const EXTRA_ROWS: Record<string, RowDef> = {
   captureCancel: {
     section: 'capture',
@@ -71,6 +71,7 @@ const EXTRA_ROWS: Record<string, RowDef> = {
     line: messages.note.hints.delete,
     detail: detail.delete,
   },
+  help: { section: 'find', keys: ['?'], line: messages.help.helpKey },
 }
 
 const SECTIONS: HelpSectionId[] = ['capture', 'days', 'note', 'find']

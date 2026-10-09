@@ -108,7 +108,7 @@ describe('help rows come from the statusline hints', () => {
     expect(keysOf('note')).toEqual(
       new Set(['j', 'k', 'x', 'z', 's', 'h', 't', 'Escape', 'e', 'd', 'Enter']),
     )
-    expect(keysOf('find')).toEqual(new Set(['/', '#', 'Tab', 'Enter', 'Escape']))
+    expect(keysOf('find')).toEqual(new Set(['/', '#', 'Tab', 'Enter', 'Escape', '?']))
   })
 })
 

@@ -243,3 +243,28 @@ describe('availableKeys · the e hint (slice 4)', () => {
     expect(availableKeys({ hasRows: true, target: 'open', armed: false })).not.toContain('edit')
   })
 })
+
+describe('? opens help (slice 9)', () => {
+  it.each([null, 'open', 'done'] as const)('from idle with target %s', (target) => {
+    expect(reduceKey(idle, '?', target)).toEqual({ state: idle, command: { type: 'help' } })
+  })
+
+  it('needs no context: on today, off today, filtered, with or without tags', () => {
+    for (const context of [
+      { filterActive: false, offToday: false },
+      { filterActive: true, offToday: true, hasTags: true },
+    ])
+      expect(reduceKey(idle, '?', 'open', context).command).toEqual({ type: 'help' })
+  })
+
+  it('while the snooze menu is armed it only disarms', () => {
+    expect(reduceKey(armed, '?', 'open')).toEqual({ state: idle, command: null })
+  })
+
+  it('is not a hint: the statusline shows a button instead', () => {
+    const states = [null, 'open', 'done'] as const
+    for (const target of states)
+      for (const hasRows of [true, false])
+        expect(availableKeys({ hasRows, target, armed: false })).not.toContain('help')
+  })
+})

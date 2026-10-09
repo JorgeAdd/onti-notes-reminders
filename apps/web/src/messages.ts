@@ -124,6 +124,7 @@ export const messages = {
       search: 'all notes and search',
     },
     captureCancel: 'esc cancel capture',
+    helpKey: '? how it works',
     /** R11 examples: `shows` is true at any moment; help-examples.test.ts runs each through the parser. */
     examples: [
       { input: 'Call back 17:00', shows: 'today 17:00, or tomorrow once it has passed' },

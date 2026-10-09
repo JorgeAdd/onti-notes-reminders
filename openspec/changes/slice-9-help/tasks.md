@@ -52,8 +52,8 @@ Global checks for every commit:
 
 ## Commit 3 `feat(web): ? command in the Today key reducer` (unit 3)
 
-- [ ] 3.1 RED `apps/web/test/keys.test.ts`: `?` idle yields `{type:'help'}` for target null/open/done; armed `?` disarms, no command; `availableKeys` unchanged. Extend `use-today-rows` test: `onHelp` called, `run` excludes `'help'`.
-- [ ] 3.2 GREEN `features/today/keys.ts` (`{type:'help'}`, `?` branch), `use-today-rows.ts` (`bar.onHelp()`). Coverage test from commit 1 stays green.
+- [x] 3.1 RED `apps/web/test/keys.test.ts`: `?` idle yields `{type:'help'}` for target null/open/done; armed `?` disarms, no command; `availableKeys` unchanged. Extend `use-today-rows` test: `onHelp` called, `run` excludes `'help'`.
+- [x] 3.2 GREEN `features/today/keys.ts` (`{type:'help'}`, `?` branch), `use-today-rows.ts` (`bar.onHelp()`). Coverage test from commit 1 stays green.
 
 ## Commit 4 `feat(web): focus trap hook` (unit 4)
 

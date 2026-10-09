@@ -18,7 +18,14 @@ type Actions = Pick<ReturnType<typeof useReminderActions>, 'snooze' | 'done' | '
 export function useTodayRows(
   today: TodayResponse | undefined,
   actions: Actions,
-  bar: { open: boolean; onOpen: () => void; mobile: boolean; blocked: boolean },
+  bar: {
+    open: boolean
+    onOpen: () => void
+    /** `?`: open the help. Absent where the page has none, so the key is not consumed. */
+    onHelp?: () => void
+    mobile: boolean
+    blocked: boolean
+  },
   /** `e` on a focused row: open that note in edit mode. Absent when the app cannot open notes. */
   onEdit: ((id: string) => void) | undefined,
   days: {
@@ -57,7 +64,7 @@ export function useTodayRows(
   const run = (
     command: Exclude<
       KeyCommand,
-      { type: 'move' | 'capture' | 'edit' | 'day' | 'today' | 'tags' | 'clearFilter' }
+      { type: 'move' | 'capture' | 'edit' | 'day' | 'today' | 'tags' | 'clearFilter' | 'help' }
     >,
     id: string,
   ) => {
@@ -82,7 +89,10 @@ export function useTodayRows(
     setKeyState(next.state)
     const { command } = next
     if (command?.type === 'capture') bar.onOpen()
-    else if (command?.type === 'move') setFocusedId(step(ids, focusedId, command.delta))
+    else if (command?.type === 'help') {
+      bar.onHelp?.()
+      return bar.onHelp !== undefined
+    } else if (command?.type === 'move') setFocusedId(step(ids, focusedId, command.delta))
     else if (command?.type === 'day') days.onStep(command.delta)
     else if (command?.type === 'today') days.onToday()
     else if (command?.type === 'tags') days.onTags()
