@@ -136,6 +136,6 @@ Global checks for every commit:
 
 ### PR2 verify and smoke
 
-- [ ] 2.9.1 `npm run verify` and `npm run build`.
+- [x] 2.9.1 `npm run verify` and `npm run build`.
 - [ ] 2.9.2 Manual smoke both viewports, light/dark: edit, empty body save, reschedule onto today (counts), remove reminder (back in list), delete confirm/cancel, `e` from Today.
 - [ ] 2.9.3 Open PR2 (after asking), label `size:exception`; same Railway-before-Vercel sequencing question.
