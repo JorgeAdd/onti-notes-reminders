@@ -85,6 +85,6 @@ Global checks for every commit:
 
 ## Verify and delivery
 
-- [ ] 9.1 `npm run verify` and `npm run build`; record main-chunk gzip vs `origin/main` (help only in the lazy chunk).
+- [x] 9.1 `npm run verify` and `npm run build`; record main-chunk gzip vs `origin/main` (help only in the lazy chunk). Result: main JS 178.98 kB gzip on `origin/main` (914fa61) vs 179.81 kB (+0.83 kB: copy, button, hint, wiring); main CSS 4.58 vs 4.63 kB gzip; lazy `HelpDialog` chunk 1.76 kB JS + 0.74 kB CSS gzip.
 - [ ] 9.2 HUMAN: manual smoke at 1280x720 and 375x667, light and dark, reduced motion, keyboard-only: `?` and button open, Tab wrap, esc, focus return, dock sheet replaces bars, statusline 44 px (boards 03/05), empty-state hint.
 - [ ] 9.3 HUMAN: open the PR (ask before push), label `size:exception`, note the config 400-line contradiction.
