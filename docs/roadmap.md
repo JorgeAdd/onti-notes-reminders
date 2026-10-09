@@ -17,7 +17,7 @@ yet specified), **Proposed** (inferred from the v1 scope, not yet agreed).
 | 6     | Web Push notifications                  | Proposed |
 | 7     | Merged into slice 2                     | —        |
 | 8     | Page entrance and theme override        | Done     |
-| 9     | How it works help                       | Named    |
+| 9     | How it works help                       | Done     |
 
 ## Slice 1 — Read-only Today page
 
@@ -106,6 +106,8 @@ the start of slice 2 because capture and snooze depend on it.
 Done 2026-10-08. Archived at `openspec/changes/archive/2026-10-08-slice-8-page-entrance-theme/`. Deferred items in `docs/backlog.md`.
 
 ## Slice 9 — How it works help
+
+Done 2026-10-09 (manual smoke pending). SG10 is unchanged: `?` was already listed. One gap found: `↵` open/fold body, in `docs/backlog.md`.
 
 Web only: no API, database or CONTRACT change.
 

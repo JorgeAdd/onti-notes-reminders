@@ -79,9 +79,9 @@ Global checks for every commit:
 
 ## Commit 8 `test(web): pin the lazy help chunk` and docs (unit 8)
 
-- [ ] 8.1 RED `apps/web/test/bundle-split.test.ts`: only `DayPage` imports `HelpDialog`, and only through `import()`. GREEN if wiring is already lazy; fix otherwise.
-- [ ] 8.2 `docs/backlog.md`: add the SG10 gap "↵ open/fold body" (pre-existing drift, not implemented, help omits it).
-- [ ] 8.3 `docs/roadmap.md`: mark Slice 9 done (SG10 unchanged).
+- [x] 8.1 RED `apps/web/test/bundle-split.test.ts`: only `DayPage` imports `HelpDialog`, and only through `import()`. GREEN if wiring is already lazy; fix otherwise.
+- [x] 8.2 `docs/backlog.md`: add the SG10 gap "↵ open/fold body" (pre-existing drift, not implemented, help omits it).
+- [x] 8.3 `docs/roadmap.md`: mark Slice 9 done (SG10 unchanged).
 
 ## Verify and delivery
 

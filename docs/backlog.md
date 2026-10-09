@@ -73,6 +73,13 @@ _Source: slice 8 verify report_
 The headless screenshots at 1280 and 375 px did not show the keyboard focus ring on the segmented theme control. Check Tab focus in a real browser, light and dark.
 _Source: slice 8 archive report_
 
+## Deferred from Slice 9
+
+### SG10 lists `↵` open/fold body, but no Today key does it
+
+SG10 includes `↵` open/fold body. No key handler on Today implements it (Enter only works on a native button), so this is drift that predates slice 9. The help follows the code and omits it. Either implement the key or drop it from SG10.
+_Source: slice 9 design, risks and contradictions_
+
 ## Deferred from Slice 4
 
 ### Manual smoke of PR1 and PR2 (pending)
