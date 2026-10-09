@@ -57,8 +57,8 @@ Global checks for every commit:
 
 ### Commit c1: `feat(shared): push payload and action claims schemas` (~120)
 
-- [ ] 1.1 RED: `packages/shared/test/push.test.ts`: valid payload and claims parse; missing token, bad uuid, empty `actions`, unknown action rejected.
-- [ ] 1.2 GREEN: `packages/shared/src/push.ts` (`PUSH_ACTIONS`, `PUSH_COPY`, `pushPayloadSchema`, `actionClaimsSchema`); export at the end of `index.ts`.
+- [x] 1.1 RED: `packages/shared/test/push.test.ts`: valid payload and claims parse; missing token, bad uuid, empty `actions`, unknown action rejected.
+- [x] 1.2 GREEN: `packages/shared/src/push.ts` (`PUSH_ACTIONS`, `PUSH_COPY`, `pushPayloadSchema`, `actionClaimsSchema`); export at the end of `index.ts`.
 
 ### Commit c2: `feat(api): build the push payload from a claimed reminder` (~230)
 

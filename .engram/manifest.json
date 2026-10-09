@@ -408,6 +408,14 @@
       "sessions": 0,
       "memories": 9,
       "prompts": 0
+    },
+    {
+      "id": "3f892b14",
+      "created_by": "jdd",
+      "created_at": "2026-10-09T00:51:39Z",
+      "sessions": 0,
+      "memories": 4,
+      "prompts": 0
     }
   ]
 }
