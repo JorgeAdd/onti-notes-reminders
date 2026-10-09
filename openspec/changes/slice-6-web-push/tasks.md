@@ -75,8 +75,8 @@ Global checks for every commit:
 
 ### Commit c4: `feat(api): sign and verify notification action tokens` (~140)
 
-- [ ] 4.1 RED: `apps/api/test/hmac-action-tokens.test.ts`: round trip; tampered payload or signature; wrong secret; 1 or 3 segments; non-JSON; bad claims; valid at `exp - 1 s`, invalid at `exp`; spy proves `timingSafeEqual`.
-- [ ] 4.2 GREEN: `infrastructure/push/hmac-action-tokens.ts` (decision 12; `verify(token, now)`).
+- [x] 4.1 RED: `apps/api/test/hmac-action-tokens.test.ts`: round trip; tampered payload or signature; wrong secret; 1 or 3 segments; non-JSON; bad claims; valid at `exp - 1 s`, invalid at `exp`; spy proves `timingSafeEqual`.
+- [x] 4.2 GREEN: `infrastructure/push/hmac-action-tokens.ts` (decision 12; `verify(token, now)`).
 
 ### Commit c5: `feat(api): send pushes with web-push` (~130 + lockfile)
 
