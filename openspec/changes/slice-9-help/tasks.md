@@ -57,8 +57,8 @@ Global checks for every commit:
 
 ## Commit 4 `feat(web): focus trap hook` (unit 4)
 
-- [ ] 4.1 RED `apps/web/test/use-focus-trap.test.tsx`: focus-in on the close button, Tab/Shift+Tab wrap, Escape calls `onEscape` with `preventDefault`, restore to `returnTo` if connected, recovery when focus is on body.
-- [ ] 4.2 GREEN `features/help/use-focus-trap.ts`.
+- [x] 4.1 RED `apps/web/test/use-focus-trap.test.tsx`: focus-in on the close button, Tab/Shift+Tab wrap, Escape calls `onEscape` with `preventDefault`, restore to `returnTo` if connected, recovery when focus is on body.
+- [x] 4.2 GREEN `features/help/use-focus-trap.ts`.
 
 ## Commit 5 `feat(web): help dialog and content` (unit 5)
 
