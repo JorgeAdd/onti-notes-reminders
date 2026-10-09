@@ -69,8 +69,7 @@ note lifecycle.
     carried-group label style, up to 8 rows (title on one line with an
     ellipsis, tags below in meta text), then "+ {n − 8} more" when
     `n > 8`. Nothing when `n = 0`.
-  - A row opens All notes on that note (editing comes later in this
-    slice); "+ {n − 8} more" opens All notes as `/` does.
+  - A row opens the note view in All notes; "+ {n − 8} more" opens All notes as `/` does.
   - Mobile (≤ 640 px): no list, only the link "{n} without a reminder".
   - Data: `GET /today` gains `undated: { count, items }` (at most 8 items:
     id, title, tags, `created_at`). No extra request; the list follows the
@@ -83,7 +82,9 @@ note lifecycle.
     R19 list, `GET /notes/:id` with the C11 `404`, markdown (R14, C10)
     rendered lazily with react-markdown + rehype-sanitize (ADR-002), and a
     read-only note view. Excerpts in All notes lose their markdown markers.
-  - Then the write side: editing, reschedule and removal, delete.
+  - Then the write side (PR2, built, awaiting review): `PATCH` and `DELETE`
+    `/notes/:id` (R20, R8), edit mode with reschedule and reminder removal,
+    the inline delete confirm, and `e` on a focused Today row.
 
 ## Slice 5 — All notes and search
 

@@ -132,7 +132,7 @@ Global checks for every commit:
 
 ### Commit 2.8 `feat(web): e on a focused Today row opens edit` (2c)
 
-- [ ] 2.8.1 RED `keys.test.ts`, `keyboard.test.tsx`, `today-edit-key.test.tsx`. GREEN `keys.ts`, `use-today-rows.ts`, `TodayContainer`, `App.tsx`; `docs/roadmap.md`, `docs/backlog.md`.
+- [x] 2.8.1 RED `keys.test.ts`, `keyboard.test.tsx`, `today-edit-key.test.tsx`. GREEN `keys.ts`, `use-today-rows.ts`, `TodayContainer`, `App.tsx`; `docs/roadmap.md`, `docs/backlog.md`.
 
 ### PR2 verify and smoke
 

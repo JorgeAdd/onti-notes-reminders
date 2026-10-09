@@ -19,6 +19,8 @@ export function useTodayRows(
   today: TodayResponse | undefined,
   actions: Actions,
   bar: { open: boolean; onOpen: () => void; mobile: boolean; blocked: boolean },
+  /** `e` on a focused row: open that note in edit mode. Absent when the app cannot open notes. */
+  onEdit: ((id: string) => void) | undefined,
   days: {
     offToday: boolean
     filterActive: boolean
@@ -55,7 +57,7 @@ export function useTodayRows(
   const run = (
     command: Exclude<
       KeyCommand,
-      { type: 'move' | 'capture' | 'day' | 'today' | 'tags' | 'clearFilter' }
+      { type: 'move' | 'capture' | 'edit' | 'day' | 'today' | 'tags' | 'clearFilter' }
     >,
     id: string,
   ) => {
@@ -85,7 +87,11 @@ export function useTodayRows(
     else if (command?.type === 'today') days.onToday()
     else if (command?.type === 'tags') days.onTags()
     else if (command?.type === 'clearFilter') days.onClearFilter()
-    else if (command !== null && focusedId !== null) run(command, focusedId)
+    else if (command?.type === 'edit') {
+      if (focusedId !== null) onEdit?.(focusedId)
+      // Without a handler `e` does nothing, so the key is not consumed.
+      return onEdit !== undefined && focusedId !== null
+    } else if (command !== null && focusedId !== null) run(command, focusedId)
     return command !== null || next.state.pending !== keyState.pending
   }
   useKeyboardLayer(today !== undefined && !bar.open && sheetItem === undefined, handle)
@@ -129,6 +135,7 @@ export function useTodayRows(
       offToday: days.offToday,
       tags: days.hasTags,
       filterActive: days.filterActive,
+      edit: onEdit !== undefined,
     }),
   }
 }

@@ -31,8 +31,11 @@ interface Props {
   reminders: ReminderApi
   /** `/` or the phone's Search button: the app switches to All notes. */
   onOpenSearch?: () => void
-  /** A "Without a reminder" row (R19): the app opens the note view on that note. */
-  onOpenNote?: (id: string) => void
+  /**
+   * A "Without a reminder" row (R19) or `e` on a focused row: the app opens the note view on that
+   * note, in edit mode when `edit` is true.
+   */
+  onOpenNote?: (id: string, edit?: boolean) => void
   /** Injectable for tests; defaults to the browser's zone. */
   browserTimeZone?: () => string
 }
@@ -107,6 +110,7 @@ export function TodayContainer({
       // The page on screen is not the page of the key yet: no row action until it lands.
       blocked: isPlaceholderData,
     },
+    onOpenNote ? (id) => onOpenNote(id, true) : undefined,
     days,
   )
   // `/` works exactly when the key layer does (no bar, tag bar or sheet open), no snooze menu is
@@ -207,7 +211,7 @@ export function TodayContainer({
           mobile={mobile}
           onOpenCapture={openBar}
           onOpenSearch={onOpenSearch}
-          {...(onOpenNote ? { onOpenNote } : {})}
+          {...(onOpenNote ? { onOpenNote: (id: string) => onOpenNote(id) } : {})}
           sheet={sheet}
           loading={loading}
           nav={days}

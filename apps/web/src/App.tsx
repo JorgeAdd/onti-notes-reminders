@@ -75,7 +75,7 @@ export function App() {
   )
   const showToday = useCallback(() => setView(TODAY), [])
   const openNote = useCallback(
-    (noteId: string) => setView({ view: 'notes', noteId, edit: false }),
+    (noteId: string, edit = false) => setView({ view: 'notes', noteId, edit }),
     [],
   )
   const closeNote = useCallback(() => setView(NOTES), [])

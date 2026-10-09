@@ -95,6 +95,7 @@ export const messages = {
       done: 'x done',
       undo: 'z undo',
       snooze: 's snooze',
+      edit: 'e edit',
       hour: 'h +1 h',
       tomorrow: 't tomorrow',
       cancel: 'esc cancel',
