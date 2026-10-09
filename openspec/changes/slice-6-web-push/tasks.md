@@ -95,10 +95,10 @@ Global checks for every commit:
 
 ### Commit c7: `feat(db): backfill notified_due_at and claim due reminders` (~200)
 
-- [ ] 7.1 RED `[pg]`: `apps/api/test/postgres/push.pg.test.ts`: two overlapping claims over 20 due notes are disjoint and complete; SQL predicate equals `isNotificationDue` over a matrix; backfill marks only overdue open rows, leaves `due_at`, second run no-op; failure counting and drop.
-- [ ] 7.2 GREEN: `supabase/migrations/20261008180000_backfill_notified_due_at.sql` (decision 25) and `docs/db/schema.md` (backfill, claim, owner-role statements incl. the ADR-001 amendment, failure policy) in this commit (rule 19).
-- [ ] 7.3 GREEN: `infrastructure/db/postgres-reminder-claimer.ts`, `postgres-push-subscriptions.ts` (scheduler side), `database.ts` table type.
-- [ ] 7.4 Run once with `ONTI_TEST_DATABASE_URL` (paste output for the PR) and once unset (skipped). Append the `[pg]` evidence to the C2 row.
+- [x] 7.1 RED `[pg]`: `apps/api/test/postgres/push.pg.test.ts`: two overlapping claims over 20 due notes are disjoint and complete; SQL predicate equals `isNotificationDue` over a matrix; backfill marks only overdue open rows, leaves `due_at`, second run no-op; failure counting and drop.
+- [x] 7.2 GREEN: `supabase/migrations/20261008180000_backfill_notified_due_at.sql` (decision 25) and `docs/db/schema.md` (backfill, claim, owner-role statements incl. the ADR-001 amendment, failure policy) in this commit (rule 19).
+- [x] 7.3 GREEN: `infrastructure/db/postgres-reminder-claimer.ts`, `postgres-push-subscriptions.ts` (scheduler side), `database.ts` table type.
+- [x] 7.4 Run once with `ONTI_TEST_DATABASE_URL` (paste output for the PR) and once unset (skipped). Append the `[pg]` evidence to the C2 row.
 
 ### Commit c8: `feat(api): start the push scheduler when configured` (~50)
 
