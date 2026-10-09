@@ -2,6 +2,7 @@ import { notesListResponseSchema, tagNameFromSlug } from '@onti/shared'
 import { at, BEFORE_CAPTURE, N1 } from '@onti/shared/fixtures/jorge-week'
 import { describe, expect, it } from 'vitest'
 import { makeCaptureNote } from '../src/application/capture-note'
+import { makeDeleteNote } from '../src/application/delete-note'
 import { UnauthorizedError } from '../src/application/errors'
 import { makeGetMe } from '../src/application/get-me'
 import { makeGetNote } from '../src/application/get-note'
@@ -12,6 +13,7 @@ import { makeSearchNotes } from '../src/application/search-notes'
 import { makeSetTimezone } from '../src/application/set-timezone'
 import { makeSnoozeNote } from '../src/application/snooze-note'
 import { makeUndoDone } from '../src/application/undo-done'
+import { makeUpdateNote } from '../src/application/update-note'
 import { buildServer } from '../src/infrastructure/http/server'
 import { ANA, InMemoryNotes, JORGE, noteRecord, profileReturning } from './fakes'
 
@@ -59,6 +61,8 @@ function server(notes: NoteRepository = new InMemoryNotes(JORGE_NOTES)) {
       snoozeNote: makeSnoozeNote({ clock, notes, profiles }),
       markDone: makeMarkDone({ clock, notes }),
       undoDone: makeUndoDone({ notes }),
+      updateNote: makeUpdateNote({ clock, notes, profiles }),
+      deleteNote: makeDeleteNote({ notes }),
     },
     corsOrigins: ['https://app.example'],
     searchNotes: makeSearchNotes({ clock, notes, profiles }),

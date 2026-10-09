@@ -1,4 +1,5 @@
 import { makeCaptureNote } from './application/capture-note'
+import { makeDeleteNote } from './application/delete-note'
 import { makeGetMe } from './application/get-me'
 import { makeGetNote } from './application/get-note'
 import { makeGetToday } from './application/get-today'
@@ -7,6 +8,7 @@ import { makeSearchNotes } from './application/search-notes'
 import { makeSetTimezone } from './application/set-timezone'
 import { makeSnoozeNote } from './application/snooze-note'
 import { makeUndoDone } from './application/undo-done'
+import { makeUpdateNote } from './application/update-note'
 import { loadConfig } from './config'
 import { JwksTokenVerifier } from './infrastructure/auth/jwks-token-verifier'
 import { SystemClock } from './infrastructure/clock/system-clock'
@@ -31,6 +33,8 @@ const app = buildServer({
     snoozeNote: makeSnoozeNote({ clock, notes, profiles }),
     markDone: makeMarkDone({ clock, notes }),
     undoDone: makeUndoDone({ notes }),
+    updateNote: makeUpdateNote({ clock, notes, profiles }),
+    deleteNote: makeDeleteNote({ notes }),
   },
   corsOrigins: config.CORS_ORIGINS,
   logger: true,

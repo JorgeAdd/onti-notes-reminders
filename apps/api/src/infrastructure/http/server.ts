@@ -4,6 +4,7 @@ import {
   dayQuerySchema,
   meResponseSchema,
   noteDetailResponseSchema,
+  noteUpdateRequestSchema,
   noteResponseSchema,
   notesListResponseSchema,
   notesQuerySchema,
@@ -20,6 +21,7 @@ import {
   ValidationError,
 } from '../../application/errors'
 import type { CaptureNote } from '../../application/capture-note'
+import type { DeleteNote } from '../../application/delete-note'
 import type { GetMe } from '../../application/get-me'
 import type { GetNote } from '../../application/get-note'
 import type { GetToday } from '../../application/get-today'
@@ -29,6 +31,7 @@ import type { SearchNotes } from '../../application/search-notes'
 import type { SetTimezone } from '../../application/set-timezone'
 import type { SnoozeNote } from '../../application/snooze-note'
 import type { UndoDone } from '../../application/undo-done'
+import type { UpdateNote } from '../../application/update-note'
 import type { Identity } from '../../domain/identity'
 import type { NoteRecord } from '../../domain/note'
 
@@ -42,6 +45,8 @@ export interface ServerDeps {
     snoozeNote: SnoozeNote
     markDone: MarkDone
     undoDone: UndoDone
+    updateNote: UpdateNote
+    deleteNote: DeleteNote
   }
   corsOrigins: string[]
   logger?: boolean
@@ -174,6 +179,20 @@ export function buildServer({
     const identity = await authenticate(request)
     const id = noteIdOf(request.params)
     return z.encode(noteDetailResponseSchema, await getNote(identity, id))
+  })
+
+  app.patch('/notes/:id', async (request) => {
+    const identity = await authenticate(request)
+    const id = noteIdOf(request.params)
+    const body = noteUpdateRequestSchema.safeParse(request.body)
+    if (!body.success) throw new ValidationError('Invalid note update')
+    return z.encode(noteDetailResponseSchema, await actions.updateNote(identity, id, body.data))
+  })
+
+  app.delete('/notes/:id', async (request, reply) => {
+    const identity = await authenticate(request)
+    await actions.deleteNote(identity, noteIdOf(request.params))
+    return reply.code(204).send()
   })
 
   app.get('/today', async (request) => {

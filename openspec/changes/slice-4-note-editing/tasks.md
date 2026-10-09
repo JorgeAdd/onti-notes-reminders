@@ -109,9 +109,9 @@ Global checks for every commit:
 
 ### Commit 2.3 `feat(api): PATCH and DELETE /notes/:id` (2a)
 
-- [ ] 2.3.1 RED `note-write-route.test.ts`: 200, 400 cases, 404 (Ana, unknown, non-UUID), 401, DELETE 204 then 404, last write wins.
-- [ ] 2.3.2 GREEN routes, `main.ts` (Postgres `updateOwn`/`deleteOwn` and `postgres/note-update.pg.test.ts` landed in 2.2: the port change breaks typecheck otherwise).
-- [ ] 2.3.3 `docs/CONTRACT.md`: R20 from `todo` to proven with these test paths (rule 23).
+- [x] 2.3.1 RED `note-write-route.test.ts`: 200, 400 cases, 404 (Ana, unknown, non-UUID), 401, DELETE 204 then 404, last write wins.
+- [x] 2.3.2 GREEN routes, `main.ts` (Postgres `updateOwn`/`deleteOwn` and `postgres/note-update.pg.test.ts` landed in 2.2: the port change breaks typecheck otherwise).
+- [x] 2.3.3 `docs/CONTRACT.md`: R20 from `todo` to proven with these test paths (rule 23).
 
 ### Commit 2.4 `refactor(shared): readDue and parseTagList` (2b)
 
