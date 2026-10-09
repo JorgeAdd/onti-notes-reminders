@@ -19,6 +19,7 @@ import { PageHeader } from './PageHeader'
 import type { KeyHint } from './keys'
 import type { RowsState } from './rows'
 import { Statusline } from './Statusline'
+import { UndatedList } from './UndatedList'
 import { WhichKey } from './WhichKey'
 
 const noop = () => undefined
@@ -81,6 +82,8 @@ interface Props {
   onOpenCapture?: () => void
   /** `/` or the phone's Search button: leave for All notes. */
   onOpenSearch?: (() => void) | undefined
+  /** R19: a row of "Without a reminder" opens the note view on that note. */
+  onOpenNote?: (id: string) => void
   sheet?: SheetState | null
   /** D5 · set while the viewed day loads: the day to show instead of the previous page's. */
   loading?: { date: string; isToday: boolean; tag: string | null } | null
@@ -106,6 +109,7 @@ export function DayPage({
   mobile = false,
   onOpenCapture = noop,
   onOpenSearch,
+  onOpenNote = noop,
   sheet = null,
   loading = null,
   nav,
@@ -140,6 +144,14 @@ export function DayPage({
           onSignOut={onSignOut}
           showTheme
           nav={nav ? { ...nav, mobile } : undefined}
+          undated={
+            <UndatedList
+              undated={today.undated}
+              mobile={mobile}
+              onOpenNote={onOpenNote}
+              onOpenAll={onOpenSearch ?? noop}
+            />
+          }
         />
         <PageHeader title={loading ? messages.day.loading(dayText) : pageTitle(today)} />
         <main className={styles.main} aria-busy={loading ? 'true' : undefined}>

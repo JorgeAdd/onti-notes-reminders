@@ -147,7 +147,7 @@ describe('capture from the Today page', () => {
     expect(reminders.snooze).not.toHaveBeenCalled()
   })
 
-  it('a capture without a time is a plain note: no row, one more in "other notes" (Q1)', async () => {
+  it('a capture without a time is a plain note: no day row, it joins "Without a reminder" (C14)', async () => {
     const request = deferred<NoteResponse>()
     const { user } = setup(vi.fn(() => request.promise))
     const input = await openBar(user)
@@ -155,10 +155,78 @@ describe('capture from the Today page', () => {
 
     await user.type(input, `${CALL}{Enter}`)
 
-    expect(screen.queryByText(CALL)).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('listitem', { name: (name) => name.startsWith(CALL) }),
+    ).not.toBeInTheDocument()
     expect(footer()).toHaveTextContent(/16 notes/)
+    expect(
+      within(screen.getByRole('region', { name: messages.undated.header(10) })).getByText(CALL),
+    ).toBeInTheDocument()
     request.resolve(saved({ dueAt: null, originalDueAt: null, tags: [] }))
     await waitFor(() => expect(footer()).toHaveTextContent(/16 notes/))
+  })
+
+  it('C14: "Export format questions #client-b": new note first, 10, "+ 2 more", equal after settling', async () => {
+    const TITLE = 'Export format questions'
+    const request = deferred<NoteResponse>()
+    let confirmed: NoteResponse | null = null
+    const { user } = setup(
+      vi.fn(() => request.promise),
+      () => Promise.resolve(confirmed ? serverPageWith(confirmed) : c4Response()),
+    )
+    const input = await openBar(user)
+    expect(screen.getByRole('region', { name: messages.undated.header(9) })).toBeInTheDocument()
+
+    await user.type(input, `${TITLE} #client-b{Enter}`)
+
+    const pending = screen.getByRole('region', { name: messages.undated.header(10) })
+    const titles = () =>
+      within(pending)
+        .getAllByRole('listitem')
+        .map((row) => row.querySelector('button')?.firstElementChild?.textContent)
+    expect(titles()).toEqual([
+      TITLE,
+      '1:1 with manager: topics',
+      'API keys rotate every 90 days',
+      'Diego prefers async updates on Slack',
+      'Domain glossary',
+      'PR review checklist',
+      'Read: Postgres partial indexes',
+      'Review agenda: search, exports, roles',
+    ])
+    expect(within(pending).getByRole('button', { name: '+ 2 more' })).toBeInTheDocument()
+    expect(screen.getByText(messages.today.otherNotes(12))).toBeInTheDocument()
+
+    confirmed = saved({
+      title: TITLE,
+      dueAt: null,
+      originalDueAt: null,
+      tags: [{ name: 'Client B', slug: 'client-b' }],
+      createdAt: new Date('2026-10-07T15:05:30.000Z'),
+    })
+    request.resolve(confirmed)
+
+    await waitFor(() =>
+      expect(screen.getByRole('region', { name: messages.undated.header(10) })).toBeInTheDocument(),
+    )
+    expect(titles()[0]).toBe(TITLE)
+    expect(titles()).toHaveLength(8)
+    expect(within(pending).getByRole('button', { name: '+ 2 more' })).toBeInTheDocument()
+  })
+
+  it('a failed capture without a time rolls the list and the count back', async () => {
+    const request = deferred<NoteResponse>()
+    const { user } = setup(vi.fn(() => request.promise))
+    const input = await openBar(user)
+    await user.type(input, `Export format questions #client-b{Enter}`)
+    expect(screen.getByRole('region', { name: messages.undated.header(10) })).toBeInTheDocument()
+
+    request.reject(new ApiError(500, 'POST /notes'))
+
+    await barInput()
+    const region = screen.getByRole('region', { name: messages.undated.header(9) })
+    expect(within(region).queryByText('Export format questions')).not.toBeInTheDocument()
+    expect(within(region).getByRole('button', { name: '+ 1 more' })).toBeInTheDocument()
   })
 
   it('a failed capture removes the row and reopens the bar with the text and one line', async () => {

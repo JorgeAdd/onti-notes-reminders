@@ -85,9 +85,9 @@ Global checks for every commit:
 
 ### Commit 1.8 `feat(web): Without a reminder list and mobile link` (1c)
 
-- [ ] 1.8.1 RED `undated-list.test.tsx` (C13 rows, "+ 1 more", empty, row opens note, more opens All notes, mobile link, 44 px/focus CSS); `capture-flow.test.tsx` C14 and rollback.
-- [ ] 1.8.2 GREEN `features/today/UndatedList.tsx` + CSS, `DateColumn` slot and scroll, `DayPage`, `TodayContainer.onOpenNote`, `messages.undated`.
-- [ ] 1.8.3 `docs/CONTRACT.md`: R19, C13, C14 proven (rows and test paths); drop from "Still `todo`" (R20 stays). `docs/roadmap.md`, `docs/backlog.md`.
+- [x] 1.8.1 RED `undated-list.test.tsx` (C13 rows, "+ 1 more", empty, row opens note, more opens All notes, mobile link, 44 px/focus CSS); `capture-flow.test.tsx` C14 and rollback.
+- [x] 1.8.2 GREEN `features/today/UndatedList.tsx` + CSS, `DateColumn` slot and scroll, `DayPage`, `TodayContainer.onOpenNote`, `messages.undated`.
+- [x] 1.8.3 `docs/CONTRACT.md`: R19, C13, C14 proven (rows and test paths); drop from "Still `todo`" (R20 stays). `docs/roadmap.md`, `docs/backlog.md`.
 
 ### PR1 verify and smoke
 

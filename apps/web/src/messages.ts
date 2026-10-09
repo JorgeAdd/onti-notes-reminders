@@ -119,6 +119,12 @@ export const messages = {
   },
   /** Slice 8: the three-state theme override (SG18). */
   theme: { label: 'Theme', system: 'System', light: 'Light', dark: 'Dark' },
+  /** Slice 4: R19, the notes without a reminder (date column; a link on a phone). */
+  undated: {
+    header: (n: number) => `Without a reminder · ${n}`,
+    more: (n: number) => `+ ${n} more`,
+    mobile: (n: number) => `${n} without a reminder`,
+  },
   /** Slice 4: the note view inside All notes (SG20). */
   note: {
     loading: 'Opening your note…',

@@ -51,16 +51,6 @@ _Source: slice 5 verify report_
 375px statusline truncates the tag to `#c…` when the tag name is long. Cosmetic; measured in real-browser smoke. May resolve with future CSS refinements.
 _Source: slice 5 verify report_
 
-### Note markdown in excerpts
-
-Search excerpts include markdown markers (e.g. `**bold**`) until slice 4 (note editing) adds markdown rendering. Planned for future work.
-_Source: slice 5 verify report_
-
-### C11 `404` for another user's note (slice 4)
-
-CONTRACT C11's `404` half (another user's note by id) is still `todo`: `GET /notes/:id` does not exist yet. It ships with note editing in slice 4 (R15).
-_Source: slice 5 verify report_
-
 ## Deferred from Slice 8
 
 ### Theme sync across devices
@@ -84,11 +74,6 @@ The headless screenshots at 1280 and 375 px did not show the keyboard focus ring
 _Source: slice 8 archive report_
 
 ## Planned for Slice 4
-
-### "Without a reminder" list in the date column
-
-Notes with no reminder and not done, newest first, in the date column (desktop) or as a link (mobile), opening All notes. Defined by CONTRACT R19 (rows C13, C14); scope in `docs/roadmap.md`, Slice 4.
-_Source: product decision, 2026-10-08 (prompt `prompts/antes/21-slice-4-without-a-reminder.md`)_
 
 ### Deep link to a note (`?note=` URL state)
 

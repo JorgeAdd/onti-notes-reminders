@@ -79,9 +79,10 @@ note lifecycle.
   - Tokens only, copy in the messages module, 44 px targets, no internal
     IDs (CLAUDE.md rules 8, 11, 12, 13).
 - Ships as two PRs:
-  - Read side first: `createdAt` on notes, the R19 list, `GET /notes/:id`
-    with the C11 `404`, markdown (R14, C10) rendered lazily with
-    react-markdown + rehype-sanitize (ADR-002), and a read-only note view.
+  - Read side first (PR1, built, awaiting merge): `createdAt` on notes, the
+    R19 list, `GET /notes/:id` with the C11 `404`, markdown (R14, C10)
+    rendered lazily with react-markdown + rehype-sanitize (ADR-002), and a
+    read-only note view. Excerpts in All notes lose their markdown markers.
   - Then the write side: editing, reschedule and removal, delete.
 
 ## Slice 5 — All notes and search

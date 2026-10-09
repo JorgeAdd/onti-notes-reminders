@@ -114,6 +114,7 @@ export function App() {
       syncTimezone={syncTimezone}
       reminders={reminders}
       onOpenSearch={() => setView(NOTES)}
+      onOpenNote={openNote}
     />
   )
 }
