@@ -90,6 +90,15 @@ Every capture example MUST be run through the shared R11 parser and MUST yield w
 - THEN `17:00` is today 17:00; `today 08:00` is today 08:00 (late); `tomorrow 9:00` is tomorrow 09:00; `+30m` and `+2h` are now plus that, to the minute; `#client-a` is tag `client-a`; no time gives no reminder (R11)
 - AND at Wed 7 18:00, `17:00` is tomorrow 17:00 and `today 08:00` is still today 08:00 (late)
 
+### Requirement: v2 note
+
+The help MUST end with the plain-text note from `messages.ts` ("Customize keys and buttons — coming in v2"). It MUST NOT be a button, a link or any other control; the feature itself is planned for v2 (`docs/backlog.md`).
+
+#### Scenario: The note closes the help on both layouts
+
+- GIVEN help is open on desktop or at <= 640 px
+- THEN its last line is the v2 note, as text, with nothing to click
+
 ### Requirement: Dialog accessibility
 
 The container MUST have `role="dialog"`, `aria-modal="true"` and a title that labels it. Focus MUST move inside on open, stay trapped (Tab and Shift+Tab wrap), and return to the trigger on close. Every control MUST be >= 44 px with a visible focus ring.

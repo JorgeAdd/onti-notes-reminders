@@ -116,6 +116,8 @@ export const messages = {
     emptyHint: 'Press ? to see how it works',
     emptyHintTouch: 'Tap ? to see how it works',
     close: 'Close',
+    /** Closing note: the feature is planned for v2 (docs/backlog.md), nothing to click. */
+    comingInV2: 'Customize keys and buttons — coming in v2',
     sections: { capture: 'Capture', days: 'Days', note: 'On a note', find: 'Find' },
     /** Second line of a row, where the key alone is not enough. */
     detail: {

@@ -42,3 +42,10 @@
   font: var(--text-meta);
   color: var(--color-ink-muted);
 }
+
+/* A closing note, not a control: the feature ships in v2. */
+.soon {
+  margin: 0;
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+}

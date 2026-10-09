@@ -1,4 +1,5 @@
 import { useId } from 'react'
+import { messages } from '../../messages'
 import type { HelpSection } from './help-model'
 import styles from './HelpContent.module.css'
 
@@ -40,6 +41,7 @@ export function HelpContent({ sections }: { sections: HelpSection[] }) {
           )}
         </section>
       ))}
+      <p className={styles.soon}>{messages.help.comingInV2}</p>
     </div>
   )
 }

@@ -140,3 +140,16 @@ describe('help components · copy and ids [static]', () => {
     for (const source of files) expect(source).not.toMatch(/\bN\d{1,2}\b/)
   })
 })
+
+describe('HelpDialog · v2 note', () => {
+  it.each([false, true])(
+    'ends with the "coming in v2" note, plain text (narrow: %s)',
+    (isNarrow) => {
+      open(isNarrow)
+      const dialog = screen.getByRole('dialog', { name: messages.help.title })
+      const note = within(dialog).getByText(messages.help.comingInV2)
+      expect(note.closest('button, a')).toBeNull()
+      expect(within(note).queryByRole('button')).toBeNull()
+    },
+  )
+})
