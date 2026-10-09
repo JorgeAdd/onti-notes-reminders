@@ -133,6 +133,8 @@ Web only: no API, database or CONTRACT change.
   copy in `messages.ts`. A test fails if a command key handled in `keys.ts`
   (or the `/` and `#` layers) has no entry in the help, and another runs
   every capture example through the shared R11 parser.
+- A short, non-interactive note at the end of the help: "Customize keys and
+  buttons — coming in v2" (the feature itself is v2, in `docs/backlog.md`).
 - Accessibility: `role="dialog"`, `aria-modal`, a labelled title; focus moves
   in, is trapped, and returns to the trigger; `esc` and a 44 px close button
   close it; page keys don't fire while it is open.

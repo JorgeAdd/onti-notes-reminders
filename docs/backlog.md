@@ -117,6 +117,13 @@ _Source: slice 4 PR2 apply and verify_
 `e` on a Today row opens the note in edit mode; leaving it goes to the All notes list, not back to Today (the view state has no `from` field). A cheap follow-up if it feels wrong.
 _Source: slice 4 design, accepted UX costs_
 
+## Planned for v2
+
+### Customize keys and buttons
+
+Let users change the keyboard keys and the touch buttons. The slice 9 help already says it is coming in v2. Needs its own grilling: per-device or per-account storage, conflicts with the R11 capture grammar and the key layers, and how the help and the statusline hints follow the custom keys (they are built from `KeyHint` today).
+_Source: maintainer request, 2026-10-09 (slice 9 smoke)_
+
 ## Suggestions
 
 ### Bundle size optimization

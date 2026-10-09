@@ -592,6 +592,14 @@
       "sessions": 0,
       "memories": 1,
       "prompts": 0
+    },
+    {
+      "id": "7df88309",
+      "created_by": "jdd",
+      "created_at": "2026-10-09T17:42:12Z",
+      "sessions": 0,
+      "memories": 1,
+      "prompts": 0
     }
   ]
 }
