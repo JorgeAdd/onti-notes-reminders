@@ -1,6 +1,6 @@
 # CONTRACT — behavior rules
 
-This is the behavioral source of truth. The rules (R1–R19) are general and
+This is the behavioral source of truth. The rules (R1–R20) are general and
 apply to any user and any data. The matrix below proves them with the
 scenario in `docs/product/scenario-dataset.md` (Jorge, `America/Mexico_City`,
 Tue 6 – Thu 8 Oct 2026). Acceptance tests assert every row with an
@@ -47,8 +47,9 @@ timezone; `start(d)` is local midnight of day `d`.
   - Both: `snooze_count += 1`; `original_due_at` unchanged;
     `done_at` stays null. Shown as "{time} · was {original} · {count}×".
 - **R8 · Manual reschedule.** Setting a due time by hand sets `due_at` and
-  `original_due_at` to the new value and `snooze_count := 0`. Removing the
-  reminder clears all reminder fields.
+  `original_due_at` to the new value and `snooze_count := 0`. Rescheduling
+  a done note reopens it (`done_at := null`). Removing the reminder clears
+  all reminder fields.
 - **R9 · Done / undo.** Done: `done_at := now`. Done on an already-done
   note keeps the first `done_at`. Done on a note without a reminder is a
   conflict (an error, `409` over HTTP). Undo: `done_at := null`; undo on an
@@ -129,6 +130,15 @@ timezone; `start(d)` is local midnight of day `d`.
   without a time (R11) adds the note at the top; setting a reminder (R8,
   R11) takes it out, removing one (R8) puts it back. R5 is unchanged: it
   counts the notes not on the viewed page, a different set.
+
+- **R20 · Note editing and delete (slice 4, documented now).** Editing a
+  note changes its title (trimmed, 1–200 chars), its body (basic markdown,
+  R14; at most 20000 chars; may be empty) and its tags (`#slug` grammar as
+  in R11; display names derived from the slug; missing tags are created).
+  The last write wins. Editing never touches the reminder fields; those
+  follow R8. Delete is permanent: the note and its tag links are removed,
+  and a tag with no notes is no longer listed. Another user's note is `404`
+  (R15).
 
 ## Matrix — EVENT → STATE BEFORE → CHANGE → STATE AFTER
 
@@ -211,6 +221,15 @@ asserted where the feature lives:
 | R12 in All notes        | `packages/shared/test/notes-list.test.ts` (`tag` is a slug), `apps/api/test/search-notes.test.ts` (tag alone, with a term, before the 50 cap, unknown and other users' tags give an empty list), `search-route.test.ts` (`GET /notes?q=&tag=`, 400 for a malformed or repeated tag), `postgres/search.pg.test.ts` (SQL `exists`, 5 tagged notes among 55 newer ones, Ana's same-slug tag). `apps/web/test/notes-container.test.tsx` and `notes-view.test.tsx`: `#` bar, tag applied, statusline `· #slug`, two-step `esc`, phone Tags button and Clear chip. |
 | C11 (listing and `401`) | `apps/api/test/search-route.test.ts`: no token and a forged token give `401`; Ana lists 0 of Jorge's notes. `search-notes.test.ts` and `search.pg.test.ts`: Ana's search never sees his notes (explicit `user_id` plus RLS).                                                                                                                                                                                                                                                                                                                                 |
 
+Slice 4 (note view and editing) adds its proof in the read-side PR, row by row
+as the tests land:
+
+| Rows          | Proven by                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C11 (`404`)   | `apps/api/test/get-note.test.ts` and `note-route.test.ts`: Ana asking for Jorge's N1 gets `404` with no hint it exists (same answer as an unknown or non-UUID id); no token and a forged token give `401`. `postgres/note-detail.pg.test.ts` (real Postgres, not in CI): `findOwn` is null for another user's note (explicit `user_id` plus RLS).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| C10, R14      | `apps/web/test/markdown-body.test.tsx`: three layers. (a) `<img src=x onerror=alert(1)>` shows as literal text, no element, no handler, no `alert`; (b) a hostile table (`javascript:` in any case, `data:`, `vbscript:`, `ftp:`, `irc:`, relative, `//host`, `<script>`, `<iframe>`, `<svg onload>`, raw anchors, entities, reference links, image syntax) creates no forbidden element or `on*` attribute, and every anchor is http, https or mailto with `rel="noopener noreferrer"`; (c) the sanitizer alone strips `<img>` and a `javascript:` href from a hast tree. `note-body-failure.test.tsx`: plain text when the chunk fails. `bundle-split.test.ts`: only the lazy `MarkdownBody` imports the libraries.                                                                                                                                                                                                                                                                 |
+| R19, C13, C14 | `packages/shared/test/undated.test.ts`: `selectUndated` gives 9 notes and the 8 rows of C13 in order (newest first, ties by title in UTF-16 code units, then id), done and dated notes excluded; `insertUndated` is C14 (new note first, 10, 8 rows). `packages/shared/test/today-patch.test.ts` and `apps/api/test/day-parity.test.ts`: the optimistic page equals the next `GET /today`, for any viewed day and tag, with a temp row settled by `replacesId`. `apps/api/test/today.test.ts`: C13 (9, still 11 other notes), C14 (10, 12 other, "4 things today"), the same set for any `date` and `tag`, Ana never sees Jorge's. `apps/web/test/undated-list.test.tsx`: header "Without a reminder · 9", the C13 rows, "+ 1 more", nothing at zero, a row opens the note, "+ 1 more" and the phone link "9 without a reminder" open All notes, 44 px and focus ring. `apps/web/test/capture-flow.test.tsx`: C14 in the UI (pending row first, 10, "+ 2 more", rollback on failure). |
+
 Slice 6 (Web Push) adds the notification proof. The `it.todo` markers stay in
 `packages/shared/test/contract.test.ts`; the rows are asserted where the feature
 lives:
@@ -221,10 +240,8 @@ lives:
 | C5 (re-arm) | `apps/api/test/dispatch-due.test.ts`: N2 notified for 10:05 and snoozed to 11:05 sends nothing at 11:04 and one push at 11:05.                                                                                                                                                                                                                                                                                                                                                                                    |
 | C7          | `apps/api/test/dispatch-due.test.ts`: N4 due 09:30 with no subscription is marked as notified, and nothing is sent (the item staying on Today is the slice 1 proof above).                                                                                                                                                                                                                                                                                                                                        |
 
-Still `todo`: C10 (markdown rendering, web), the `404` half of C11
-(`GET /notes/{id}` for another user's note, API; slice 4 owns note detail),
-R19 with C13 and C14 (the "Without a reminder" list; slice 4 adds the
-rule and its tests together, CLAUDE.md rule 23), and C15 ("+1 h" from a
-notification; slice 6 adds its tests, CLAUDE.md rule 23).
+Still `todo`: R20 (note editing and permanent delete; the slice 4 write-side
+PR adds its tests, CLAUDE.md rule 23) and C15 ("+1 h" from a notification;
+slice 6 adds its tests, CLAUDE.md rule 23).
 C11's `401` part is also covered in `apps/api/test/server.test.ts`; RLS
 isolation was verified with SQL on the migration (see `docs/db/schema.md`).

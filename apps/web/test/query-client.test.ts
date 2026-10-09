@@ -11,6 +11,11 @@ it('never retries a 400: the viewed day or tag was refused, retrying cannot fix 
   expect(shouldRetry(0, new ApiError(503, 'GET /today'))).toBe(true)
 })
 
+it('never retries a 404: the note is gone or not the caller, retrying only delays the answer', () => {
+  expect(shouldRetry(0, new ApiError(404, 'GET /notes/x'))).toBe(false)
+  expect(shouldRetry(0, new ApiError(500, 'GET /notes/x'))).toBe(true)
+})
+
 it('retries other failures a couple of times, then gives up', () => {
   expect(shouldRetry(0, new Error('boom'))).toBe(true)
   expect(shouldRetry(1, new Error('boom'))).toBe(true)

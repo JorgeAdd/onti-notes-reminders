@@ -31,6 +31,8 @@ interface Props {
   reminders: ReminderApi
   /** `/` or the phone's Search button: the app switches to All notes. */
   onOpenSearch?: () => void
+  /** A "Without a reminder" row (R19): the app opens the note view on that note. */
+  onOpenNote?: (id: string) => void
   /** Injectable for tests; defaults to the browser's zone. */
   browserTimeZone?: () => string
 }
@@ -47,6 +49,7 @@ export function TodayContainer({
   syncTimezone,
   reminders,
   onOpenSearch,
+  onOpenNote,
   browserTimeZone = readBrowserTimeZone,
 }: Props) {
   const queryClient = useQueryClient()
@@ -204,6 +207,7 @@ export function TodayContainer({
           mobile={mobile}
           onOpenCapture={openBar}
           onOpenSearch={onOpenSearch}
+          {...(onOpenNote ? { onOpenNote } : {})}
           sheet={sheet}
           loading={loading}
           nav={days}

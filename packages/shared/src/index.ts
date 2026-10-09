@@ -8,9 +8,14 @@ export {
 export { instant } from './instant'
 export {
   captureRequestSchema,
+  NOTE_LIMITS,
+  noteDetailResponseSchema,
+  noteDetailSchema,
   noteResponseSchema,
   snoozeRequestSchema,
   type CaptureRequest,
+  type NoteDetail,
+  type NoteDetailResponse,
   type NoteResponse,
   type SnoozePreset,
   type SnoozeRequest,
@@ -36,9 +41,11 @@ export * from './domain/capture'
 export * from './domain/day-page'
 export * from './domain/duration'
 export * from './domain/other-notes'
+export * from './domain/plain-text'
 export * from './domain/reminder'
 export * from './domain/tag'
 export * from './domain/time'
+export * from './domain/undated'
 export { CAPTURE_LIMITS, isValidTimeZone } from './timezone'
 export {
   noteListItemSchema,

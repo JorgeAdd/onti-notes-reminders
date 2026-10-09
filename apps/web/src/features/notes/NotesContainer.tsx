@@ -1,8 +1,9 @@
-import { summarizeTags, type NotesListResponse } from '@onti/shared'
+import { summarizeTags, type NoteDetailResponse, type NotesListResponse } from '@onti/shared'
 import { useQuery } from '@tanstack/react-query'
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { UnauthorizedError } from '../../lib/api'
 import { skewOf } from '../../lib/clock'
+import { NoteContainer } from '../note/NoteContainer'
 import { useKeyboardLayer } from '../today/use-keyboard-layer'
 import { useNarrow } from '../today/use-narrow'
 import { useNow } from '../today/use-now'
@@ -25,6 +26,13 @@ interface Props {
   onSessionExpired: () => void
   onBack: () => void
   onSignOut: () => void
+  /** The open note (the note view replaces the list; term and tag stay), or `null`. */
+  noteId: string | null
+  /** GET /notes/:id bound to the session token. */
+  loadNote: (id: string) => Promise<NoteDetailResponse>
+  onOpenNote: (id: string) => void
+  /** Closes the note view back to the list as it was left. */
+  onCloseNote: () => void
 }
 
 /** The last answer that arrived, with the term it belongs to and when it arrived. */
@@ -40,7 +48,16 @@ interface Shown {
  * query (so a late answer for an older term never replaces the current one) and the last good
  * list, which stays on screen while the next one loads or fails.
  */
-export function NotesContainer({ load, onSessionExpired, onBack, onSignOut }: Props) {
+export function NotesContainer({
+  load,
+  onSessionExpired,
+  onBack,
+  onSignOut,
+  noteId,
+  loadNote,
+  onOpenNote,
+  onCloseNote,
+}: Props) {
   const [text, setText] = useState('')
   const [inputFocused, setInputFocused] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -70,11 +87,14 @@ export function NotesContainer({ load, onSessionExpired, onBack, onSignOut }: Pr
   }
   const now = useNow(shown ? skewOf(shown.data.now, shown.receivedAt) : 0)
 
+  // While a note is open the note view owns `esc` and the list's keys are off.
+  const listKeys = noteId === null
   // `esc` leaves from anywhere (Q6), but not while an IME composes; with a tag active the first
   // `esc` clears it and closes the bar instead (Decision 15). `#` opens the tag bar, even from the
   // input: search ignores punctuation, so no searchable character is lost. `/` outside the input
   // comes back to it. No other key does anything here (rows are read-only).
   useEffect(() => {
+    if (!listKeys) return
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.isComposing || event.defaultPrevented) return
       if (event.key === 'Escape') {
@@ -87,14 +107,28 @@ export function NotesContainer({ load, onSessionExpired, onBack, onSignOut }: Pr
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [onBack, tag, canTag])
+  }, [onBack, tag, canTag, listKeys])
   // Like Today, `/` is off while the tag bar is open.
-  useKeyboardLayer(!tagBarOpen, (key) => (key === '/' ? (inputRef.current?.focus(), true) : false))
+  useKeyboardLayer(listKeys && !tagBarOpen, (key) =>
+    key === '/' ? (inputRef.current?.focus(), true) : false,
+  )
 
   const expired = query.error instanceof UnauthorizedError
   useEffect(() => {
     if (expired) onSessionExpired()
   }, [expired, onSessionExpired])
+
+  if (noteId !== null) {
+    return (
+      <NoteContainer
+        id={noteId}
+        load={loadNote}
+        onClose={onCloseNote}
+        onSessionExpired={onSessionExpired}
+        onSignOut={onSignOut}
+      />
+    )
+  }
 
   if (shown === null) {
     if (expired) return null
@@ -111,7 +145,7 @@ export function NotesContainer({ load, onSessionExpired, onBack, onSignOut }: Pr
   const results = query.isError ? (
     <NotesStatus kind="error" onRetry={() => void query.refetch()} />
   ) : data.notes.length > 0 ? (
-    <NoteList notes={data.notes} now={now} timezone={data.timezone} />
+    <NoteList notes={data.notes} now={now} timezone={data.timezone} onOpen={onOpenNote} />
   ) : data.total === 0 ? (
     <NotesStatus kind="empty" />
   ) : (

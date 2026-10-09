@@ -66,8 +66,11 @@ function describeFailure(error: unknown, action: Action['type'], title: string |
   return messages.errors.actionFailed(action, title)
 }
 
-/** The optimistic page change for an action; a capture inserts a row under its temporary id. */
-function change(action: Action): ReminderChange {
+/**
+ * The optimistic page change for an action; a capture inserts a row under its temporary id, created
+ * "now" on the display clock (the settle swaps in the server's value).
+ */
+function change(action: Action, now: Date): ReminderChange {
   if (action.type !== 'capture') return action
   const { title, tags, dueAt } = action.submit.capture
   return {
@@ -80,6 +83,7 @@ function change(action: Action): ReminderChange {
       originalDueAt: dueAt,
       snoozeCount: 0,
       doneAt: null,
+      createdAt: now,
     },
   }
 }
@@ -126,7 +130,7 @@ export function useReminderActions({ api, now, view, onSessionExpired, onCapture
         await queryClient.cancelQueries({ queryKey: key })
         previous = queryClient.getQueryData<TodayResponse>(key)
         if (previous)
-          queryClient.setQueryData(key, applyReminderChange(previous, change(action), now))
+          queryClient.setQueryData(key, applyReminderChange(previous, change(action, now), now))
         // A cached neighbour day would show the old position of the item for a moment.
         queryClient.removeQueries({ queryKey: DAY_KEYS, type: 'inactive' })
       }

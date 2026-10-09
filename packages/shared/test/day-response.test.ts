@@ -4,6 +4,7 @@ import {
   buildDayResponse,
   filterByTag,
   markDone,
+  NO_UNDATED,
   summarizeTags,
   tagNameFromSlug,
   todayResponseSchema,
@@ -32,6 +33,7 @@ describe('buildDayResponse · unfiltered', () => {
 
   it('today: the slice 1-2 page, with the new fields at their neutral values', () => {
     const response = buildDayResponse({
+      undated: NO_UNDATED,
       notes: withUuid,
       now: at('2026-10-07 09:05'),
       timezone: TZ,
@@ -63,6 +65,7 @@ describe('buildDayResponse · unfiltered', () => {
 
   it('another day: window is the viewed day, no carried, other count is total minus rail (R18, R5)', () => {
     const response = buildDayResponse({
+      undated: NO_UNDATED,
       notes: withUuid,
       now: NOW,
       timezone: TZ,
@@ -82,6 +85,7 @@ describe('buildDayResponse · unfiltered', () => {
 
   it('todayWindow(now).end stays the rollover instant, independent of the viewed day', () => {
     const response = buildDayResponse({
+      undated: NO_UNDATED,
       notes: withUuid,
       now: NOW,
       timezone: TZ,
@@ -96,6 +100,7 @@ describe('buildDayResponse · unfiltered', () => {
 
   it('the response round-trips the wire schema', () => {
     const response = buildDayResponse({
+      undated: NO_UNDATED,
       notes: withUuid,
       now: NOW,
       timezone: TZ,
@@ -112,6 +117,7 @@ describe('buildDayResponse · C8 filtered (Thu 8 14:30, #client-b)', () => {
   const { matching, hiddenCount } = filterByTag(withUuid, 'client-b')
   const build = (date?: string): TodayResponse =>
     buildDayResponse({
+      undated: NO_UNDATED,
       notes: matching,
       now: NOW,
       timezone: TZ,
@@ -166,6 +172,7 @@ describe('buildDayResponse · C8 filtered (Thu 8 14:30, #client-b)', () => {
   it('carried items are filtered too (client-a on Wed 7 09:05 carries one)', () => {
     const a = filterByTag(withUuid, 'client-a')
     const response = buildDayResponse({
+      undated: NO_UNDATED,
       notes: a.matching,
       now: at('2026-10-07 09:05'),
       timezone: TZ,
@@ -182,6 +189,7 @@ describe('buildDayResponse · C8 filtered (Thu 8 14:30, #client-b)', () => {
 
   it('an empty filtered page: zero notes, everything hidden', () => {
     const response = buildDayResponse({
+      undated: NO_UNDATED,
       notes: [],
       now: NOW,
       timezone: TZ,

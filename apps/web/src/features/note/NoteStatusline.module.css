@@ -1,0 +1,15 @@
+.bar {
+  composes: bar from '../today/Statusline.module.css';
+}
+
+.mode {
+  composes: mode from '../today/Statusline.module.css';
+}
+
+.hints {
+  composes: hints from '../today/Statusline.module.css';
+}
+
+.clock {
+  composes: clock from '../today/Statusline.module.css';
+}
