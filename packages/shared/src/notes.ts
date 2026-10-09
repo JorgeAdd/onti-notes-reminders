@@ -4,6 +4,9 @@ import { truncateToMinute } from './domain/time'
 import { instant } from './instant'
 import { CAPTURE_LIMITS } from './timezone'
 
+/** R20: the longest body, in UTF-16 code units (the unit `z.string().max()` counts). */
+export const NOTE_LIMITS = { bodyMax: 20000 } as const
+
 /** A note as the write endpoints answer: full reminder state, no body. `null` dates = plain note. */
 export const noteResponseSchema = z.object({
   id: z.uuid(),
@@ -13,9 +16,26 @@ export const noteResponseSchema = z.object({
   originalDueAt: instant.nullable(),
   snoozeCount: z.number().int().nonnegative(),
   doneAt: instant.nullable(),
+  /** Required: the optimistic undated list (R19) orders by it, so a forgotten select must fail. */
+  createdAt: instant,
 })
 
 export type NoteResponse = z.output<typeof noteResponseSchema>
+
+/** One note with its body, as GET /notes/:id answers (R20 limits the body to `bodyMax`). */
+export const noteDetailSchema = noteResponseSchema.extend({
+  body: z.string().max(NOTE_LIMITS.bodyMax),
+})
+
+/** GET /notes/:id: `now` and `timezone` let the view format due times without a second call. */
+export const noteDetailResponseSchema = z.object({
+  now: instant,
+  timezone: z.string().min(1),
+  note: noteDetailSchema,
+})
+
+export type NoteDetail = z.output<typeof noteDetailSchema>
+export type NoteDetailResponse = z.output<typeof noteDetailResponseSchema>
 
 /** POST /notes/:id/snooze (R7): presets only, the client never sends a time. */
 export const snoozeRequestSchema = z.object({ preset: z.enum(['hour', 'tomorrow']) })

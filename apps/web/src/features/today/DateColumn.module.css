@@ -5,6 +5,8 @@
   display: grid;
   align-content: start;
   gap: var(--space-xs);
+  /* Header, 8 undated rows and Sign out can pass a short viewport. */
+  overflow-y: auto;
 }
 
 .block {

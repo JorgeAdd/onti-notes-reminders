@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   ApiError,
   captureNote,
+  fetchNote,
   fetchToday,
   markNoteDone,
   patchTimezone,
@@ -27,6 +28,7 @@ const body = {
   tags: [{ slug: 'client-a', name: 'Client A' }],
   hiddenCount: 0,
   others: [],
+  undated: { count: 0, items: [] },
   carried: [],
   rail: [
     {
@@ -176,6 +178,7 @@ describe('post and the reminder calls (Decision 10)', () => {
     originalDueAt: '2026-10-07T15:30:00.000Z',
     snoozeCount: 1,
     doneAt: null,
+    createdAt: '2026-10-01T16:00:00.000Z',
   }
 
   it('post sends no Content-Type without a body', async () => {
@@ -238,6 +241,7 @@ describe('captureNote (R11)', () => {
     originalDueAt: '2026-10-06T23:00:00.000Z',
     snoozeCount: 0,
     doneAt: null,
+    createdAt: '2026-10-06T22:00:00.000Z',
   }
 
   it('POSTs the structured payload with slugs and an ISO instant, and decodes the note', async () => {
@@ -336,5 +340,49 @@ describe('searchNotes', () => {
   it('rejects a body that breaks the shared schema (a 51st note, a long excerpt)', async () => {
     respond(200, { ...list, notes: [{ ...list.notes[0]!, excerpt: 'x'.repeat(121) }] })
     await expect(searchNotes('t', '')).rejects.toThrow()
+  })
+})
+
+describe('fetchNote (C11)', () => {
+  const detail = {
+    now: '2026-10-07T15:05:00.000Z',
+    timezone: 'America/Mexico_City',
+    note: {
+      id: ID,
+      title: 'Ask Luis',
+      tags: [{ name: 'Client A', slug: 'client-a' }],
+      dueAt: '2026-10-07T23:00:00.000Z',
+      originalDueAt: '2026-10-07T23:00:00.000Z',
+      snoozeCount: 0,
+      doneAt: null,
+      createdAt: '2026-10-01T16:00:00.000Z',
+      body: 'Ana needs **admin** access',
+    },
+  }
+
+  it('calls GET /notes/:id with the bearer token and decodes the body and the instants', async () => {
+    const fetchMock = respond(200, detail)
+    const result = await fetchNote('token-1', ID)
+
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect((url as URL).href).toBe(`http://localhost:3000/notes/${ID}`)
+    expect(init?.method).toBe('GET')
+    expect(init?.headers).toEqual({ Authorization: 'Bearer token-1' })
+    expect(result.note.body).toBe('Ana needs **admin** access')
+    expect(result.note.createdAt).toEqual(new Date('2026-10-01T16:00:00.000Z'))
+    expect(result.now).toBeInstanceOf(Date)
+    expect(result.timezone).toBe('America/Mexico_City')
+  })
+
+  it('maps 404 to ApiError and 401 to UnauthorizedError', async () => {
+    respond(404)
+    await expect(fetchNote('t', ID)).rejects.toMatchObject({ status: 404 })
+    respond(401)
+    await expect(fetchNote('t', ID)).rejects.toBeInstanceOf(UnauthorizedError)
+  })
+
+  it('rejects an answer without the creation time (a stale API)', async () => {
+    respond(200, { ...detail, note: { ...detail.note, createdAt: undefined } })
+    await expect(fetchNote('t', ID)).rejects.toThrow()
   })
 })

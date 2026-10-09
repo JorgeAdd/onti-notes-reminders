@@ -8,6 +8,7 @@ import { at, BEFORE_CAPTURE, N1 } from '@onti/shared/fixtures/jorge-week'
 import { describe, expect, it } from 'vitest'
 import { UnauthorizedError } from '../src/application/errors'
 import { makeGetMe } from '../src/application/get-me'
+import { makeGetNote } from '../src/application/get-note'
 import { makeGetToday } from '../src/application/get-today'
 import { makeCaptureNote } from '../src/application/capture-note'
 import { makeMarkDone } from '../src/application/mark-done'
@@ -48,6 +49,7 @@ const JORGE_NOTES: NoteRecord[] = [
   snoozeCount: n.snoozeCount,
   doneAt: n.doneAt,
   notifiedDueAt: n.notifiedDueAt,
+  createdAt: n.createdAt,
 }))
 
 /** Owner-scoped, like RLS; fresh per server so writes never leak between tests. */
@@ -59,6 +61,7 @@ const failingNotes: NoteRepository = {
   listOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
   mutateReminder: () => Promise.reject(new Error('connection refused: postgres://secret')),
   searchOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
+  findOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
 }
 
 /** N1 (index 0) is done; N2 (index 1) is the late open item due Tue 18:00. */
@@ -91,6 +94,7 @@ function server(
     },
     corsOrigins: ['https://app.example'],
     searchNotes: makeSearchNotes({ clock, notes: noteRepository, profiles }),
+    getNote: makeGetNote({ clock, notes: noteRepository, profiles }),
   })
 }
 

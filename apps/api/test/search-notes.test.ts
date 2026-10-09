@@ -96,6 +96,20 @@ describe('searchNotes (C9)', () => {
   })
 })
 
+describe('searchNotes raw body (R13)', () => {
+  it('finds a word inside markdown markers by its prefix, and shows it without them', async () => {
+    const marked = {
+      ownerId: JORGE.userId,
+      body: 'Deploy **staging** today',
+      createdAt: new Date(Date.UTC(2026, 9, 7)),
+      note: noteRecord(700, { title: 'Release chores' }),
+    }
+    const { notes } = await searcher([marked]).search(JORGE, 'stag')
+    expect(notes.map((n) => n.title)).toEqual(['Release chores'])
+    expect(notes[0]!.excerpt).toBe('Deploy staging today')
+  })
+})
+
 describe('searchNotes listing', () => {
   it('returns every note newest first when q is missing, empty, blank or punctuation', async () => {
     for (const q of [undefined, '', '   ', '???']) {
@@ -138,7 +152,8 @@ describe('searchNotes listing', () => {
         excerpt: excerptOf(N1_BODY),
       },
     ])
-    expect(notes[0]!.excerpt).toContain('**admin**')
+    expect(notes[0]!.excerpt).toContain('Ana needs to move admin permissions')
+    expect(notes[0]!.excerpt).not.toMatch(/[*_`]/u)
   })
 
   it('gives an empty excerpt for a note without a body', async () => {

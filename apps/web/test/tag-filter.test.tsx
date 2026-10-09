@@ -182,7 +182,7 @@ it('0 notes: a filter with nothing left shows the header, all hidden, calm copy,
     await screen.findByRole('heading', { level: 1, name: messages.filter.header(0) }),
   ).toBeVisible()
   expect(screen.getByRole('main')).toHaveTextContent(messages.today.noNotes)
-  expect(screen.queryAllByRole('listitem')).toHaveLength(0)
+  expect(within(screen.getByRole('main')).queryAllByRole('listitem')).toHaveLength(0)
   expect(screen.getByRole('complementary')).toHaveTextContent(messages.filter.hidden(15))
 
   await user.keyboard('{Escape}')

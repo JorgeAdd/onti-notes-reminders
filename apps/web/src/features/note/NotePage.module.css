@@ -1,0 +1,68 @@
+.desk {
+  composes: desk from '../notes/NotesPage.module.css';
+}
+
+.page {
+  composes: page from '../notes/NotesPage.module.css';
+}
+
+.main {
+  composes: main from '../notes/NotesPage.module.css';
+}
+
+.dock {
+  composes: dock from '../notes/NotesPage.module.css';
+}
+
+.header {
+  composes: header from '../notes/NotesPage.module.css';
+}
+
+.title {
+  composes: title from '../notes/NotesPage.module.css';
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.title:focus-visible {
+  outline: var(--focus-ring);
+}
+
+/* SG12: done is an ink strike, never a colour. */
+.done {
+  text-decoration-line: line-through;
+  text-decoration-color: var(--color-ink);
+  color: var(--color-ink-muted);
+}
+
+.back {
+  composes: back from '../notes/NotesPage.module.css';
+}
+
+.back:focus-visible {
+  outline: var(--focus-ring);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-lg);
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+}
+
+.meta > span + span::before {
+  content: '·';
+  margin-right: var(--space-sm);
+}
+
+/* Read by assistive technology only: the strike is the sighted cue. */
+.hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

@@ -1,4 +1,4 @@
-import { buildDayResponse, summarizeTags, type DayNote, type TodayResponse } from '@onti/shared'
+import { buildDayResponse, selectUndated, summarizeTags, type TodayResponse } from '@onti/shared'
 import { at, BEFORE_CAPTURE, N1, TZ, type FixtureNote } from '@onti/shared/fixtures/jorge-week'
 
 /** Wire ids are UUIDs; the fixture's N# ids stay in the dataset and never reach the UI. */
@@ -7,7 +7,7 @@ const uuid = (index: number) => `00000000-0000-4000-8000-${String(index).padStar
 /** C4 stands after Moment 1: N1 exists and was done on Tue 17:00, so it is one of the 11 others. */
 const NOTES: FixtureNote[] = [{ ...N1, doneAt: at('2026-10-06 17:00') }, ...BEFORE_CAPTURE]
 
-const WIRE_NOTES = (): DayNote[] =>
+const WIRE_NOTES = () =>
   NOTES.map((note, index) => ({
     ...note,
     id: uuid(index + 1),
@@ -19,7 +19,7 @@ const WIRE_NOTES = (): DayNote[] =>
  * views another day of the same week.
  */
 export function c4Response(date?: string): TodayResponse {
-  const notes: DayNote[] = NOTES.map((note, index) => ({
+  const notes = NOTES.map((note, index) => ({
     ...note,
     id: uuid(index + 1),
     tags: note.tags.map((tag) => ({ name: tag, slug: tag })),
@@ -32,6 +32,7 @@ export function c4Response(date?: string): TodayResponse {
     tag: null,
     hiddenCount: 0,
     tags: summarizeTags(notes),
+    undated: selectUndated(notes),
   })
 }
 
@@ -46,5 +47,6 @@ export function c8Response(): TodayResponse {
     tag: 'client-b',
     hiddenCount: all.length - matching.length,
     tags: summarizeTags(all),
+    undated: selectUndated(all),
   })
 }

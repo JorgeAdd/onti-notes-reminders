@@ -9,6 +9,7 @@ import {
   buildDayResponse,
   filterByTag,
   markDone,
+  selectUndated,
   snoozeOneHour,
   snoozeTomorrow,
   summarizeTags,
@@ -45,6 +46,7 @@ function respond(notes: FixtureNote[], view: View = TODAY, now = NOW): TodayResp
     tag: view.tag,
     hiddenCount,
     tags: summarizeTags(own),
+    undated: selectUndated(own),
   })
 }
 
@@ -77,6 +79,7 @@ const toResponse = (note: FixtureNote): NoteResponse => ({
   originalDueAt: note.originalDueAt,
   snoozeCount: note.snoozeCount,
   doneAt: note.doneAt,
+  createdAt: note.createdAt,
 })
 
 /** What the server does to the full list for one change. */
@@ -392,5 +395,95 @@ describe('applyReminderChange · tags', () => {
   it('a change that adds no tag leaves tags untouched', () => {
     const before = respond(WEEK)
     expect(applyReminderChange(before, { type: 'done', id: 'N4' }, NOW).tags).toEqual(before.tags)
+  })
+})
+
+describe('applyReminderChange · undated parity (R19, C14)', () => {
+  const idea = (id = 'NX', title = 'Export format questions', tag = 'client-b') =>
+    fixtureNote(id, title, null, tag)
+  const insert = (page: TodayResponse, note: FixtureNote, replacesId?: string) =>
+    applyReminderChange(
+      page,
+      { type: 'insert', note: toResponse(note), ...(replacesId ? { replacesId } : {}) },
+      NOW,
+    )
+
+  it('C14: a capture without a time goes first, 9 becomes 10 and 8 rows stay', () => {
+    const before = respond(BEFORE_CAPTURE)
+    expect(before.undated.count).toBe(9)
+    const created = idea()
+    const patched = insert(before, created)
+    expect(patched.undated.count).toBe(10)
+    expect(patched.undated.items).toHaveLength(8)
+    expect(patched.undated.items[0]!.title).toBe('Export format questions')
+    expect(patched).toEqual(respond([...BEFORE_CAPTURE, created]))
+  })
+
+  it('on a smaller world the count and the rows grow together', () => {
+    const small = BEFORE_CAPTURE.filter((n) => ['N2', 'N3', 'N7', 'N8', 'N9'].includes(n.id))
+    const before = respond(small)
+    expect(before.undated.count).toBe(3)
+    const created = idea()
+    const patched = insert(before, created)
+    expect(patched.undated).toMatchObject({ count: 4 })
+    expect(patched.undated.items).toHaveLength(4)
+    expect(patched).toEqual(respond([...small, created]))
+  })
+
+  it('a capture with a time leaves the undated block alone', () => {
+    const before = respond(BEFORE_CAPTURE)
+    const created = fixtureNote('NX', 'Call back', '2026-10-07 17:00')
+    const patched = insert(before, created)
+    expect(patched.undated).toEqual(before.undated)
+    expect(patched).toEqual(respond([...BEFORE_CAPTURE, created]))
+  })
+
+  it.each([
+    ['another day', { date: '2026-10-09', tag: null }],
+    ['a tag it carries', { date: null, tag: 'client-b' }],
+    ['a tag it does not carry', { date: null, tag: 'client-a' }],
+    ['a day and a tag', { date: '2026-10-09', tag: 'client-a' }],
+  ])('joins the list whatever is viewed: %s', (_name, view) => {
+    const created = idea()
+    const patched = insert(respond(WEEK, view), created)
+    expect(patched.undated.count).toBe(respond(WEEK, view).undated.count + 1)
+    expect(patched.undated.items[0]!.title).toBe('Export format questions')
+    expect(patched).toEqual(respond([...WEEK, created], view))
+  })
+
+  it('settling with replacesId swaps the temp row for the server note, count unchanged', () => {
+    const real = idea()
+    const temp = { ...real, id: 'temp-1' }
+    const pending = insert(respond(BEFORE_CAPTURE), temp)
+    expect(pending.undated.items[0]!.id).toBe('temp-1')
+    const settled = insert(pending, real, 'temp-1')
+    expect(settled.undated.count).toBe(10)
+    expect(settled.undated.items.map((i) => i.id)).not.toContain('temp-1')
+    expect(settled).toEqual(respond([...BEFORE_CAPTURE, real]))
+  })
+
+  it('two queued captures both land, the later one first', () => {
+    const first = idea('N1X', 'First idea')
+    const second = { ...idea('N2X', 'Second idea'), createdAt: at('2026-10-07 09:06') }
+    const patched = insert(insert(respond(BEFORE_CAPTURE), first), second)
+    expect(patched.undated.count).toBe(11)
+    expect(patched.undated.items.slice(0, 2).map((i) => i.title)).toEqual([
+      'Second idea',
+      'First idea',
+    ])
+    expect(patched).toEqual(respond([...BEFORE_CAPTURE, first, second]))
+  })
+
+  it('snooze, done and undo leave the undated block untouched', () => {
+    const page = respond(BEFORE_CAPTURE)
+    for (const change of [
+      { type: 'snooze', id: 'N4', preset: 'hour' },
+      { type: 'done', id: 'N4' },
+      { type: 'done', id: 'N7' },
+    ] satisfies ReminderChange[]) {
+      expect(applyReminderChange(page, change, NOW).undated).toEqual(page.undated)
+    }
+    const done = applyReminderChange(page, { type: 'done', id: 'N4' }, NOW)
+    expect(applyReminderChange(done, { type: 'undo', id: 'N4' }, NOW).undated).toEqual(page.undated)
   })
 })

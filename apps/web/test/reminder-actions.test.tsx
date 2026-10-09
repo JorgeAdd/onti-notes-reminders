@@ -44,6 +44,7 @@ const itemNamed = (today: TodayResponse, start: string): TodayItem => {
 
 const toNote = (item: TodayItem, patch: Partial<NoteResponse> = {}): NoteResponse => ({
   ...item,
+  createdAt: new Date('2026-10-01T16:00:00.000Z'),
   ...patch,
 })
 
@@ -185,6 +186,7 @@ describe('capture (SG9, R11)', () => {
           originalDueAt: at('2026-10-07 17:00'),
           snoozeCount: 0,
           doneAt: null,
+          createdAt: at('2026-10-07 09:05'),
         }),
       ),
     )

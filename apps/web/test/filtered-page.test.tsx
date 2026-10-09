@@ -125,7 +125,9 @@ describe('capture on a filtered view (R11: no tag injected)', () => {
     expect(await screen.findByText(messages.filter.hiddenNotice('client-b'))).toBeVisible()
     expect(screen.getByText('11 notes hidden')).toBeVisible()
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('5 notes')
-    expect(screen.queryByText('Buy milk')).not.toBeInTheDocument()
+    // Never on the page, but R19's list ignores the filter: the new note joins it.
+    expect(within(screen.getByRole('main')).queryByText('Buy milk')).not.toBeInTheDocument()
+    expect(within(screen.getByRole('complementary')).getByText('Buy milk')).toBeVisible()
   })
 
   it('a capture that carries the active tag shows no notice', async () => {

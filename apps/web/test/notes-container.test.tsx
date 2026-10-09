@@ -39,6 +39,10 @@ function renderNotes(
         onSessionExpired={onSessionExpired}
         onBack={onBack}
         onSignOut={() => undefined}
+        noteId={null}
+        loadNote={() => new Promise(() => undefined)}
+        onOpenNote={() => undefined}
+        onCloseNote={() => undefined}
       />
     </QueryClientProvider>,
   )

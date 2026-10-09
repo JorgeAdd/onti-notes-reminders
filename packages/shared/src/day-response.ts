@@ -1,5 +1,6 @@
 import { buildDayPage, type PageNote } from './domain/day-page'
 import { otherNotes } from './domain/other-notes'
+import type { Undated } from './domain/undated'
 import type { OtherItem, TodayItem, TodayResponse } from './today'
 
 /** A note as the day page needs it (the stored `NoteRecord` shape, no body). */
@@ -32,6 +33,11 @@ export interface DayResponseInput {
   /** R12 · notes the filter hid (0 when unfiltered). */
   hiddenCount: number
   tags: TagSummary[]
+  /**
+   * R19 · precomputed from the WHOLE account: the tag-filtered `notes` cannot produce it. Required,
+   * so a caller that forgets it fails to compile instead of showing an empty list.
+   */
+  undated: Undated
 }
 
 function toItem(note: DayNote): TodayItem {
@@ -65,7 +71,7 @@ const toOtherItem = (note: DayNote): OtherItem => ({
  * lists the matches not on the page and `otherCount` is their count.
  */
 export function buildDayResponse(input: DayResponseInput): TodayResponse {
-  const { notes, now, timezone, tag, hiddenCount, tags } = input
+  const { notes, now, timezone, tag, hiddenCount, tags, undated } = input
   const page = buildDayPage(notes, now, timezone, input.date)
   const others = tag === null ? [] : otherNotes(notes, page).map(toOtherItem)
   return {
@@ -77,6 +83,7 @@ export function buildDayResponse(input: DayResponseInput): TodayResponse {
     tags,
     hiddenCount,
     others,
+    undated,
     window: page.window,
     openCount: page.openCount,
     anyDoneToday: page.anyDoneToday,

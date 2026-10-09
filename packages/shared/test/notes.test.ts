@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
-import { captureRequestSchema, noteResponseSchema, snoozeRequestSchema } from '../src'
+import {
+  captureRequestSchema,
+  NOTE_LIMITS,
+  noteDetailResponseSchema,
+  noteDetailSchema,
+  noteResponseSchema,
+  snoozeRequestSchema,
+} from '../src'
 
 const ID = '00000000-0000-4000-8000-000000000001'
 const wire = {
@@ -11,6 +18,7 @@ const wire = {
   originalDueAt: '2026-10-07T15:00:00.000Z',
   snoozeCount: 1,
   doneAt: null,
+  createdAt: '2026-10-01T16:00:00.000Z',
 }
 
 describe('noteResponseSchema', () => {
@@ -19,7 +27,13 @@ describe('noteResponseSchema', () => {
     expect(note.dueAt).toEqual(new Date('2026-10-07T15:30:00.000Z'))
     expect(note.originalDueAt).toEqual(new Date('2026-10-07T15:00:00.000Z'))
     expect(note.doneAt).toBeNull()
+    expect(note.createdAt).toEqual(new Date('2026-10-01T16:00:00.000Z'))
     expect(z.encode(noteResponseSchema, note)).toEqual(wire)
+  })
+
+  it('requires createdAt (a forgotten select must not pass)', () => {
+    expect(noteResponseSchema.safeParse({ ...wire, createdAt: undefined }).success).toBe(false)
+    expect(noteResponseSchema.safeParse({ ...wire, createdAt: 'yesterday' }).success).toBe(false)
   })
 
   it('accepts a plain note with no reminder (all instants null)', () => {
@@ -36,6 +50,45 @@ describe('noteResponseSchema', () => {
     ['a non-ISO instant', { dueAt: 'tomorrow' }],
   ])('rejects %s', (_label, patch) => {
     expect(noteResponseSchema.safeParse({ ...wire, ...patch }).success).toBe(false)
+  })
+})
+
+describe('note detail (GET /notes/:id)', () => {
+  const detail = { ...wire, body: 'Ana needs **admin** access.' }
+  const envelope = {
+    now: '2026-10-07T15:05:00.000Z',
+    timezone: 'America/Mexico_City',
+    note: detail,
+  }
+
+  it('NOTE_LIMITS.bodyMax is 20000 (R20)', () => {
+    expect(NOTE_LIMITS.bodyMax).toBe(20000)
+  })
+
+  it('noteDetailSchema is the note response plus a body of at most bodyMax units', () => {
+    const note = noteDetailSchema.parse(detail)
+    expect(note.body).toBe(detail.body)
+    expect(note.createdAt).toEqual(new Date('2026-10-01T16:00:00.000Z'))
+    expect(noteDetailSchema.safeParse({ ...detail, body: '' }).success).toBe(true)
+    expect(noteDetailSchema.safeParse({ ...detail, body: 'a'.repeat(20000) }).success).toBe(true)
+    expect(noteDetailSchema.safeParse({ ...detail, body: 'a'.repeat(20001) }).success).toBe(false)
+    expect(noteDetailSchema.safeParse(wire).success).toBe(false)
+  })
+
+  it('noteDetailResponseSchema wraps now, timezone and the note, and round-trips the wire', () => {
+    const response = noteDetailResponseSchema.parse(envelope)
+    expect(response.now).toEqual(new Date('2026-10-07T15:05:00.000Z'))
+    expect(response.timezone).toBe('America/Mexico_City')
+    expect(response.note.body).toBe(detail.body)
+    expect(z.encode(noteDetailResponseSchema, response)).toEqual(envelope)
+  })
+
+  it.each([
+    ['a missing now', { now: undefined }],
+    ['an empty timezone', { timezone: '' }],
+    ['a missing note', { note: undefined }],
+  ])('rejects %s', (_label, patch) => {
+    expect(noteDetailResponseSchema.safeParse({ ...envelope, ...patch }).success).toBe(false)
   })
 })
 

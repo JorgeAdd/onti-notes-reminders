@@ -9,6 +9,7 @@ import { makeMarkDone } from '../src/application/mark-done'
 import type { TokenVerifier } from '../src/application/ports'
 import { makePushActions } from '../src/application/push-actions'
 import { makeSubscriptionActions } from '../src/application/push-subscribe'
+import { makeGetNote } from '../src/application/get-note'
 import { makeSearchNotes } from '../src/application/search-notes'
 import { makeSetTimezone } from '../src/application/set-timezone'
 import { makeSnoozeNote } from '../src/application/snooze-note'
@@ -64,6 +65,7 @@ function harness(options: { withPush?: boolean } = {}) {
     },
     corsOrigins: [ORIGIN],
     searchNotes: makeSearchNotes({ clock, notes, profiles }),
+    getNote: makeGetNote({ clock, notes, profiles }),
     ...(options.withPush === false
       ? {}
       : {
