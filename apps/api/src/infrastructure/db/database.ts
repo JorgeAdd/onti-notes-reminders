@@ -36,6 +36,18 @@ export interface Database {
     note_id: string
     tag_id: string
   }
+  push_subscriptions: {
+    id: Generated<string>
+    user_id: string
+    endpoint: string
+    p256dh: string
+    auth: string
+    user_agent: string | null
+    /** Defaults to 0 on insert. */
+    failure_count: Generated<number>
+    last_success_at: Date | null
+    created_at: ColumnType<Date, never, never>
+  }
 }
 
 export function createDatabase(connectionString: string): Kysely<Database> {

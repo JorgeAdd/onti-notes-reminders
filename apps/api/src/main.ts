@@ -1,3 +1,4 @@
+import webpush from 'web-push'
 import { makeCaptureNote } from './application/capture-note'
 import { makeDeleteNote } from './application/delete-note'
 import { makeGetMe } from './application/get-me'
@@ -16,6 +17,7 @@ import { createDatabase } from './infrastructure/db/database'
 import { PostgresNoteRepository } from './infrastructure/db/postgres-note-repository'
 import { PostgresProfileRepository } from './infrastructure/db/postgres-profile-repository'
 import { buildServer } from './infrastructure/http/server'
+import { createPushRuntime } from './push-runtime'
 
 const config = loadConfig()
 const db = createDatabase(config.DATABASE_URL)
@@ -42,7 +44,17 @@ const app = buildServer({
   getNote: makeGetNote({ clock, notes, profiles }),
 })
 
+// Push is off unless all five push variables are set (no sender, no scheduler).
+const pushRuntime = createPushRuntime({
+  push: config.push,
+  db,
+  clock,
+  client: webpush,
+  log: { error: (message, context) => app.log.error(context ?? {}, message) },
+})
+
 async function shutdown() {
+  await pushRuntime?.scheduler.stop()
   await app.close()
   await db.destroy()
   process.exit(0)
@@ -51,3 +63,4 @@ process.on('SIGTERM', () => void shutdown())
 process.on('SIGINT', () => void shutdown())
 
 await app.listen({ port: config.PORT, host: '0.0.0.0' })
+pushRuntime?.scheduler.start()
