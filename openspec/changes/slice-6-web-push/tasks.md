@@ -164,8 +164,8 @@ Global checks for every commit:
 
 ### Commit c16: `feat(web): unsubscribe this browser on sign-out` (~120)
 
-- [ ] 19.1 RED: `apps/web/test/sign-out-push.test.tsx`: unsubscribe and delete with the captured token, then session ends; reject still ends; no subscription → no call, no wait; 2 s cap (fake timers).
-- [ ] 19.2 GREEN: `App.tsx` `signOut`; note the bounded-wait exception in its comment.
+- [x] 19.1 RED: `apps/web/test/sign-out-push.test.tsx`: unsubscribe and delete with the captured token, then session ends; reject still ends; no subscription → no call, no wait; 2 s cap (fake timers).
+- [x] 19.2 GREEN: `App.tsx` `signOut`; note the bounded-wait exception in its comment.
 
 ### PR3 close
 

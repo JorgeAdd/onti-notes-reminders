@@ -4,6 +4,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react
 import type { DayView } from './features/today/day-view'
 import { AuthContainer } from './features/auth/AuthContainer'
 import { PushBridge } from './features/push/PushBridge'
+import { unsubscribeThisBrowser } from './features/push/push-client'
 import { TodayContainer } from './features/today/TodayContainer'
 import {
   captureNote,
@@ -27,6 +28,19 @@ const NotesContainer = lazy(() => importNotes().then((m) => ({ default: m.NotesC
 type AppView = { view: 'today' } | { view: 'notes'; noteId: string | null; edit: boolean }
 const TODAY: AppView = { view: 'today' }
 const NOTES: AppView = { view: 'notes', noteId: null, edit: false }
+
+/** How long sign-out may wait for this browser's push subscription to be removed. */
+const SIGN_OUT_PUSH_WAIT_MS = 2000
+
+/** Resolves when `promise` settles (either way) or after `ms`, whichever comes first. */
+async function settleWithin(promise: Promise<unknown>, ms: number) {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<void>((resolve) => {
+    timer = setTimeout(resolve, ms)
+  })
+  await Promise.race([promise.catch(() => undefined), timeout])
+  clearTimeout(timer)
+}
 
 export function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -93,16 +107,25 @@ export function App() {
     }),
     [accessToken],
   )
-  // The screen never waits on the network: the local session is cleared first,
-  // and a failed sign-out call is ignored (the token is unusable anyway).
-  const signOut = useCallback(() => {
+  // The screen never waits on the network: the local session is cleared first, and a failed
+  // sign-out call is ignored (the token is unusable anyway).
+  const clearSession = useCallback(() => {
     setSession(null)
     supabase.auth.signOut().catch(() => undefined)
   }, [])
+  // The one exception to "never waits" (slice 6, decision 24): a user's sign-out first removes
+  // this browser's push subscription, waiting at most SIGN_OUT_PUSH_WAIT_MS and only when this
+  // browser is subscribed (otherwise it settles at once). An expired session skips it: the token
+  // would be refused, so `onSessionExpired` clears the session directly.
+  const signOut = useCallback(() => {
+    const token = accessToken
+    if (!token) return clearSession()
+    void settleWithin(unsubscribeThisBrowser(token), SIGN_OUT_PUSH_WAIT_MS).then(clearSession)
+  }, [accessToken, clearSession])
   const onSessionExpired = useCallback(() => {
     setExpired(true)
-    signOut()
-  }, [signOut])
+    clearSession()
+  }, [clearSession])
 
   if (!ready) return null
   if (!session) return <AuthContainer expired={expired} />
