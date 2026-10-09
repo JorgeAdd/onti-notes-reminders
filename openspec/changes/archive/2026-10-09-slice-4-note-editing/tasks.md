@@ -92,8 +92,8 @@ Global checks for every commit:
 ### PR1 verify and smoke
 
 - [x] 1.9.1 `npm run verify` and `npm run build`; main-chunk gzip table vs `origin/main` (markdown only in the lazy chunk).
-- [ ] 1.9.2 Manual smoke 1280x720 and 375x667, light/dark, reduced motion: C13 list, open/`esc`, C10 body, no horizontal scroll; screenshots in the PR (recorded deviation).
-- [ ] 1.9.3 Open PR1 (after asking), label `size:exception`. Deploy order: Railway before Vercel. Vercel deploys `main` on push and Railway after checks, so ask the human how to sequence before merging.
+- [ ] 1.9.2 Manual smoke 1280x720 and 375x667, light/dark, reduced motion: C13 list, open/`esc`, C10 body, no horizontal scroll; screenshots in the PR (recorded deviation). pending: the maintainer has not run the manual smoke yet (2026-10-09).
+- [x] 1.9.3 Open PR1 (after asking), label `size:exception`. Deploy order: Railway before Vercel. Vercel deploys `main` on push and Railway after checks, so ask the human how to sequence before merging. PR #19 opened and merged (c3462cb).
 
 ## PR2 — write side (`size:exception`, ~1,660)
 
@@ -137,5 +137,5 @@ Global checks for every commit:
 ### PR2 verify and smoke
 
 - [x] 2.9.1 `npm run verify` and `npm run build`.
-- [ ] 2.9.2 Manual smoke both viewports, light/dark: edit, empty body save, reschedule onto today (counts), remove reminder (back in list), delete confirm/cancel, `e` from Today.
-- [ ] 2.9.3 Open PR2 (after asking), label `size:exception`; same Railway-before-Vercel sequencing question.
+- [ ] 2.9.2 Manual smoke both viewports, light/dark: edit, empty body save, reschedule onto today (counts), remove reminder (back in list), delete confirm/cancel, `e` from Today. pending: the maintainer has not run the manual smoke yet (2026-10-09).
+- [x] 2.9.3 Open PR2 (after asking), label `size:exception`; same Railway-before-Vercel sequencing question. PR #21 opened and merged (061ff8a).

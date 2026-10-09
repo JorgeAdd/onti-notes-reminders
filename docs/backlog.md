@@ -73,7 +73,27 @@ _Source: slice 8 verify report_
 The headless screenshots at 1280 and 375 px did not show the keyboard focus ring on the segmented theme control. Check Tab focus in a real browser, light and dark.
 _Source: slice 8 archive report_
 
-## Planned for Slice 4
+## Deferred from Slice 4
+
+### Manual smoke of PR1 and PR2 (pending)
+
+The maintainer has not run the manual smoke yet (2026-10-09). PR1: 1280x720 and 375x667, light and dark, reduced motion, C13 list, open and `esc`, C10 body, no horizontal scroll. PR2: both viewports, edit, empty-body save, reschedule onto today (counts), remove reminder, delete confirm and cancel, `e` from Today.
+_Source: slice 4 verify reports PR1 and PR2 (tasks 1.9.2 and 2.9.2)_
+
+### App-level test for Today after a write
+
+No test renders Today after a write and checks the counts and the undated list. Add one App-level test: reschedule an undated note, Today shows it on the rail with the undated count minus one and the header count plus one; then remove the reminder and see it back in the list. It also closes the three PARTIAL PR2 scenarios.
+_Source: slice 4 verify report PR2, WARNING 1_
+
+### App-level test for an old undated note from Today and refresh
+
+The PR1 scenarios "Old undated note" (opened from Today) and "Refresh" (a fresh render lands on Today) are tested in halves only. Add one App-level test that drives a Today row to the note view and one that asserts the landing page after a fresh render.
+_Source: slice 4 verify report PR1, WARNING 3_
+
+### Capture-flow and note-open-flow timing flake
+
+`note-open-flow` tests carry a 20 s timeout because they flake at 5 s under load. The `capture-flow` tests have no such override and carry the same risk. Align the timeouts or find the slow step.
+_Source: slice 4 verify reports PR1 and PR2, item 7_
 
 ### Deep link to a note (`?note=` URL state)
 

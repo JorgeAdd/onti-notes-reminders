@@ -12,7 +12,7 @@ yet specified), **Proposed** (inferred from the v1 scope, not yet agreed).
 | 1     | Read-only Today page                    | Done     |
 | 2     | Timezone, capture, snooze and done/undo | Done     |
 | 3     | Day navigation and tag filter           | Done     |
-| 4     | Note editing and markdown               | Proposed |
+| 4     | Note editing and markdown               | Done     |
 | 5     | All notes and search                    | Done     |
 | 6     | Web Push notifications                  | Proposed |
 | 7     | Merged into slice 2                     | —        |
@@ -49,42 +49,13 @@ shipped:
 Done 2026-10-08. Day navigation keys (`[`, `]`, `t`) and tag filter (`#`) with URL state persistence. Archived at
 `openspec/changes/archive/2026-10-08-slice-3-day-navigation-tag-filter/`. Deferred items in `docs/backlog.md`.
 
-## Slice 4 — Note editing and markdown (proposed)
+## Slice 4 — Note editing and markdown
 
-Creation ships with capture in slice 2; this slice covers the rest of the
-note lifecycle.
-
-- Note view in All notes, opened from an All notes row, a "Without a
-  reminder" row, or `e` on a focused Today row (which opens it straight in
-  edit mode):
-  - Edit the title, body and tags (`#slug` grammar); last write wins.
-  - Manual reschedule and reminder removal (R8); rescheduling a done note
-    reopens it.
-  - Delete with an inline confirm ("Delete? ↵ confirm · esc cancel"); a
-    hard delete.
-  - Keys `e` and `d` only in the note view (SG10).
-- Basic markdown body, always sanitized; raw HTML is never rendered (R14).
-- "Without a reminder" list in the date column (R19, matrix C13 and C14):
-  - Desktop: below Sign out, header "Without a reminder · {n}" in the
-    carried-group label style, up to 8 rows (title on one line with an
-    ellipsis, tags below in meta text), then "+ {n − 8} more" when
-    `n > 8`. Nothing when `n = 0`.
-  - A row opens the note view in All notes; "+ {n − 8} more" opens All notes as `/` does.
-  - Mobile (≤ 640 px): no list, only the link "{n} without a reminder".
-  - Data: `GET /today` gains `undated: { count, items }` (at most 8 items:
-    id, title, tags, `created_at`). No extra request; the list follows the
-    page's refetch and optimistic updates (capture without a time adds the
-    note at the top).
-  - Tokens only, copy in the messages module, 44 px targets, no internal
-    IDs (CLAUDE.md rules 8, 11, 12, 13).
-- Ships as two PRs:
-  - Read side first (PR1, built, awaiting merge): `createdAt` on notes, the
-    R19 list, `GET /notes/:id` with the C11 `404`, markdown (R14, C10)
-    rendered lazily with react-markdown + rehype-sanitize (ADR-002), and a
-    read-only note view. Excerpts in All notes lose their markdown markers.
-  - Then the write side (PR2, built, awaiting review): `PATCH` and `DELETE`
-    `/notes/:id` (R20, R8), edit mode with reschedule and reminder removal,
-    the inline delete confirm, and `e` on a focused Today row.
+Done 2026-10-09 (manual smoke pending). Read side (PR #19, c3462cb) and write
+side (PR #21, 061ff8a). Note view in All notes with edit, reschedule, reminder
+removal and delete; markdown body (R14); "Without a reminder" list (R19).
+Archived at `openspec/changes/archive/2026-10-09-slice-4-note-editing/`.
+Deferred items in `docs/backlog.md`.
 
 ## Slice 5 — All notes and search
 

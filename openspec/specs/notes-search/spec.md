@@ -84,7 +84,7 @@ Without a token or with an invalid one `GET /notes` MUST return `401` (C11). Ano
 
 ### Requirement: All notes view
 
-The view MUST replace the day page, keeping the date column, paper look, dock and statusline. It MUST list notes newest first, styled like board 04's "back of the pad". It MUST NOT use URL state: a refresh returns to today. Each row MUST show the title, tags, the due date/time if any, a strike when done, and a body excerpt of about 120 characters. The excerpt MUST be plain text and MUST NOT render HTML or markdown; titles and tags also render as plain text. Rows MUST be read-only: no `x`, `s`, `z` or action controls. No internal IDs (N1-N15) appear.
+The view MUST replace the day page, keeping the date column, paper look, dock and statusline. It MUST list notes newest first, styled like board 04's "back of the pad". It MUST NOT use URL state: a refresh returns to today. Each row MUST show the title, tags, the due date/time if any, a strike when done, and a body excerpt of about 120 characters. The excerpt MUST be plain text with markdown markers removed (`markdown-rendering`) and MUST NOT render HTML or markdown; titles and tags also render as plain text. Activating a row MUST open the note view (`note-view`). Rows MUST NOT offer `x`, `s`, `z` or action controls. No internal IDs (N1-N15) appear.
 
 #### Scenario: Row content
 
@@ -92,9 +92,15 @@ The view MUST replace the day page, keeping the date column, paper look, dock an
 - WHEN the view renders
 - THEN its row shows title, tag, due date/time, strike, and an excerpt of about 120 characters
 
-#### Scenario: Body as text
+#### Scenario: Markers stripped [PR1]
 
-- GIVEN a body containing `<img src=x onerror=alert(1)>` or `**bold**`
+- GIVEN a body `**bold** and [link](https://x.y)`
+- WHEN the excerpt renders
+- THEN it reads `bold and link` with no element created
+
+#### Scenario: HTML as text
+
+- GIVEN a body containing `<img src=x onerror=alert(1)>`
 - WHEN the excerpt renders
 - THEN it shows literally and no element is created
 
@@ -104,11 +110,17 @@ The view MUST replace the day page, keeping the date column, paper look, dock an
 - WHEN All notes renders
 - THEN it appears in the list
 
-#### Scenario: Read-only
+#### Scenario: Rows stay action-free
 
 - GIVEN the notes view
 - WHEN `x`, `s` or `z` is pressed outside the search input
 - THEN nothing happens: no row changes and no request is sent
+
+#### Scenario: Row opens note [PR1]
+
+- GIVEN a listed note
+- WHEN its row is activated
+- THEN the note view opens for it
 
 ### Requirement: Search interaction
 
@@ -168,6 +180,16 @@ This step MUST ship last, after slice 3 merges, reusing its `#` tag bar and tag 
 - WHEN searching `staging`
 - THEN only notes with that tag and a match are listed
 
+### Requirement: Search matches the raw body [PR1]
+
+Search MUST keep matching title and body text as stored, so a word inside markdown markers (for example `**staging**`) is found by its word prefix (R13). Stripping applies to the excerpt display only.
+
+#### Scenario: Marked word
+
+- GIVEN a body `Deploy **staging** today`
+- WHEN searching `stag`
+- THEN the note is returned
+
 ## Out of scope
 
-Markdown rendering (slice 4), highlighting, pagination, URL state, row actions, `GET /notes/:id`, fuzzy or substring matching.
+Highlighting, pagination, URL state, row actions, fuzzy or substring matching.
