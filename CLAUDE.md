@@ -111,7 +111,8 @@ Sources of truth: `docs/design/style-guide-decisions.md` (SG1–SG20),
 18. **The API verifies the JWT on every request** (signature via Supabase
     JWKS, `iss`, `aud`, expiry) and runs user queries as `authenticated`
     with the verified claims. Another user's resource is `404`; a missing
-    or invalid token is `401`.
+    or invalid token is `401`. The only exception: `POST /push-actions/*`
+    accepts a signed action token instead of a JWT (ADR-004).
     Why: identity is the only thing the API trusts from the client
     (ADR-001); RLS is the second lock if a query forgets its `where`.
 

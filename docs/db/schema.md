@@ -76,14 +76,14 @@ API against the IANA database.
 
 A note and its optional reminder (ADR-003).
 
-| Column            | Meaning                                                                                                                                                           |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `due_at`          | When the reminder is due (UTC). `null` → plain note, and then all reminder columns must be empty (`notes_reminder_fields_consistent`).                            |
-| `original_due_at` | `due_at` before any snooze. Set on create and on manual reschedule only.                                                                                          |
-| `snooze_count`    | Number of snoozes since the last manual schedule.                                                                                                                 |
-| `done_at`         | When it was marked done; `null` = open. Undo sets it back to `null`.                                                                                              |
-| `notified_due_at` | The `due_at` value a notification was sent for. The scheduler picks a note when `due_at <= now`, `done_at is null` and `notified_due_at is distinct from due_at`. |
-| `search`          | Generated `tsvector` (`simple`) over title + body.                                                                                                                |
+| Column            | Meaning                                                                                                                                                                                           |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `due_at`          | When the reminder is due (UTC). `null` → plain note, and then all reminder columns must be empty (`notes_reminder_fields_consistent`).                                                            |
+| `original_due_at` | `due_at` before any snooze. Set on create and on manual reschedule only.                                                                                                                          |
+| `snooze_count`    | Number of snoozes since the last manual schedule.                                                                                                                                                 |
+| `done_at`         | When it was marked done; `null` = open. Undo sets it back to `null`.                                                                                                                              |
+| `notified_due_at` | The `due_at` value a notification was claimed for. The scheduler picks a note when `due_at <= now`, `done_at is null` and `notified_due_at is distinct from due_at` (see "Push scheduler" below). |
+| `search`          | Generated `tsvector` (`simple`) over title + body.                                                                                                                                                |
 
 Indexes: open reminders per user by due time (Today page), open reminders
 by due time (scheduler), notes per user by creation (All notes), GIN on
@@ -97,8 +97,49 @@ composite foreign keys guarantee note and tag belong to the same user.
 
 ### `push_subscriptions`
 
-One row per browser/device that accepted notifications. `failure_count`
-lets the scheduler drop endpoints that keep failing (e.g. 410 Gone).
+One row per browser/device that accepted notifications. `endpoint` is unique
+across users: a browser has one push endpoint, and the subscription follows
+whoever subscribed last (see the owner-role statements below).
+`failure_count` counts consecutive failed sends and `last_success_at` the last
+accepted one.
+
+## Push scheduler (slice 6)
+
+Decisions: `docs/adr/ADR-004`, `openspec/changes/slice-6-web-push/design.md`.
+
+**Backfill.** Migration `20261008180000_backfill_notified_due_at.sql` sets
+`notified_due_at := due_at` on every open reminder that is already overdue
+(`due_at <= now()`, `done_at is null`). Without it the first scheduler tick
+would send every overdue reminder at once. It never changes `due_at`, a second
+run is a no-op, and it MUST be applied before the deploy that sets the VAPID
+configuration. It sets `updated_at` through the `notes_set_updated_at` trigger;
+nothing reads that column.
+
+**Claim.** Every 30 s one statement, run as the owner role in autocommit, picks
+the notes with `due_at <= $now`, `done_at is null` and
+`notified_due_at is distinct from due_at` (at most 100, earliest first) under
+`FOR UPDATE SKIP LOCKED`, and sets `notified_due_at := due_at` in the same
+statement, before any push is sent. A reminder is therefore sent at most once
+per `due_at` value, concurrent claims (rollout overlap, several replicas) are
+disjoint, and a snooze (a new `due_at`) re-arms it (R10, C5). Users without a
+subscription are claimed too and nothing is sent: Today still lists the item
+(C7). `$now` is the application clock, never SQL `now()`. The predicate equals
+the CONTRACT's `isNotificationDue`; `apps/api/test/postgres/push.pg.test.ts`
+checks it over a matrix of states. The partial index `notes_open_due_idx`
+serves the scan. A claim bumps `updated_at` through the trigger.
+
+**Owner-role statements.** The API runs user requests as `authenticated`
+(ADR-001). Besides the claim above, the scheduler reads the subscriptions of the
+owner of a claimed reminder and writes the outcome of each send to
+`push_subscriptions` as the owner role. The ADR-001 amendment (2026-10-08)
+allows exactly one more owner-role statement: the subscribe upsert that
+reassigns an endpoint from another user to the caller, which ships with the
+subscription routes.
+
+**Failure policy.** A `404` or `410` from the push service deletes the row. Any
+other failure adds one to `failure_count` and deletes the row when it reaches 5
+consecutive failures (an update and a delete in one transaction). A success sets
+`failure_count := 0` and `last_success_at`.
 
 ## Security
 
@@ -107,6 +148,8 @@ lets the scheduler drop endpoints that keep failing (e.g. 410 Gone).
 - `anon` has no privileges. `authenticated` has CRUD, filtered by RLS.
 - The API runs user requests as `authenticated` with the verified JWT
   claims (ADR-001), so RLS applies to the API path too.
+- The push scheduler and the subscribe reassignment are the only statements
+  that run as the owner role (ADR-001 and its 2026-10-08 amendment).
 - Trigger functions (`handle_new_user`, `set_updated_at`) are not
   executable by any client role (migration `20261007090000`). The Supabase
   security advisor reports 0 findings on the deployed database.
