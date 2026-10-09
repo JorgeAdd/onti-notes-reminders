@@ -107,7 +107,7 @@ Global checks for every commit:
 
 ### PR1 close
 
-- [ ] 9.1 Final `npm run verify` and `npm run build`; PR body: forecast, `size:exception`, build check, pg output.
+- [x] 9.1 Final `npm run verify` and `npm run build`; PR body: forecast, `size:exception`, build check, pg output.
 - [ ] 9.2 Manual smoke (local): API with push config logs ticks; without it, no scheduler. Real delivery is checked after PR2 and PR3.
 
 ## PR2 — subscription and action endpoints (~665 lines, within budget)
