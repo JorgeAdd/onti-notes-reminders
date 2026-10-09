@@ -84,7 +84,7 @@ Global checks for every commit:
 - [x] 5.2 RED: `apps/api/test/web-push-sender.test.ts`: `sent`; 404 and 410 `gone`; 500, 429, no-status error `failed`; options carry VAPID, `TTL` 3600, `urgency`, `timeout`.
 - [x] 5.3 RED: `apps/api/test/web-push-interop.test.ts`: default import exposes `sendNotification` and `generateVAPIDKeys`; static check that `web-push` stays in `dependencies` (tsup externalizes only those).
 - [x] 5.4 GREEN: `infrastructure/push/web-push-sender.ts` (decision 8).
-- [ ] 5.5 Build check: `npm run build -w @onti/api`; `dist/main.js` keeps `from "web-push"` external; the `node --input-type=module` import from `apps/api` prints `function`. Record in the PR.
+- [x] 5.5 Build check: `npm run build -w @onti/api`; `dist/main.js` keeps `from "web-push"` external; the `node --input-type=module` import from `apps/api` prints `function`. Record in the PR.
 
 ### Commit c6: `feat(api): push config and interval scheduler` (~200)
 
@@ -102,8 +102,8 @@ Global checks for every commit:
 
 ### Commit c8: `feat(api): start the push scheduler when configured` (~50)
 
-- [ ] 8.1 RED: test that `config.push === null` builds no sender, scheduler or `push` dep.
-- [ ] 8.2 GREEN: `main.ts` wiring; scheduler starts after `listen`; shutdown stops scheduler, then app, then DB.
+- [x] 8.1 RED: test that `config.push === null` builds no sender, scheduler or `push` dep.
+- [x] 8.2 GREEN: `main.ts` wiring; scheduler starts after `listen`; shutdown stops scheduler, then app, then DB.
 
 ### PR1 close
 
