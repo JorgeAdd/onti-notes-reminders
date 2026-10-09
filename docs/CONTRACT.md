@@ -220,11 +220,16 @@ asserted where the feature lives:
 | R12 in All notes        | `packages/shared/test/notes-list.test.ts` (`tag` is a slug), `apps/api/test/search-notes.test.ts` (tag alone, with a term, before the 50 cap, unknown and other users' tags give an empty list), `search-route.test.ts` (`GET /notes?q=&tag=`, 400 for a malformed or repeated tag), `postgres/search.pg.test.ts` (SQL `exists`, 5 tagged notes among 55 newer ones, Ana's same-slug tag). `apps/web/test/notes-container.test.tsx` and `notes-view.test.tsx`: `#` bar, tag applied, statusline `· #slug`, two-step `esc`, phone Tags button and Clear chip. |
 | C11 (listing and `401`) | `apps/api/test/search-route.test.ts`: no token and a forged token give `401`; Ana lists 0 of Jorge's notes. `search-notes.test.ts` and `search.pg.test.ts`: Ana's search never sees his notes (explicit `user_id` plus RLS).                                                                                                                                                                                                                                                                                                                                 |
 
-Still `todo`: C10 (markdown rendering, web), the `404` half of C11
-(`GET /notes/{id}` for another user's note, API; slice 4 owns note detail),
-R19 with C13 and C14 (the "Without a reminder" list; slice 4 adds the
-rule and its tests together, CLAUDE.md rule 23), and R20 (note editing and
-permanent delete; the slice 4 write-side PR adds its tests, CLAUDE.md
-rule 23).
+Slice 4 (note view and editing) adds its proof in the read-side PR, row by row
+as the tests land:
+
+| Rows        | Proven by                                                                                                                                                                                                                                                                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| C11 (`404`) | `apps/api/test/get-note.test.ts` and `note-route.test.ts`: Ana asking for Jorge's N1 gets `404` with no hint it exists (same answer as an unknown or non-UUID id); no token and a forged token give `401`. `postgres/note-detail.pg.test.ts` (real Postgres, not in CI): `findOwn` is null for another user's note (explicit `user_id` plus RLS). |
+
+Still `todo`: C10 (markdown rendering, web), R19 with C13 and C14 (the
+"Without a reminder" list; slice 4 adds the rule and its tests together,
+CLAUDE.md rule 23), and R20 (note editing and permanent delete; the slice 4
+write-side PR adds its tests, CLAUDE.md rule 23).
 C11's `401` part is also covered in `apps/api/test/server.test.ts`; RLS
 isolation was verified with SQL on the migration (see `docs/db/schema.md`).

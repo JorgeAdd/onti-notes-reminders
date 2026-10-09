@@ -1,6 +1,6 @@
 import type { Reminder } from '@onti/shared'
 import type { Identity } from '../domain/identity'
-import type { NoteRecord } from '../domain/note'
+import type { NoteDetail, NoteRecord } from '../domain/note'
 
 /** Verifies an access token and returns who it belongs to. Throws UnauthorizedError. */
 export interface TokenVerifier {
@@ -64,6 +64,11 @@ export interface NoteRepository {
     id: string,
     decide: (reminder: Reminder) => Reminder,
   ): Promise<NoteRecord | null>
+  /**
+   * One note of the caller with its body and tags (no row lock). Null when the id is unknown or
+   * not the caller's (R15, C11): the two look the same.
+   */
+  findOwn(identity: Identity, id: string): Promise<NoteDetail | null>
   /**
    * The caller's notes newest first (`created_at desc, id desc`), at most `limit`. With terms, only
    * notes matching EVERY term as a word prefix on title or body; no terms means no filter. `total`

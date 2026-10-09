@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { makeCaptureNote } from '../src/application/capture-note'
 import { UnauthorizedError } from '../src/application/errors'
 import { makeGetMe } from '../src/application/get-me'
+import { makeGetNote } from '../src/application/get-note'
 import { makeGetToday } from '../src/application/get-today'
 import { makeMarkDone } from '../src/application/mark-done'
 import type { Clock, NoteRepository, TokenVerifier } from '../src/application/ports'
@@ -42,6 +43,7 @@ const failingNotes: NoteRepository = {
   listOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
   mutateReminder: () => Promise.reject(new Error('connection refused: postgres://secret')),
   searchOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
+  findOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
 }
 
 function server(notes: NoteRepository = new InMemoryNotes(JORGE_NOTES)) {
@@ -58,6 +60,7 @@ function server(notes: NoteRepository = new InMemoryNotes(JORGE_NOTES)) {
     },
     corsOrigins: ['https://app.example'],
     searchNotes: makeSearchNotes({ clock, notes, profiles }),
+    getNote: makeGetNote({ clock, notes, profiles }),
   })
 }
 

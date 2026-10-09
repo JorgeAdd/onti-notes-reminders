@@ -3,6 +3,7 @@ import {
   captureRequestSchema,
   dayQuerySchema,
   meResponseSchema,
+  noteDetailResponseSchema,
   noteResponseSchema,
   notesListResponseSchema,
   notesQuerySchema,
@@ -20,6 +21,7 @@ import {
 } from '../../application/errors'
 import type { CaptureNote } from '../../application/capture-note'
 import type { GetMe } from '../../application/get-me'
+import type { GetNote } from '../../application/get-note'
 import type { GetToday } from '../../application/get-today'
 import type { MarkDone } from '../../application/mark-done'
 import type { TokenVerifier } from '../../application/ports'
@@ -44,6 +46,7 @@ export interface ServerDeps {
   corsOrigins: string[]
   logger?: boolean
   searchNotes: SearchNotes
+  getNote: GetNote
 }
 
 const BEARER = /^Bearer\s+(\S+)$/i
@@ -84,6 +87,7 @@ export function buildServer({
   corsOrigins,
   logger = false,
   searchNotes,
+  getNote,
 }: ServerDeps) {
   const app = Fastify({ logger })
 
@@ -164,6 +168,12 @@ export function buildServer({
       notesListResponseSchema,
       await searchNotes(identity, query.data.q, query.data.tag),
     )
+  })
+
+  app.get('/notes/:id', async (request) => {
+    const identity = await authenticate(request)
+    const id = noteIdOf(request.params)
+    return z.encode(noteDetailResponseSchema, await getNote(identity, id))
   })
 
   app.get('/today', async (request) => {

@@ -1,8 +1,8 @@
 import type { Reminder } from '@onti/shared'
-import { sql, type Kysely } from 'kysely'
+import { sql, type Kysely, type Transaction } from 'kysely'
 import type { NewNote, NoteListRow, NoteRepository } from '../../application/ports'
 import type { Identity } from '../../domain/identity'
-import type { NoteRecord } from '../../domain/note'
+import type { NoteDetail, NoteRecord } from '../../domain/note'
 import { asUser } from './as-user'
 import type { Database } from './database'
 
@@ -52,6 +52,43 @@ export class PostgresNoteRepository implements NoteRepository {
         notifiedDueAt: row.notified_due_at,
         createdAt: row.created_at,
       }))
+    })
+  }
+
+  findOwn(identity: Identity, id: string): Promise<NoteDetail | null> {
+    return asUser(this.db, identity, async (trx) => {
+      // Explicit user_id plus RLS behind it: another user's id selects nothing (R15, C11).
+      const row = await trx
+        .selectFrom('notes')
+        .select([
+          'id',
+          'title',
+          'body',
+          'due_at',
+          'original_due_at',
+          'snooze_count',
+          'done_at',
+          'notified_due_at',
+          'created_at',
+        ])
+        .where('id', '=', id)
+        .where('user_id', '=', identity.userId)
+        .executeTakeFirst()
+      if (!row) return null
+
+      const tags = (await tagsFor(trx, identity.userId, [row.id])).get(row.id) ?? []
+      return {
+        id: row.id,
+        title: row.title,
+        body: row.body,
+        tags,
+        dueAt: row.due_at,
+        originalDueAt: row.original_due_at,
+        snoozeCount: row.snooze_count,
+        doneAt: row.done_at,
+        notifiedDueAt: row.notified_due_at,
+        createdAt: row.created_at,
+      }
     })
   }
 
@@ -267,6 +304,30 @@ export class PostgresNoteRepository implements NoteRepository {
       }
     })
   }
+}
+
+/** The caller's tags for `ids`, ordered by slug. Used by the methods added after the first three copies. */
+async function tagsFor(
+  trx: Transaction<Database>,
+  userId: string,
+  ids: string[],
+): Promise<Map<string, NoteRecord['tags']>> {
+  const byNote = new Map<string, NoteRecord['tags']>()
+  if (ids.length === 0) return byNote
+  const links = await trx
+    .selectFrom('note_tags')
+    .innerJoin('tags', 'tags.id', 'note_tags.tag_id')
+    .select(['note_tags.note_id', 'tags.name', 'tags.slug'])
+    .where('note_tags.user_id', '=', userId)
+    .where('note_tags.note_id', 'in', ids)
+    .orderBy('tags.slug')
+    .execute()
+  for (const link of links) {
+    const tags = byNote.get(link.note_id) ?? []
+    tags.push({ name: link.name, slug: link.slug })
+    byNote.set(link.note_id, tags)
+  }
+  return byNote
 }
 
 const BODY_HEAD = 400

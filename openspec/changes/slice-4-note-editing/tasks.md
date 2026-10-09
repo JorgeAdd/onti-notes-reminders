@@ -53,10 +53,10 @@ Global checks for every commit:
 
 ### Commit 1.3 `feat(api): GET /notes/:id with the C11 404` (1a)
 
-- [ ] 1.3.1 RED `apps/api/test/get-note.test.ts` and `note-route.test.ts`: 200 shape, Ana 404, non-UUID 404, 401 without and forged token.
-- [ ] 1.3.2 GREEN `findOwn` (port, fake, Postgres with `tagsFor`), `application/get-note.ts`, route in `server.ts`, `main.ts` wiring.
-- [ ] 1.3.3 `apps/api/test/postgres/note-detail.pg.test.ts` (RLS, tags; `ONTI_TEST_DATABASE_URL`, not in CI).
-- [ ] 1.3.4 `docs/CONTRACT.md` Verification status: C11 `404` proven; drop it from "Still `todo`".
+- [x] 1.3.1 RED `apps/api/test/get-note.test.ts` and `note-route.test.ts`: 200 shape, Ana 404, non-UUID 404, 401 without and forged token.
+- [x] 1.3.2 GREEN `findOwn` (port, fake, Postgres with `tagsFor`), `application/get-note.ts`, route in `server.ts`, `main.ts` wiring.
+- [x] 1.3.3 `apps/api/test/postgres/note-detail.pg.test.ts` (RLS, tags; `ONTI_TEST_DATABASE_URL`, not in CI).
+- [x] 1.3.4 `docs/CONTRACT.md` Verification status: C11 `404` proven; drop it from "Still `todo`".
 
 ### Commit 1.4 `feat(web): lazy markdown body with the R14 allowlist` (1b)
 

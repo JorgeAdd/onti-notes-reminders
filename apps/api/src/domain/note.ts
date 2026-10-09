@@ -6,3 +6,8 @@ export interface NoteRecord extends PageNote {
   tags: { name: string; slug: string }[]
   createdAt: Date
 }
+
+/** One note with its body, as the note view reads it (R20: at most 20 000 characters). */
+export interface NoteDetail extends NoteRecord {
+  body: string
+}

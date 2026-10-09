@@ -7,7 +7,7 @@ import type {
   Profile,
   ProfileRepository,
 } from '../src/application/ports'
-import type { NoteRecord } from '../src/domain/note'
+import type { NoteDetail, NoteRecord } from '../src/domain/note'
 
 export const JORGE: Identity = {
   userId: '7b0c5a2e-3f4d-4c1a-9e8b-2d6f0a1b3c4d',
@@ -131,6 +131,12 @@ export class InMemoryNotes implements NoteRepository {
     this.rows.set(note.id, { ownerId: identity.userId, note, body: '' })
     this.created.push({ ownerId: identity.userId, input })
     return Promise.resolve(note)
+  }
+
+  findOwn(identity: Identity, id: string): Promise<NoteDetail | null> {
+    const row = this.rows.get(id)
+    if (!row || row.ownerId !== identity.userId) return Promise.resolve(null)
+    return Promise.resolve({ ...row.note, body: row.body })
   }
 
   listOwn(identity: Identity): Promise<NoteRecord[]> {
