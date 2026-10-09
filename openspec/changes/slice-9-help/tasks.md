@@ -40,10 +40,10 @@ Global checks for every commit:
 
 ## Commit 1 `feat(web): help model with key coverage test` (unit 1)
 
-- [ ] 1.1 RED `apps/web/test/help-coverage.test.ts`: probe `reduceKey` (printable ASCII + Escape/Enter/Tab, idle/armed x target null/open/done x context flags); scan `src/features/**` for `key === '<x>'` literals (`/`, `#`, note `e`/`d`, tag-bar Tab/Enter); reverse check (every model key produced); `KeyHint` exhaustiveness; touch rows hold no keys; touch copy names `messages.mobile.*`, `actionSheet.done`, `capture.presets.*`, `day.prev/next`.
-- [ ] 1.2 GREEN `apps/web/src/messages.ts`: `help` block (title, open, close, sections, detail, touch, emptyHint, emptyHintTouch).
-- [ ] 1.3 GREEN `apps/web/src/features/help/help-model.ts`: `HINT_ROWS: Record<KeyHint, ...>`, extra rows (`?`, note `d`, capture `esc`), `buildHelp(touch)` (Capture, Days, On a note, Find), `helpKeys()`.
-- [ ] 1.4 Prove removing a row fails the test (spec "Coverage"); refactor.
+- [x] 1.1 RED `apps/web/test/help-coverage.test.ts`: probe `reduceKey` (printable ASCII + Escape/Enter/Tab, idle/armed x target null/open/done x context flags); scan `src/features/**` for `key === '<x>'` literals (`/`, `#`, note `e`/`d`, tag-bar Tab/Enter); reverse check (every model key produced); `KeyHint` exhaustiveness; touch rows hold no keys; touch copy names `messages.mobile.*`, `actionSheet.done`, `capture.presets.*`, `day.prev/next`.
+- [x] 1.2 GREEN `apps/web/src/messages.ts`: `help` block (title, open, close, sections, detail, touch, emptyHint, emptyHintTouch).
+- [x] 1.3 GREEN `apps/web/src/features/help/help-model.ts`: `HINT_ROWS: Record<KeyHint, ...>`, extra rows (`?`, note `d`, capture `esc`), `buildHelp(touch)` (Capture, Days, On a note, Find), `helpKeys()`.
+- [x] 1.4 Prove removing a row fails the test (spec "Coverage"); refactor.
 
 ## Commit 2 `test(web): capture examples run through the R11 parser` (unit 2)
 

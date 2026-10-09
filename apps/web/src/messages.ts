@@ -107,6 +107,33 @@ export const messages = {
       search: '/ search',
     },
   },
+  /** Slice 9: the "How it works" help (`?` on Today). Key rows reuse `statusline.keys`. */
+  help: {
+    title: 'How it works',
+    open: 'How it works',
+    close: 'Close',
+    sections: { capture: 'Capture', days: 'Days', note: 'On a note', find: 'Find' },
+    /** Second line of a row, where the key alone is not enough. */
+    detail: {
+      captureCancel: 'closes the capture bar',
+      today: 'from another day',
+      snooze: 'then h or t',
+      cancel: 'closes the snooze menu',
+      edit: 'opens the focused note for editing',
+      delete: 'in the note view: ↵ confirms, esc cancels',
+      search: 'all notes and search',
+    },
+    captureCancel: 'esc cancel capture',
+    /** On a phone the touch lines replace the key rows. */
+    touch: {
+      capture: [
+        'Tap + Capture to write a note. Insert Today 17:00, +1 h or Tomorrow 9:00 with one tap.',
+      ],
+      days: ['Use Previous day and Next day in the date column, then Today to come back.'],
+      note: ['Tap a note, then choose Done or a snooze time. Open a note to edit or delete it.'],
+      find: ['Tap Search for all notes. Tap Tags to filter by tag.'],
+    },
+  },
   errors: {
     generic: 'Something went wrong. Please try again.',
     dismiss: 'Dismiss',
