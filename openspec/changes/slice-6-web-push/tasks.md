@@ -138,12 +138,12 @@ Global checks for every commit:
 
 ### Gate: rebase after slice 4 merges
 
-- [ ] 14.1 Wait until slice 4 is merged (and PR2). Branch or rebase onto `main`; resolve `DayPage`, `DateColumn`, `MobileBar`, `App.tsx`, `messages.ts`; `npm run verify`.
+- [x] 14.1 Wait until slice 4 is merged (and PR2). Branch or rebase onto `main`; resolve `DayPage`, `DateColumn`, `MobileBar`, `App.tsx`, `messages.ts`; `npm run verify`.
 
 ### Commit c12: `feat(web): service worker for push and actions` (~230)
 
-- [ ] 15.1 RED: `apps/web/test/sw.test.ts` (`node:vm`, stubbed `self`): show with title, body, tag, `renotify`; invalid payload still shows; no actions when `maxActions` 0; Done success posts `onti:refetch`; non-2xx, throw, missing token → fallback: focus + `onti:action` with `noteId` and `dueAt`, else `openWindow('/?action=…&note=…&due=…')`; body tap opens `/`.
-- [ ] 15.2 GREEN: `apps/web/public/sw.js` (decisions 18, 19); `eslint.config.js` worker globals.
+- [x] 15.1 RED: `apps/web/test/sw.test.ts` (`node:vm`, stubbed `self`): show with title, body, tag, `renotify`; invalid payload still shows; no actions when `maxActions` 0; Done success posts `onti:refetch`; non-2xx, throw, missing token → fallback: focus + `onti:action` with `noteId` and `dueAt`, else `openWindow('/?action=…&note=…&due=…')`; body tap opens `/`.
+- [x] 15.2 GREEN: `apps/web/public/sw.js` (decisions 18, 19); `eslint.config.js` worker globals.
 
 ### Commit c13: `feat(web): manifest, icons and worker registration` (~130 + PNGs)
 

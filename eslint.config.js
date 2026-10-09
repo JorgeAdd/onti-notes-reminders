@@ -72,5 +72,14 @@ export default tseslint.config(
     ...tseslint.configs.disableTypeChecked,
     languageOptions: { globals: globals.node },
   },
+  {
+    // The push service worker is a plain script outside the TS project: worker globals, no types.
+    files: ['apps/web/public/sw.js'],
+    ...tseslint.configs.disableTypeChecked,
+    languageOptions: {
+      globals: globals.serviceworker,
+      parserOptions: { projectService: false },
+    },
+  },
   prettier,
 )
