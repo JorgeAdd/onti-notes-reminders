@@ -119,7 +119,7 @@ Global checks for every commit:
 
 ### Commit 2.5 `feat(web): DELETE and 204 in the api client` (2b)
 
-- [ ] 2.5.1 RED `api.test.ts` (204 → `undefined`, 404, 401, no `Content-Type`). GREEN `request`, `updateNote`, `deleteNote`.
+- [x] 2.5.1 RED `api.test.ts` (204 → `undefined`, 404, 401, no `Content-Type`). GREEN `request`, `updateNote`, `deleteNote`.
 
 ### Commit 2.6 `feat(web): edit mode in the note view` (2b)
 

@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   ApiError,
   captureNote,
+  deleteNote,
   fetchNote,
   fetchToday,
   markNoteDone,
@@ -11,6 +12,7 @@ import {
   searchNotes,
   snoozeNote,
   undoNoteDone,
+  updateNote,
   UnauthorizedError,
 } from '../src/lib/api'
 
@@ -384,5 +386,98 @@ describe('fetchNote (C11)', () => {
   it('rejects an answer without the creation time (a stale API)', async () => {
     respond(200, { ...detail, note: { ...detail.note, createdAt: undefined } })
     await expect(fetchNote('t', ID)).rejects.toThrow()
+  })
+})
+
+describe('updateNote (R20)', () => {
+  const detail = {
+    now: '2026-10-07T15:05:00.000Z',
+    timezone: 'America/Mexico_City',
+    note: {
+      id: ID,
+      title: 'New title',
+      tags: [{ name: 'Client B', slug: 'client-b' }],
+      dueAt: null,
+      originalDueAt: null,
+      snoozeCount: 0,
+      doneAt: null,
+      createdAt: '2026-10-01T16:00:00.000Z',
+      body: '',
+    },
+  }
+
+  it('sends PATCH /notes/:id with a JSON body and decodes the detail', async () => {
+    const fetchMock = respond(200, detail)
+    const result = await updateNote('token-1', ID, { title: 'New title', body: '' })
+
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect((url as URL).href).toBe(`http://localhost:3000/notes/${ID}`)
+    expect(init?.method).toBe('PATCH')
+    expect(init?.headers).toEqual({
+      Authorization: 'Bearer token-1',
+      'Content-Type': 'application/json',
+    })
+    expect(JSON.parse(init?.body as string)).toEqual({ title: 'New title', body: '' })
+    expect(result.note.title).toBe('New title')
+    expect(result.note.createdAt).toEqual(new Date('2026-10-01T16:00:00.000Z'))
+  })
+
+  it('encodes the three dueAt states: a Date as ISO, null to remove, absent left out', async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(() => Promise.resolve(new Response(JSON.stringify(detail))))
+    await updateNote('t', ID, { dueAt: new Date('2026-10-09T15:30:00.000Z') })
+    await updateNote('t', ID, { dueAt: null })
+    await updateNote('t', ID, { tags: ['client-b'] })
+    const sent = fetchMock.mock.calls.map(([, init]) => JSON.parse(init?.body as string) as object)
+    expect(sent).toEqual([
+      { dueAt: '2026-10-09T15:30:00.000Z' },
+      { dueAt: null },
+      { tags: ['client-b'] },
+    ])
+  })
+
+  it('maps 404 and 400 to ApiError and 401 to UnauthorizedError', async () => {
+    respond(404)
+    await expect(updateNote('t', ID, { title: 'x' })).rejects.toMatchObject({ status: 404 })
+    respond(400)
+    await expect(updateNote('t', ID, { title: 'x' })).rejects.toMatchObject({ status: 400 })
+    respond(401)
+    await expect(updateNote('t', ID, { title: 'x' })).rejects.toBeInstanceOf(UnauthorizedError)
+  })
+})
+
+describe('deleteNote and 204 (R20)', () => {
+  const noContent = () =>
+    vi
+      .spyOn(globalThis, 'fetch')
+      .mockImplementation(() => Promise.resolve(new Response(null, { status: 204 })))
+
+  it('request("DELETE") resolves undefined on 204 without parsing a body', async () => {
+    noContent()
+    await expect(request('DELETE', `/notes/${ID}`, 't')).resolves.toBeUndefined()
+  })
+
+  it('deleteNote sends DELETE with the bearer token, no body and no Content-Type', async () => {
+    const fetchMock = noContent()
+    await expect(deleteNote('token-1', ID)).resolves.toBeUndefined()
+
+    const [url, init] = fetchMock.mock.calls[0]!
+    expect((url as URL).href).toBe(`http://localhost:3000/notes/${ID}`)
+    expect(init?.method).toBe('DELETE')
+    expect(init?.headers).toEqual({ Authorization: 'Bearer token-1' })
+    expect(init).not.toHaveProperty('body')
+  })
+
+  it('a 200 JSON answer still decodes as before (the 204 branch does not swallow bodies)', async () => {
+    respond(200, { ok: true })
+    await expect(request('GET', '/x', 't')).resolves.toEqual({ ok: true })
+  })
+
+  it('maps 404 to ApiError (the caller treats it as already gone) and 401 to UnauthorizedError', async () => {
+    respond(404)
+    await expect(deleteNote('t', ID)).rejects.toMatchObject({ status: 404 })
+    respond(401)
+    await expect(deleteNote('t', ID)).rejects.toBeInstanceOf(UnauthorizedError)
   })
 })
