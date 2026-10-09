@@ -132,8 +132,6 @@ describe('optimistic patch equals the real use case', () => {
     }
     const change: ReminderChange = { type: 'insert', note: wire }
     const patched = applyReminderChange(await world().page(query), change, NOW)
-    // The undated block of an insert joins the parity in the next commit (insertUndated).
-    const same = { ...(await world([note]).page(query)), undated: patched.undated }
-    expect(patched).toEqual(same)
+    expect(patched).toEqual(await world([note]).page(query))
   })
 })

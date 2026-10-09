@@ -80,8 +80,8 @@ Global checks for every commit:
 
 ### Commit 1.7 `feat(web): optimistic undated parity` (1c)
 
-- [ ] 1.7.1 RED `today-patch.test.ts` and `apps/api/test/day-parity.test.ts`: capture without a time (C14), timed capture, filtered/other day, settle with `replacesId`, snooze/done/undo unchanged.
-- [ ] 1.7.2 GREEN `applyReminderChange` insert branch via `insertUndated`.
+- [x] 1.7.1 RED `today-patch.test.ts` and `apps/api/test/day-parity.test.ts`: capture without a time (C14), timed capture, filtered/other day, settle with `replacesId`, snooze/done/undo unchanged.
+- [x] 1.7.2 GREEN `applyReminderChange` insert branch via `insertUndated`.
 
 ### Commit 1.8 `feat(web): Without a reminder list and mobile link` (1c)
 
