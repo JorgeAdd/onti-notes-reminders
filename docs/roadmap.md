@@ -7,16 +7,16 @@ to `docs/CONTRACT.md`.
 Status legend: **Done**, **Named** (referenced in slice 1 artifacts, scope not
 yet specified), **Proposed** (inferred from the v1 scope, not yet agreed).
 
-| Slice | Theme                                   | Status   |
-| ----- | --------------------------------------- | -------- |
-| 1     | Read-only Today page                    | Done     |
-| 2     | Timezone, capture, snooze and done/undo | Done     |
-| 3     | Day navigation and tag filter           | Done     |
-| 4     | Note editing and markdown               | Done     |
-| 5     | All notes and search                    | Done     |
-| 6     | Web Push notifications                  | Proposed |
-| 7     | Merged into slice 2                     | —        |
-| 8     | Page entrance and theme override        | Done     |
+| Slice | Theme                                   | Status |
+| ----- | --------------------------------------- | ------ |
+| 1     | Read-only Today page                    | Done   |
+| 2     | Timezone, capture, snooze and done/undo | Done   |
+| 3     | Day navigation and tag filter           | Done   |
+| 4     | Note editing and markdown               | Done   |
+| 5     | All notes and search                    | Done   |
+| 6     | Web Push notifications                  | Done   |
+| 7     | Merged into slice 2                     | —      |
+| 8     | Page entrance and theme override        | Done   |
 
 ## Slice 1 — Read-only Today page
 
@@ -62,32 +62,16 @@ Deferred items in `docs/backlog.md`.
 Done 2026-10-08. All notes view with full-text word-prefix search (`/` key), excerpts, and tag filtering in All notes. Archived at
 `openspec/changes/archive/2026-10-08-slice-5-all-notes-search/`. Deferred items in `docs/backlog.md`.
 
-## Slice 6 — Web Push notifications (proposed)
+## Slice 6 — Web Push notifications
 
-- Service worker and backend scheduler, one push per `due_at` value (R10).
-- Done from the notification (matrix C3) reuses slice 2's done mutation.
-- "+1 h" from the notification (R7, matrix C15). The notification has two
-  actions, Done and "+1 h" (SG17).
-- Actions authenticate with a signed action token (ADR-004): HMAC-SHA-256
-  over the note, user, `due_at`, allowed actions and a 24 h expiry, carried
-  in the encrypted push payload and sent to
-  `POST /push-actions/{done|snooze}`. On any failure the click opens the
-  app (`/?action=...` with the note id and `due_at`), where the normal JWT
-  path runs the action only if Today still shows that note open with the
-  same `due_at`.
-- A one-time backfill migration marks the currently overdue open reminders
-  as notified, so the first scheduler tick sends no burst.
-- Opt-in permission control in the date column, under the theme control,
-  and in the mobile bar; added after slice 4 merges. Permission is never
-  requested on page load.
-- Sign-out unsubscribes this browser. Pushes go to every subscribed device.
-- Body: the first 2 non-empty lines of the note, markdown stripped, up to
-  120 chars, plus the tag display name.
-- iOS is best effort, with placeholder icons and a web app manifest.
-- Denied permission still leaves the item due in the Today view.
-- Ships as three PRs after slice 4's first PR: backend scheduler and
-  sender; subscription and action endpoints; web (service worker,
-  manifest, permission control).
+Done 2026-10-09 (push not live yet: VAPID setup and manual smoke pending).
+Backend core (PR #20, 88f30ef), endpoints (PR #22, 9d83214) and web (PR #24,
+ce314f2). Scheduler per `due_at` (R10); Done and "+1 h" from the notification
+(C3, C15) authenticated by signed action tokens (ADR-004); subscribe and
+unsubscribe; service worker; opt-in permission control; sign-out unsubscribes
+this browser. Archived at `openspec/changes/archive/2026-10-09-slice-6-web-push/`.
+Deferred items in `docs/backlog.md`.
+
 - Human-only setup:
   - VAPID keys: `npx web-push generate-vapid-keys`.
   - Railway env: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`,

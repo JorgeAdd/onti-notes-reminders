@@ -36,10 +36,10 @@ _Source: slice 3 verify report_
 Mobile statusline hides the mode label (pre-existing behavior). "Thu 8" wraps on 375px devices without causing horizontal scroll. Cosmetic; low priority.
 _Source: slice 3 verify report_
 
-### CI Postgres job for search
+### CI Postgres job for search and push
 
-`apps/api/test/postgres/search.pg.test.ts` (21 tests) is skipped in CI without ONTI_TEST_DATABASE_URL. Add a dedicated throwaway Postgres database step to CI to enable real-database verification in the pipeline.
-_Source: slice 5 verify report_
+`apps/api/test/postgres/search.pg.test.ts` (21 tests) and the Slice 6 push suites `apps/api/test/postgres/push.pg.test.ts` and `apps/api/test/postgres/push-subscriptions.pg.test.ts` are skipped in CI without ONTI_TEST_DATABASE_URL. Add a dedicated throwaway Postgres database step to CI to enable real-database verification in the pipeline. The push suites run in the same job.
+_Source: slice 5 verify report; slice 6 verify reports PR1 and PR2 (pg tests not in CI)_
 
 ### Seed body write path integration test
 
@@ -109,6 +109,42 @@ _Source: slice 4 PR2 apply and verify_
 
 `e` on a Today row opens the note in edit mode; leaving it goes to the All notes list, not back to Today (the view state has no `from` field). A cheap follow-up if it feels wrong.
 _Source: slice 4 design, accepted UX costs_
+
+## Deferred from Slice 6
+
+### Turn push on: HUMAN setup, in this order
+
+1. Generate VAPID keys: `npx web-push generate-vapid-keys`.
+2. Apply `20261008180000_backfill_notified_due_at.sql` to Supabase BEFORE the Railway deploy that sets the VAPID config. Without it, the first scheduler tick sends a burst for overdue reminders.
+3. Railway variables: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `PUSH_ACTION_SECRET` (>= 32 chars), `API_PUBLIC_URL`; `CORS_ORIGINS` includes the Vercel origin.
+4. Run a single, non-sleeping Railway API instance.
+5. Vercel: `VITE_VAPID_PUBLIC_KEY`, then redeploy. Add the same line to `apps/web/.env.example` by hand (not done by the agent: `.env*` files are blocked for it).
+6. Run the four manual smokes in the next entry.
+   _Source: slice 6 tasks H1–H5; slice 6 verify report PR3; archive report_
+
+### Manual smokes for Slice 6 (pending)
+
+Not done yet (2026-10-09).
+
+- 9.2 (local): API with push config logs ticks; without push config, no scheduler.
+- 13.2: `curl` subscribe twice with two users (one row, new owner); action with a forged token gives `401`.
+- 20.2: four bar targets at 375 px without horizontal scroll; if not, move phones to the date column only.
+- 20.3 (after deploy, not CI): delivery within 30 s with the app closed; Done and "+1 h" from the notification; a second tap opens Today and changes nothing; denied copy; sign-out removes the row; iOS installed PWA best effort.
+  _Source: slice 6 tasks 9.2, 13.2, 20.2, 20.3_
+
+### Malformed JSON on `/push-actions` returns 400, not 401
+
+A malformed JSON body on `POST /push-actions/*` gets Fastify's own client error, mapped to `400 validation_error` (`apps/api/src/infrastructure/http/server.ts`). ADR-004 lists `401` for a malformed token, and a malformed body is not a token. No data leaks and no handler runs. No test covers the JSON case. Decide whether ADR-004 names the `400`, or whether the route answers `401`.
+_Source: slice 6 verify report PR2 (untested 400-versus-401 edge); code check at archive_
+
+### PR3 small deviations from design
+
+- No notification icon: `sw.js` shows the notification without the `icon` the design lists.
+- No `Content-Type` header for the manifest in `vercel.json`.
+- The notification control is last in the phone bar.
+- The failure line uses `role="alert"`.
+- `background_color` comes from the page token, not the `--color-desk` value the design lists.
+  _Source: slice 6 verify report PR3, W5 and design notes_
 
 ## Suggestions
 
