@@ -1,6 +1,6 @@
 # CONTRACT — behavior rules
 
-This is the behavioral source of truth. The rules (R1–R19) are general and
+This is the behavioral source of truth. The rules (R1–R20) are general and
 apply to any user and any data. The matrix below proves them with the
 scenario in `docs/product/scenario-dataset.md` (Jorge, `America/Mexico_City`,
 Tue 6 – Thu 8 Oct 2026). Acceptance tests assert every row with an
@@ -131,6 +131,15 @@ timezone; `start(d)` is local midnight of day `d`.
   R11) takes it out, removing one (R8) puts it back. R5 is unchanged: it
   counts the notes not on the viewed page, a different set.
 
+- **R20 · Note editing and delete (slice 4, documented now).** Editing a
+  note changes its title (trimmed, 1–200 chars), its body (basic markdown,
+  R14; at most 20000 chars; may be empty) and its tags (`#slug` grammar as
+  in R11; display names derived from the slug; missing tags are created).
+  The last write wins. Editing never touches the reminder fields; those
+  follow R8. Delete is permanent: the note and its tag links are removed,
+  and a tag with no notes is no longer listed. Another user's note is `404`
+  (R15).
+
 ## Matrix — EVENT → STATE BEFORE → CHANGE → STATE AFTER
 
 Times are local (`America/Mexico_City`, UTC−6). IDs refer to the dataset
@@ -213,7 +222,9 @@ asserted where the feature lives:
 
 Still `todo`: C10 (markdown rendering, web), the `404` half of C11
 (`GET /notes/{id}` for another user's note, API; slice 4 owns note detail),
-and R19 with C13 and C14 (the "Without a reminder" list; slice 4 adds the
-rule and its tests together, CLAUDE.md rule 23).
+R19 with C13 and C14 (the "Without a reminder" list; slice 4 adds the
+rule and its tests together, CLAUDE.md rule 23), and R20 (note editing and
+permanent delete; the slice 4 write-side PR adds its tests, CLAUDE.md
+rule 23).
 C11's `401` part is also covered in `apps/api/test/server.test.ts`; RLS
 isolation was verified with SQL on the migration (see `docs/db/schema.md`).
