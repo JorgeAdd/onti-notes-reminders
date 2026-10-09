@@ -131,7 +131,7 @@ Global checks for every commit:
 
 ### PR2 close
 
-- [ ] 13.1 Final `npm run verify`; PR body with forecast and `size:exception`.
+- [x] 13.1 Final `npm run verify` (api 418 passed + 37 skipped, web 459, shared 290 + 3 todo; api 455 passed with a throwaway database) and `npm run build` green; PR body with forecast. Actual size is about 1,140 added lines against the 800 budget, so PR2 needs `size:exception` or a split (human decision).
 - [ ] 13.2 Manual smoke: `curl` subscribe twice with two users (one row, new owner); action with a forged token 401.
 
 ## PR3 — web: worker, manifest, control, bridge, sign-out (~1,080 lines, `size:exception`)
