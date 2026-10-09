@@ -62,10 +62,10 @@ Global checks for every commit:
 
 ### Commit c2: `feat(api): build the push payload from a claimed reminder` (~230)
 
-- [ ] 2.1 RED: `apps/api/test/plain-text.test.ts`: bold, italic, code, links, images, headings, lists, quotes, fences; blank lines; 3 lines give 2; 120 code points with `…`.
-- [ ] 2.2 GREEN: `apps/api/src/domain/plain-text.ts` (`stripMarkdown`, `firstLines`); note to swap for slice 4's helper if merged.
-- [ ] 2.3 RED: `apps/api/test/push-payload.test.ts`: C2 title `17:00 · …` and body with "Client A"; New York and Mexico City titles; invalid zone → UTC; `tag` = note id; token and `apiUrl` embedded; no id in title or body (rule 13).
-- [ ] 2.4 GREEN: `application/push-ports.ts` (decision 1) and `application/push-payload.ts`.
+- [x] 2.1 RED: `apps/api/test/plain-text.test.ts`: bold, italic, code, links, images, headings, lists, quotes, fences; blank lines; 3 lines give 2; 120 code points with `…`.
+- [x] 2.2 GREEN: `apps/api/src/domain/plain-text.ts` (`stripMarkdown`, `firstLines`); note to swap for slice 4's helper if merged.
+- [x] 2.3 RED: `apps/api/test/push-payload.test.ts`: C2 title `17:00 · …` and body with "Client A"; New York and Mexico City titles; invalid zone → UTC; `tag` = note id; token and `apiUrl` embedded; no id in title or body (rule 13).
+- [x] 2.4 GREEN: `application/push-ports.ts` (decision 1) and `application/push-payload.ts`.
 
 ### Commit c3: `feat(api): dispatch due reminders once per due_at` (~300)
 
