@@ -1,0 +1,45 @@
+/* Same stack as the theme control and Sign out; in the phone bar its parts join the row. */
+.control {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.compact {
+  display: contents;
+}
+
+.text {
+  margin: 0;
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+}
+
+/* An explanation takes the bar's whole row, so a long line never squeezes the buttons. */
+.compact .text {
+  flex: 1 1 100%;
+}
+
+.action {
+  min-width: var(--size-target);
+  min-height: var(--size-target);
+  padding: 0 var(--space-lg);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-control);
+  background: var(--color-page);
+  color: var(--color-ink);
+  font: var(--text-meta-strong);
+  cursor: pointer;
+}
+
+.compact .action {
+  flex: 1 1 auto;
+}
+
+.action:disabled {
+  cursor: progress;
+}
+
+.action:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--space-xs);
+}

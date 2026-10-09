@@ -153,9 +153,9 @@ Global checks for every commit:
 
 ### Commit c14: `feat(web): opt-in notification control` (~420)
 
-- [ ] 17.1 RED: `apps/web/test/push-client.test.ts`: state from permission and subscription; `enable` order; POST failure rolls back; `unsubscribeThisBrowser` never throws.
-- [ ] 17.2 RED: `apps/web/test/push-control.test.tsx`: no `requestPermission` on mount; each state's copy from `messages`; hidden without key; resync once; CSS uses `--size-target`, `--focus-ring`, no `--color-date`, no `--core-*`; desktop column Today only, phone bar slot, absent on All notes.
-- [ ] 17.3 GREEN: `features/push/{push-client,push-api}.ts`, `PushControl.tsx` + CSS, `PushContainer.tsx`; `messages.notifications` appended last; slots in `DayPage`, `DateColumn`, `MobileBar`.
+- [x] 17.1 RED: `apps/web/test/push-client.test.ts`: state from permission and subscription; `enable` order; POST failure rolls back; `unsubscribeThisBrowser` never throws.
+- [x] 17.2 RED: `apps/web/test/push-control.test.tsx`: no `requestPermission` on mount; each state's copy from `messages`; hidden without key; resync once; CSS uses `--size-target`, `--focus-ring`, no `--color-date`, no `--core-*`; desktop column Today only, phone bar slot, absent on All notes.
+- [x] 17.3 GREEN: `features/push/{push-client,push-api}.ts`, `PushControl.tsx` + CSS, `PushContainer.tsx`; `messages.notifications` appended last; slots in `DayPage`, `DateColumn`, `MobileBar`.
 
 ### Commit c15: `feat(web): guarded open-the-app fallback` (~180)
 
