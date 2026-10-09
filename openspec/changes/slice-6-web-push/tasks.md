@@ -114,8 +114,8 @@ Global checks for every commit:
 
 ### Commit c9: `feat(api): done and +1 h from a notification token` (~200)
 
-- [ ] 10.1 RED: `apps/api/test/push-actions.test.ts`: C3 done stamps the clock; done twice keeps `done_at`; C15 10:05 → 11:05, count 2, original Tue 18:00; replay `due_at_changed`; rescheduled `due_at_changed`; snooze on done `not_open`; unknown and another user's note `NotFoundError`; DST D3; token route equals JWT route.
-- [ ] 10.2 GREEN: `application/push-actions.ts` (decisions 13, 14; check inside the row lock).
+- [x] 10.1 RED: `apps/api/test/push-actions.test.ts`: C3 done stamps the clock; done twice keeps `done_at`; C15 10:05 → 11:05, count 2, original Tue 18:00; replay `due_at_changed`; rescheduled `due_at_changed`; snooze on done `not_open`; unknown and another user's note `NotFoundError`; DST D3; token route equals JWT route.
+- [x] 10.2 GREEN: `application/push-actions.ts` (decisions 13, 14; check inside the row lock).
 
 ### Commit c10: `feat(api): subscribe and unsubscribe a browser` (~230)
 
