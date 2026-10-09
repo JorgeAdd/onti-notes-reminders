@@ -69,9 +69,9 @@ Global checks for every commit:
 
 ### Commit c3: `feat(api): dispatch due reminders once per due_at` (~300)
 
-- [ ] 3.1 RED: `apps/api/test/dispatch-due.test.ts`: C2 one push, second tick claims 0; C5 nothing at 11:04, one at 11:05 (re-armed); C7 no subscription marks and sends nothing; past capture sent next tick; done and future skipped; no retry; 3 devices 3 sends; 410 deletes, others still sent; 500 counts; drop at 5; success resets; one reminder's error does not stop others; batch cap 10.
-- [ ] 3.2 GREEN: `application/dispatch-due.ts` (`makeDispatchDue`, `CLAIM_BATCH`, `MAX_BATCHES_PER_TICK`, `MAX_PUSH_FAILURES`); `apps/api/test/push-fakes.ts` (claimer built on `isNotificationDue`, `MutableClock`, fakes).
-- [ ] 3.3 `docs/CONTRACT.md` Verification status: add a "Slice 6" table with C2, C5 (re-arm) and C7 rows citing `dispatch-due.test.ts`.
+- [x] 3.1 RED: `apps/api/test/dispatch-due.test.ts`: C2 one push, second tick claims 0; C5 nothing at 11:04, one at 11:05 (re-armed); C7 no subscription marks and sends nothing; past capture sent next tick; done and future skipped; no retry; 3 devices 3 sends; 410 deletes, others still sent; 500 counts; drop at 5; success resets; one reminder's error does not stop others; batch cap 10.
+- [x] 3.2 GREEN: `application/dispatch-due.ts` (`makeDispatchDue`, `CLAIM_BATCH`, `MAX_BATCHES_PER_TICK`, `MAX_PUSH_FAILURES`); `apps/api/test/push-fakes.ts` (claimer built on `isNotificationDue`, `MutableClock`, fakes).
+- [x] 3.3 `docs/CONTRACT.md` Verification status: add a "Slice 6" table with C2, C5 (re-arm) and C7 rows citing `dispatch-due.test.ts`.
 
 ### Commit c4: `feat(api): sign and verify notification action tokens` (~140)
 

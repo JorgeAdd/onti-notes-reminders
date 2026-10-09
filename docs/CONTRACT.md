@@ -211,6 +211,16 @@ asserted where the feature lives:
 | R12 in All notes        | `packages/shared/test/notes-list.test.ts` (`tag` is a slug), `apps/api/test/search-notes.test.ts` (tag alone, with a term, before the 50 cap, unknown and other users' tags give an empty list), `search-route.test.ts` (`GET /notes?q=&tag=`, 400 for a malformed or repeated tag), `postgres/search.pg.test.ts` (SQL `exists`, 5 tagged notes among 55 newer ones, Ana's same-slug tag). `apps/web/test/notes-container.test.tsx` and `notes-view.test.tsx`: `#` bar, tag applied, statusline `· #slug`, two-step `esc`, phone Tags button and Clear chip. |
 | C11 (listing and `401`) | `apps/api/test/search-route.test.ts`: no token and a forged token give `401`; Ana lists 0 of Jorge's notes. `search-notes.test.ts` and `search.pg.test.ts`: Ana's search never sees his notes (explicit `user_id` plus RLS).                                                                                                                                                                                                                                                                                                                                 |
 
+Slice 6 (Web Push) adds the notification proof. The `it.todo` markers stay in
+`packages/shared/test/contract.test.ts`; the rows are asserted where the feature
+lives:
+
+| Rows        | Proven by                                                                                                                                                                                                                                              |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| C2          | `apps/api/test/dispatch-due.test.ts`: N1 due 17:00 sends one push and the second tick claims 0 (`notified_due_at` is 17:00). `apps/api/test/push-payload.test.ts`: the title `17:00 · …` in the profile zone, the two plain body lines and "Client A". |
+| C5 (re-arm) | `apps/api/test/dispatch-due.test.ts`: N2 notified for 10:05 and snoozed to 11:05 sends nothing at 11:04 and one push at 11:05.                                                                                                                         |
+| C7          | `apps/api/test/dispatch-due.test.ts`: N4 due 09:30 with no subscription is marked as notified, and nothing is sent (the item staying on Today is the slice 1 proof above).                                                                             |
+
 Still `todo`: C10 (markdown rendering, web), the `404` half of C11
 (`GET /notes/{id}` for another user's note, API; slice 4 owns note detail),
 R19 with C13 and C14 (the "Without a reminder" list; slice 4 adds the
