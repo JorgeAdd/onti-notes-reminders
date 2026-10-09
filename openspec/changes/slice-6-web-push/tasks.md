@@ -169,7 +169,7 @@ Global checks for every commit:
 
 ### PR3 close
 
-- [ ] 20.1 Final `npm run verify` and `npm run build`; record main JS size; PR body with `size:exception`.
+- [x] 20.1 Final `npm run verify` (api 491 passed + 49 skipped, web 693, shared 396 + 3 todo) and `npm run build` green; main JS 619.02 kB (178.98 kB gzip); PR body with `size:exception`.
 - [ ] 20.2 Manual: four bar targets at 375 px without horizontal scroll; if not, move phones to the date column only.
 - [ ] 20.3 Manual smoke after deploy (not CI): delivery within 30 s with the app closed; Done and "+1 h" from the notification; second tap opens Today and changes nothing; denied copy; sign-out removes the row; iOS installed PWA best effort.
 
