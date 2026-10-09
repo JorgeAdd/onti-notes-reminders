@@ -4,6 +4,8 @@ import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { UnauthorizedError } from '../../lib/api'
 import { skewOf } from '../../lib/clock'
 import { NoteContainer } from '../note/NoteContainer'
+import { NOTES_KEYS } from '../note/query-keys'
+import type { NoteApi } from '../note/use-note-actions'
 import { useKeyboardLayer } from '../today/use-keyboard-layer'
 import { useNarrow } from '../today/use-narrow'
 import { useNow } from '../today/use-now'
@@ -30,6 +32,10 @@ interface Props {
   noteId: string | null
   /** GET /notes/:id bound to the session token. */
   loadNote: (id: string) => Promise<NoteDetailResponse>
+  /** PATCH and DELETE bound to the session token. */
+  noteApi: NoteApi
+  /** Open the note straight in edit mode (`e` on a Today row). */
+  startInEdit: boolean
   onOpenNote: (id: string) => void
   /** Closes the note view back to the list as it was left. */
   onCloseNote: () => void
@@ -55,6 +61,8 @@ export function NotesContainer({
   onSignOut,
   noteId,
   loadNote,
+  noteApi,
+  startInEdit,
   onOpenNote,
   onCloseNote,
 }: Props) {
@@ -65,7 +73,7 @@ export function NotesContainer({
   const [tag, setTag] = useState<string | null>(null)
   const [tagBarOpen, setTagBarOpen] = useState(false)
   const mobile = useNarrow()
-  const query = useQuery({ queryKey: ['notes', term, tag], queryFn: () => load(term, tag) })
+  const query = useQuery({ queryKey: [...NOTES_KEYS, term, tag], queryFn: () => load(term, tag) })
   const [shown, setShown] = useState<Shown | null>(null)
   // Every tag any answer carried (Decision 15): a narrowed list alone would offer no way to switch.
   const [tagsSeen, setTagsSeen] = useState<Record<string, string>>({})
@@ -123,6 +131,8 @@ export function NotesContainer({
       <NoteContainer
         id={noteId}
         load={loadNote}
+        api={noteApi}
+        startInEdit={startInEdit}
         onClose={onCloseNote}
         onSessionExpired={onSessionExpired}
         onSignOut={onSignOut}

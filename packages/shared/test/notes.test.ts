@@ -6,6 +6,7 @@ import {
   noteDetailResponseSchema,
   noteDetailSchema,
   noteResponseSchema,
+  noteUpdateRequestSchema,
   snoozeRequestSchema,
 } from '../src'
 
@@ -176,5 +177,63 @@ describe('captureRequestSchema (R11)', () => {
       dueAt: new Date('2026-10-06T22:00:00.000Z'),
     })
     expect(wire).toEqual(valid)
+  })
+})
+
+describe('noteUpdateRequestSchema (PATCH /notes/:id, R20)', () => {
+  const parse = (input: unknown) => noteUpdateRequestSchema.safeParse(input)
+
+  it('accepts any single field and leaves the others absent', () => {
+    expect(noteUpdateRequestSchema.parse({ title: '  New title  ' })).toEqual({
+      title: 'New title',
+    })
+    expect(noteUpdateRequestSchema.parse({ body: 'Some **text**' })).toEqual({
+      body: 'Some **text**',
+    })
+    expect(noteUpdateRequestSchema.parse({ tags: ['client-b'] })).toEqual({ tags: ['client-b'] })
+  })
+
+  it('rejects an empty object and one with only unknown keys', () => {
+    expect(parse({}).success).toBe(false)
+    expect(parse({ unknown: 1 }).success).toBe(false)
+  })
+
+  it('strips unknown keys, including client-sent tag names (R11)', () => {
+    expect(noteUpdateRequestSchema.parse({ title: 'a', extra: 1, tagNames: ['X'] })).toEqual({
+      title: 'a',
+    })
+  })
+
+  it.each([
+    ['a blank title', { title: '   ' }],
+    ['an empty title', { title: '' }],
+    ['a title over 200', { title: 'x'.repeat(201) }],
+    ['a body over the limit', { body: 'x'.repeat(NOTE_LIMITS.bodyMax + 1) }],
+    ['a NUL in the title', { title: 'a\u0000b' }],
+    ['a NUL in the body', { body: 'a\u0000b' }],
+    ['a bad slug', { tags: ['Client A'] }],
+    ['duplicate slugs', { tags: ['a', 'a'] }],
+    ['more than 10 tags', { tags: Array.from({ length: 11 }, (_v, i) => `t${i}`) }],
+    ['a slug over 40', { tags: ['x'.repeat(41)] }],
+    ['a non-ISO dueAt', { dueAt: 'tomorrow' }],
+  ])('rejects %s', (_label, input) => {
+    expect(parse(input).success).toBe(false)
+  })
+
+  it('allows an empty body (R20) and a body of exactly the limit', () => {
+    expect(noteUpdateRequestSchema.parse({ body: '' })).toEqual({ body: '' })
+    expect(parse({ body: 'x'.repeat(NOTE_LIMITS.bodyMax) }).success).toBe(true)
+  })
+
+  it('allows an empty tag list (remove every tag)', () => {
+    expect(noteUpdateRequestSchema.parse({ tags: [] })).toEqual({ tags: [] })
+  })
+
+  it('reads dueAt in three states: absent, null (remove), value (reschedule, to the minute)', () => {
+    expect('dueAt' in noteUpdateRequestSchema.parse({ title: 'a' })).toBe(false)
+    expect(noteUpdateRequestSchema.parse({ dueAt: null })).toEqual({ dueAt: null })
+    expect(noteUpdateRequestSchema.parse({ dueAt: '2026-10-08T15:30:45.123Z' })).toEqual({
+      dueAt: new Date('2026-10-08T15:30:00.000Z'),
+    })
   })
 })

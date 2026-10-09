@@ -27,6 +27,11 @@ function whenLabel(dueAt: Date, now: Date, timeZone: string): string {
   return weekdayTime(dueAt, timeZone)
 }
 
+/** "today 17:00 · in 5h48": a due time as the preview words it (also used by the note edit form). */
+export function describeDue(dueAt: Date, now: Date, timeZone: string): string {
+  return `${whenLabel(dueAt, now, timeZone)} · ${relativeLabel(dueAt, now)}`
+}
+
 /**
  * C1 · what the bar shows before ↵: "→ Client A · today 17:00 · in 5h48". The same shared parse
  * and the same display clock produce the payload, so preview equals saved (R11).
@@ -36,9 +41,7 @@ export function previewCapture(input: string, now: Date, timeZone: string): Prev
   if (capture.title === '') return { kind: 'empty' }
   if (capture.title.length > CAPTURE_LIMITS.titleMax) return { kind: 'tooLong' }
   const when =
-    capture.dueAt === null
-      ? messages.capture.noReminder
-      : `${whenLabel(capture.dueAt, now, timeZone)} · ${relativeLabel(capture.dueAt, now)}`
+    capture.dueAt === null ? messages.capture.noReminder : describeDue(capture.dueAt, now, timeZone)
   const tags = capture.tags.map((tag) => tag.name).join(', ')
   return {
     kind: 'ok',

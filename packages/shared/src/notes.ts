@@ -49,17 +49,43 @@ const minuteInstant = z.codec(z.iso.datetime(), z.date(), {
   encode: (date) => date.toISOString(),
 })
 
+const slugList = z
+  .array(z.string().max(CAPTURE_LIMITS.slugMax).regex(TAG_SLUG))
+  .max(CAPTURE_LIMITS.tagsMax)
+  .refine((slugs) => new Set(slugs).size === slugs.length, 'Tag slugs must be unique')
+
 /**
  * POST /notes (R11): the structured result of the capture parse. Tag names are NOT sent; the
  * server derives them from the slugs. A past `dueAt` is valid (an explicit "today 09:00").
  */
 export const captureRequestSchema = z.object({
   title: z.string().trim().min(1).max(CAPTURE_LIMITS.titleMax),
-  tags: z
-    .array(z.string().max(CAPTURE_LIMITS.slugMax).regex(TAG_SLUG))
-    .max(CAPTURE_LIMITS.tagsMax)
-    .refine((slugs) => new Set(slugs).size === slugs.length, 'Tag slugs must be unique'),
+  tags: slugList,
   dueAt: minuteInstant.nullable(),
 })
 
 export type CaptureRequest = z.output<typeof captureRequestSchema>
+
+/** Postgres `text` cannot store U+0000, so it must be a 400 here instead of a 500 there. */
+const hasNoNul = (value: string) => !value.includes('\u0000')
+
+/**
+ * PATCH /notes/:id (R20, R8): every field optional, at least one required. `dueAt` has three
+ * states: absent = unchanged, `null` = remove the reminder, a value = reschedule. Tag names are
+ * not accepted (R11: the server derives them) and zod strips them as unknown keys.
+ */
+export const noteUpdateRequestSchema = z
+  .object({
+    title: z.string().trim().min(1).max(CAPTURE_LIMITS.titleMax).refine(hasNoNul),
+    /** R20: a body may be empty; only the title may not. */
+    body: z.string().max(NOTE_LIMITS.bodyMax).refine(hasNoNul),
+    tags: slugList,
+    dueAt: minuteInstant.nullable(),
+  })
+  .partial()
+  .refine(
+    (patch) => Object.values(patch).some((value) => value !== undefined),
+    'At least one field is required',
+  )
+
+export type NoteUpdateRequest = z.output<typeof noteUpdateRequestSchema>

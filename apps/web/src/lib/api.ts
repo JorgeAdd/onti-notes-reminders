@@ -1,8 +1,10 @@
 import {
   noteDetailResponseSchema,
   noteResponseSchema,
+  noteUpdateRequestSchema,
   type CaptureRequest,
   type NoteDetailResponse,
+  type NoteUpdateRequest,
   timezoneResponseSchema,
   todayResponseSchema,
   type NoteResponse,
@@ -11,6 +13,7 @@ import {
   type SnoozePreset,
   type TodayResponse,
 } from '@onti/shared'
+import { z } from 'zod'
 import { env } from './env'
 
 /** The API rejected the token: the session is over (Decision 12). Other failures stay generic. */
@@ -37,7 +40,7 @@ export class ApiError extends Error {
  * empty body declared as JSON, and the done/undo actions send none (Decision 10).
  */
 export async function request(
-  method: 'GET' | 'POST' | 'PATCH',
+  method: 'GET' | 'POST' | 'PATCH' | 'DELETE',
   path: string,
   accessToken: string,
   body?: unknown,
@@ -51,6 +54,8 @@ export async function request(
   })
   if (response.status === 401) throw new UnauthorizedError()
   if (!response.ok) throw new ApiError(response.status, `${method} ${path}`)
+  // 204 has no body, and `response.json()` would throw on it (DELETE, R20).
+  if (response.status === 204) return undefined
   return response.json()
 }
 
@@ -116,4 +121,22 @@ export async function searchNotes(
 /** C11 · one of the caller's notes with its body; another user's note and an unknown id are 404. */
 export async function fetchNote(accessToken: string, id: string): Promise<NoteDetailResponse> {
   return noteDetailResponseSchema.parse(await request('GET', `/notes/${id}`, accessToken))
+}
+
+/**
+ * R20, R8 · edits a note: only the fields present change; `dueAt` is absent (unchanged), `null`
+ * (remove the reminder) or a Date (reschedule). Answers the updated detail.
+ */
+export async function updateNote(
+  accessToken: string,
+  id: string,
+  patch: NoteUpdateRequest,
+): Promise<NoteDetailResponse> {
+  const body = z.encode(noteUpdateRequestSchema, patch)
+  return noteDetailResponseSchema.parse(await request('PATCH', `/notes/${id}`, accessToken, body))
+}
+
+/** R20 · permanent delete. 404 means it is already gone; the caller decides what that means. */
+export async function deleteNote(accessToken: string, id: string): Promise<void> {
+  await request('DELETE', `/notes/${id}`, accessToken)
 }

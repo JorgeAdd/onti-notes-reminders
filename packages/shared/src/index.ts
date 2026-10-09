@@ -12,11 +12,13 @@ export {
   noteDetailResponseSchema,
   noteDetailSchema,
   noteResponseSchema,
+  noteUpdateRequestSchema,
   snoozeRequestSchema,
   type CaptureRequest,
   type NoteDetail,
   type NoteDetailResponse,
   type NoteResponse,
+  type NoteUpdateRequest,
   type SnoozePreset,
   type SnoozeRequest,
 } from './notes'

@@ -1,0 +1,98 @@
+.form {
+  display: grid;
+  gap: var(--space-md);
+  max-width: 40rem;
+}
+
+.field {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.label {
+  font: var(--text-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.current {
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+}
+
+.input,
+.textarea {
+  padding: 0 var(--space-md);
+  background: var(--color-page);
+  color: var(--color-ink);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  font: var(--text-body);
+}
+
+.input {
+  min-height: var(--size-target);
+}
+
+.textarea {
+  padding: var(--space-md);
+  min-height: var(--size-target);
+  resize: vertical;
+}
+
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: var(--focus-ring);
+}
+
+/* SG5: the reminder preview is Plex Mono italic, ink only. */
+.preview {
+  margin: 0;
+  font: var(--text-meta);
+  font-style: italic;
+  color: var(--color-ink-muted);
+}
+
+.error {
+  margin: 0;
+  font: var(--text-meta);
+  color: var(--color-ink);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.button,
+.save {
+  min-height: var(--size-target);
+  padding: 0 var(--space-lg);
+  background: var(--color-page);
+  color: var(--color-ink);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  font: var(--text-meta);
+  cursor: pointer;
+}
+
+/* SG20: Save is the one ink-filled control. */
+.save {
+  background: var(--color-ink);
+  color: var(--color-page);
+  border-color: var(--color-ink);
+  font: var(--text-meta-strong);
+}
+
+.save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.button:focus-visible,
+.save:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}

@@ -99,43 +99,43 @@ Global checks for every commit:
 
 ### Commit 2.1 `feat(shared): note update request and clearReminder` (2a)
 
-- [ ] 2.1.1 RED `notes.test.ts`: `{}` rejected, blank title 400, `''` body ok, body 20001 rejected, U+0000, `dueAt` three states; `rules.test.ts` `clearReminder`, R8 reopen.
-- [ ] 2.1.2 GREEN `noteUpdateRequestSchema`, `clearReminder` in `domain/reminder.ts`.
+- [x] 2.1.1 RED `notes.test.ts`: `{}` rejected, blank title 400, `''` body ok, body 20001 rejected, U+0000, `dueAt` three states; `rules.test.ts` `clearReminder`, R8 reopen.
+- [x] 2.1.2 GREEN `noteUpdateRequestSchema`, `clearReminder` in `domain/reminder.ts`.
 
 ### Commit 2.2 `feat(api): update and delete note use cases` (2a)
 
-- [ ] 2.2.1 RED `update-note.test.ts` (title/body, tags replaced with derived names, R8 reschedule, null clears, foreign 404, throw rolls back), `delete-note.test.ts`.
-- [ ] 2.2.2 GREEN `NotePatch`, fake `updateOwn`/`deleteOwn`, `application/{update-note,delete-note}.ts`.
+- [x] 2.2.1 RED `update-note.test.ts` (title/body, tags replaced with derived names, R8 reschedule, null clears, foreign 404, throw rolls back), `delete-note.test.ts`.
+- [x] 2.2.2 GREEN `NotePatch`, fake `updateOwn`/`deleteOwn`, `application/{update-note,delete-note}.ts`.
 
 ### Commit 2.3 `feat(api): PATCH and DELETE /notes/:id` (2a)
 
-- [ ] 2.3.1 RED `note-write-route.test.ts`: 200, 400 cases, 404 (Ana, unknown, non-UUID), 401, DELETE 204 then 404, last write wins.
-- [ ] 2.3.2 GREEN Postgres `updateOwn`/`deleteOwn`, routes, `main.ts`; `postgres/note-update.pg.test.ts` (orphan tags not listed, cascade, RLS).
-- [ ] 2.3.3 `docs/CONTRACT.md`: R20 from `todo` to proven with these test paths (rule 23).
+- [x] 2.3.1 RED `note-write-route.test.ts`: 200, 400 cases, 404 (Ana, unknown, non-UUID), 401, DELETE 204 then 404, last write wins.
+- [x] 2.3.2 GREEN routes, `main.ts` (Postgres `updateOwn`/`deleteOwn` and `postgres/note-update.pg.test.ts` landed in 2.2: the port change breaks typecheck otherwise).
+- [x] 2.3.3 `docs/CONTRACT.md`: R20 from `todo` to proven with these test paths (rule 23).
 
 ### Commit 2.4 `refactor(shared): readDue and parseTagList` (2b)
 
-- [ ] 2.4.1 RED `tag.test.ts` `parseTagList`; capture tests `readDue` parity. GREEN `domain/{tag,capture}.ts`.
+- [x] 2.4.1 RED `tag.test.ts` `parseTagList`; capture tests `readDue` parity. GREEN `domain/{tag,capture}.ts`.
 
 ### Commit 2.5 `feat(web): DELETE and 204 in the api client` (2b)
 
-- [ ] 2.5.1 RED `api.test.ts` (204 → `undefined`, 404, 401, no `Content-Type`). GREEN `request`, `updateNote`, `deleteNote`.
+- [x] 2.5.1 RED `api.test.ts` (204 → `undefined`, 404, 401, no `Content-Type`). GREEN `request`, `updateNote`, `deleteNote`.
 
 ### Commit 2.6 `feat(web): edit mode in the note view` (2b)
 
-- [ ] 2.6.1 RED `note-edit.test.tsx` (design Testing PR2 row 7, cache invalidation spies).
-- [ ] 2.6.2 GREEN `NoteEditForm.tsx` + CSS, `use-note-actions.ts`, `NoteContainer` modes, `messages.ts`.
+- [x] 2.6.1 RED `note-edit.test.tsx` (design Testing PR2 row 7, cache invalidation spies).
+- [x] 2.6.2 GREEN `NoteEditForm.tsx` + CSS, `use-note-actions.ts`, `NoteContainer` modes, `messages.ts`.
 
 ### Commit 2.7 `feat(web): inline delete confirm` (2c)
 
-- [ ] 2.7.1 RED `note-delete.test.tsx` (`d`, `↵`, `esc` stays, 404 gone, no double fire, `d` elsewhere inert). GREEN `StatuslineConfirm.tsx`.
+- [x] 2.7.1 RED `note-delete.test.tsx` (`d`, `↵`, `esc` stays, 404 gone, no double fire, `d` elsewhere inert). GREEN `StatuslineConfirm.tsx`.
 
 ### Commit 2.8 `feat(web): e on a focused Today row opens edit` (2c)
 
-- [ ] 2.8.1 RED `keys.test.ts`, `keyboard.test.tsx`, `today-edit-key.test.tsx`. GREEN `keys.ts`, `use-today-rows.ts`, `TodayContainer`, `App.tsx`; `docs/roadmap.md`, `docs/backlog.md`.
+- [x] 2.8.1 RED `keys.test.ts`, `keyboard.test.tsx`, `today-edit-key.test.tsx`. GREEN `keys.ts`, `use-today-rows.ts`, `TodayContainer`, `App.tsx`; `docs/roadmap.md`, `docs/backlog.md`.
 
 ### PR2 verify and smoke
 
-- [ ] 2.9.1 `npm run verify` and `npm run build`.
+- [x] 2.9.1 `npm run verify` and `npm run build`.
 - [ ] 2.9.2 Manual smoke both viewports, light/dark: edit, empty body save, reschedule onto today (counts), remove reminder (back in list), delete confirm/cancel, `e` from Today.
 - [ ] 2.9.3 Open PR2 (after asking), label `size:exception`; same Railway-before-Vercel sequencing question.

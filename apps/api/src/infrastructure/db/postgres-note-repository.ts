@@ -1,6 +1,6 @@
 import type { Reminder } from '@onti/shared'
 import { sql, type Kysely, type Transaction } from 'kysely'
-import type { NewNote, NoteListRow, NoteRepository } from '../../application/ports'
+import type { NewNote, NoteListRow, NotePatch, NoteRepository } from '../../application/ports'
 import type { Identity } from '../../domain/identity'
 import type { NoteDetail, NoteRecord } from '../../domain/note'
 import { asUser } from './as-user'
@@ -89,6 +89,85 @@ export class PostgresNoteRepository implements NoteRepository {
         notifiedDueAt: row.notified_due_at,
         createdAt: row.created_at,
       }
+    })
+  }
+
+  updateOwn(identity: Identity, id: string, patch: NotePatch): Promise<NoteDetail | null> {
+    return asUser(this.db, identity, async (trx) => {
+      // `for update` (as mutateReminder): two edits of one note serialise, none is lost.
+      const row = await trx
+        .selectFrom('notes')
+        .select([
+          'id',
+          'title',
+          'body',
+          'due_at',
+          'original_due_at',
+          'snooze_count',
+          'done_at',
+          'notified_due_at',
+          'created_at',
+        ])
+        .where('id', '=', id)
+        .where('user_id', '=', identity.userId)
+        .forUpdate()
+        .executeTakeFirst()
+      if (!row) return null
+
+      const current: Reminder = {
+        dueAt: row.due_at,
+        originalDueAt: row.original_due_at,
+        snoozeCount: row.snooze_count,
+        doneAt: row.done_at,
+        notifiedDueAt: row.notified_due_at,
+      }
+      // Anything the reminder step throws rolls the whole transaction back.
+      const reminder = patch.reminder ? patch.reminder(current) : current
+      const title = patch.title ?? row.title
+      const body = patch.body ?? row.body
+
+      // Skipped when nothing differs, so `updated_at` (set by trigger) does not move.
+      if (title !== row.title || body !== row.body || !sameReminder(current, reminder)) {
+        await trx
+          .updateTable('notes')
+          .set({
+            title,
+            body,
+            due_at: reminder.dueAt,
+            original_due_at: reminder.originalDueAt,
+            snooze_count: reminder.snoozeCount,
+            done_at: reminder.doneAt,
+            notified_due_at: reminder.notifiedDueAt,
+          })
+          .where('id', '=', id)
+          .where('user_id', '=', identity.userId)
+          .execute()
+      }
+
+      if (patch.tags) await replaceTags(trx, identity.userId, id, patch.tags)
+
+      const tags = (await tagsFor(trx, identity.userId, [id])).get(id) ?? []
+      return {
+        id,
+        title,
+        body,
+        tags,
+        ...reminder,
+        createdAt: row.created_at,
+      }
+    })
+  }
+
+  async deleteOwn(identity: Identity, id: string): Promise<boolean> {
+    return asUser(this.db, identity, async (trx) => {
+      // note_tags cascades; the generated search column goes with the row. RLS is the second lock.
+      const deleted = await trx
+        .deleteFrom('notes')
+        .where('id', '=', id)
+        .where('user_id', '=', identity.userId)
+        .returning('id')
+        .executeTakeFirst()
+      return deleted !== undefined
     })
   }
 
@@ -303,6 +382,44 @@ export class PostgresNoteRepository implements NoteRepository {
         })),
       }
     })
+  }
+}
+
+/**
+ * Makes `wanted` the note's tag set. Tags upsert sorted by slug (same lock order as capture) with
+ * the no-op `do update` so an existing tag keeps its stored name; the links are then replaced.
+ * Tags left without notes stay as rows and never list (R20: lists derive from notes).
+ */
+async function replaceTags(
+  trx: Transaction<Database>,
+  userId: string,
+  noteId: string,
+  wanted: { slug: string; name: string }[],
+): Promise<void> {
+  const sorted = [...wanted].sort((a, b) => a.slug.localeCompare(b.slug))
+  const tags =
+    sorted.length === 0
+      ? []
+      : await trx
+          .insertInto('tags')
+          .values(sorted.map(({ slug, name }) => ({ user_id: userId, slug, name })))
+          .onConflict((conflict) =>
+            conflict
+              .columns(['user_id', 'slug'])
+              .doUpdateSet({ slug: (eb) => eb.ref('tags.slug') }),
+          )
+          .returning(['id'])
+          .execute()
+  await trx
+    .deleteFrom('note_tags')
+    .where('note_id', '=', noteId)
+    .where('user_id', '=', userId)
+    .execute()
+  if (tags.length > 0) {
+    await trx
+      .insertInto('note_tags')
+      .values(tags.map((tag) => ({ user_id: userId, note_id: noteId, tag_id: tag.id })))
+      .execute()
   }
 }
 

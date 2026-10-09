@@ -11,11 +11,13 @@ import { makeGetMe } from '../src/application/get-me'
 import { makeGetNote } from '../src/application/get-note'
 import { makeGetToday } from '../src/application/get-today'
 import { makeCaptureNote } from '../src/application/capture-note'
+import { makeDeleteNote } from '../src/application/delete-note'
 import { makeMarkDone } from '../src/application/mark-done'
 import { makeSearchNotes } from '../src/application/search-notes'
 import { makeSetTimezone } from '../src/application/set-timezone'
 import { makeSnoozeNote } from '../src/application/snooze-note'
 import { makeUndoDone } from '../src/application/undo-done'
+import { makeUpdateNote } from '../src/application/update-note'
 import type {
   Clock,
   NoteRepository,
@@ -62,6 +64,8 @@ const failingNotes: NoteRepository = {
   mutateReminder: () => Promise.reject(new Error('connection refused: postgres://secret')),
   searchOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
   findOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
+  updateOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
+  deleteOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
 }
 
 /** N1 (index 0) is done; N2 (index 1) is the late open item due Tue 18:00. */
@@ -91,6 +95,8 @@ function server(
       snoozeNote: makeSnoozeNote({ clock, notes: noteRepository, profiles }),
       markDone: makeMarkDone({ clock, notes: noteRepository }),
       undoDone: makeUndoDone({ notes: noteRepository }),
+      updateNote: makeUpdateNote({ clock, notes: noteRepository, profiles }),
+      deleteNote: makeDeleteNote({ notes: noteRepository }),
     },
     corsOrigins: ['https://app.example'],
     searchNotes: makeSearchNotes({ clock, notes: noteRepository, profiles }),
