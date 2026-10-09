@@ -63,6 +63,9 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+/** Lets the bridge's async chain finish (a macrotask), so a "not called" check proves something. */
+const settle = () => new Promise((resolve) => setTimeout(resolve, 0))
+
 describe('the URL action (ADR-004 decision 5)', () => {
   it('clears the URL before anything else, then runs Done when Today still shows the note open with that due_at', async () => {
     url('done', open.id, DUE)
@@ -86,7 +89,7 @@ describe('the URL action (ADR-004 decision 5)', () => {
     url('snooze', open.id, DUE + 3_600_000)
     mount()
     await waitFor(() => expect(api.fetchToday).toHaveBeenCalled())
-    await Promise.resolve()
+    await settle()
     expect(api.snoozeNote).not.toHaveBeenCalled()
     expect(location.search).toBe('')
   })
@@ -110,7 +113,7 @@ describe('the URL action (ADR-004 decision 5)', () => {
     url('done', '00000000-0000-4000-8000-0000000000ff', DUE)
     mount()
     await waitFor(() => expect(api.fetchToday).toHaveBeenCalledTimes(2))
-    await Promise.resolve()
+    await settle()
     expect(api.markNoteDone).not.toHaveBeenCalled()
   })
 
@@ -122,12 +125,12 @@ describe('the URL action (ADR-004 decision 5)', () => {
     ] as const) {
       url(action, open.id, due)
       const view = mount()
-      await Promise.resolve()
+      await settle()
       expect(location.search).toBe('')
       view.unmount()
     }
     mount()
-    await Promise.resolve()
+    await settle()
     expect(api.fetchToday).not.toHaveBeenCalled()
     expect(api.markNoteDone).not.toHaveBeenCalled()
     expect(api.snoozeNote).not.toHaveBeenCalled()
@@ -162,7 +165,7 @@ describe('worker messages', () => {
     mount()
     message({ type: 'onti:action', action: 'snooze', noteId: open.id, dueAt: DUE - 60_000 })
     await waitFor(() => expect(api.fetchToday).toHaveBeenCalled())
-    await Promise.resolve()
+    await settle()
     expect(api.snoozeNote).not.toHaveBeenCalled()
   })
 
