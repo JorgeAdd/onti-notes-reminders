@@ -47,8 +47,8 @@ Global checks for every commit:
 
 ## Commit 2 `test(web): capture examples run through the R11 parser` (unit 2)
 
-- [ ] 2.1 RED `apps/web/test/help-examples.test.ts`: per-`input` expectation (title, tags, due) with `parseCapture` at Wed 09:05 `America/Mexico_City` and Wed 18:00; every example has an expectation; `shows` names the day word and time.
-- [ ] 2.2 GREEN `messages.help.examples`: `Call back 17:00`, `Call back today 08:00`, `Call back tomorrow 9:00`, `Stretch +30m`, `Review PR +2h`, `Call back #client-a`, `Buy milk`; wire into `buildHelp` Capture.
+- [x] 2.1 RED `apps/web/test/help-examples.test.ts`: per-`input` expectation (title, tags, due) with `parseCapture` at Wed 09:05 `America/Mexico_City` and Wed 18:00; every example has an expectation; `shows` names the day word and time.
+- [x] 2.2 GREEN `messages.help.examples`: `Call back 17:00`, `Call back today 08:00`, `Call back tomorrow 9:00`, `Stretch +30m`, `Review PR +2h`, `Call back #client-a`, `Buy milk`; wire into `buildHelp` Capture.
 
 ## Commit 3 `feat(web): ? command in the Today key reducer` (unit 3)
 

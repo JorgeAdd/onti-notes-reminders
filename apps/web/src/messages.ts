@@ -124,6 +124,16 @@ export const messages = {
       search: 'all notes and search',
     },
     captureCancel: 'esc cancel capture',
+    /** R11 examples: `shows` is true at any moment; help-examples.test.ts runs each through the parser. */
+    examples: [
+      { input: 'Call back 17:00', shows: 'today 17:00, or tomorrow once it has passed' },
+      { input: 'Call back today 08:00', shows: 'today 08:00, even if it has passed (shown late)' },
+      { input: 'Call back tomorrow 9:00', shows: 'tomorrow 09:00' },
+      { input: 'Stretch +30m', shows: '30 minutes from now' },
+      { input: 'Review PR +2h', shows: '2 hours from now' },
+      { input: 'Call back #client-a', shows: 'tagged client-a, no reminder' },
+      { input: 'Buy milk', shows: 'a note with no reminder' },
+    ],
     /** On a phone the touch lines replace the key rows. */
     touch: {
       capture: [

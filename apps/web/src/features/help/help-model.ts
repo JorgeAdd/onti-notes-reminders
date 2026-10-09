@@ -11,10 +11,17 @@ export interface HelpRow {
   detail?: string
 }
 
+export interface HelpExample {
+  input: string
+  shows: string
+}
+
 export interface HelpSection {
   id: HelpSectionId
   title: string
   rows: HelpRow[]
+  /** Capture only: what typing each example does (the presets insert the same tokens). */
+  examples?: HelpExample[]
 }
 
 interface RowDef {
@@ -89,6 +96,7 @@ export function buildHelp(touch: boolean): HelpSection[] {
     id,
     title: messages.help.sections[id],
     rows: touch ? touchRows(id) : keyRows(id),
+    ...(id === 'capture' ? { examples: [...messages.help.examples] } : {}),
   }))
 }
 
