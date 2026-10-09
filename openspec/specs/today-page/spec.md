@@ -6,7 +6,7 @@ Read-only day page for the signed-in user. Behavior numbers live in `docs/CONTRA
 
 ### Requirement: GET /today API
 
-The API MUST expose `GET /today`, verify the JWT, and return the day page of the token subject only (R15). "Today" and every per-day grouping MUST use the profile timezone (R16) and the Clock port (R1). The response MUST conform to a shared schema validated on both sides.
+The API MUST expose `GET /today`, verify the JWT, and return the day page of the token subject only (R15). "Today" and every per-day grouping MUST use the profile timezone (R16) and the Clock port (R1). The response MUST conform to a shared schema validated on both sides. [PR1] It MUST also carry the undated set of `undated-list` (R19).
 
 #### Scenario: Wed 09:05 day page (C4)
 
@@ -32,6 +32,12 @@ The API MUST expose `GET /today`, verify the JWT, and return the day page of the
 - GIVEN a profile timezone with a DST day (D1/D2)
 - WHEN `/today` is requested on that day
 - THEN the window is computed in local-day arithmetic (R1)
+
+#### Scenario: Undated set [PR1]
+
+- GIVEN Jorge's dataset at Wed 7 09:05
+- WHEN he requests `/today`
+- THEN the response carries the C13 undated count and leading items, and the page fields are unchanged
 
 ### Requirement: Page sections
 
@@ -63,7 +69,7 @@ On today's page the page MUST show, per boards 03/05 (light) and 09/11 (dark): d
 
 ### Requirement: Statusline
 
-A statusline fixed at the bottom MUST show the weekday, day, today/carried/total counts and the current time, matching boards 03/09; weekday and day name the viewed day. The mode label MUST show on desktop; MAY be hidden on narrow (mobile) layouts per board 05. While a tag filter is on, the mode label MUST read `FILTER · #{slug}` (`tag-filter`). On desktop it MUST show key hints only for keys that work in the current state (`c`, `j`/`k`, `x`, `z`, `s`, `esc`, and `[`/`]`, `t`, `#`, `tab`, `↵` per `day-navigation` and `tag-filter`, and `/` for search), and MUST NOT show hints for keys of unshipped features. Hint text MUST come from messages.
+A statusline fixed at the bottom MUST show the weekday, day, today/carried/total counts and the current time, matching boards 03/09; weekday and day name the viewed day. The mode label MUST show on desktop; MAY be hidden on narrow (mobile) layouts per board 05. While a tag filter is on, the mode label MUST read `FILTER · #{slug}` (`tag-filter`). On desktop it MUST show key hints only for keys that work in the current state (`c`, `j`/`k`, `x`, `z`, `s`, `esc`, and `[`/`]`, `t`, `#`, `tab`, `↵` per `day-navigation` and `tag-filter`, `/` for search, and `e` with a row focused [PR2]), and MUST NOT show hints for keys of unshipped features. Hint text MUST come from messages.
 
 #### Scenario: Counts
 
@@ -75,7 +81,13 @@ A statusline fixed at the bottom MUST show the weekday, day, today/carried/total
 
 - GIVEN a desktop viewport, today, no item focused and no filter
 - WHEN the statusline renders
-- THEN it hints `c`, `j`/`k`, `[`/`]`, `#` and `/`, and does not hint `x`, `z`, `s`, `t`, `tab` or `↵`; with an open item focused it adds `x` and `s`; with a done item focused, `z`
+- THEN it hints `c`, `j`/`k`, `[`/`]`, `#` and `/`, and does not hint `x`, `z`, `s`, `t`, `tab`, `↵` or `e`; with an open item focused it adds `x` and `s`; with a done item focused, `z`
+
+#### Scenario: Edit hint [PR2]
+
+- GIVEN a desktop viewport and any Today row focused
+- WHEN the statusline renders
+- THEN it also hints `e`, and does not hint `d`
 
 #### Scenario: Day and filter hints
 
@@ -146,6 +158,32 @@ The page MUST have landmarks (main, header, statusline) and one h1. Times MUST b
 - GIVEN any focusable element
 - WHEN it receives focus
 - THEN a visible ink outline shows and its target is at least 44 px
+
+### Requirement: Edit key on a Today row [PR2]
+
+`e` on a focused Today row MUST open the note view in edit mode (`note-editing`). It MUST do nothing with no focused row, inside text fields, or while the capture bar, tag bar or a sheet is open. Rows in "Other notes with #{tag}" and mobile sheets offer no `e`.
+
+#### Scenario: Focused row
+
+- GIVEN a focused rail row
+- WHEN `e` is pressed
+- THEN All notes opens on that note in edit mode
+
+#### Scenario: Capture bar open
+
+- GIVEN the capture bar is focused
+- WHEN `e` is typed
+- THEN the letter is typed and nothing opens
+
+### Requirement: Undated list in the date column [PR1]
+
+The date column MUST render the undated list and mobile link of `undated-list`, and the "Without a reminder" copy MUST come from messages. It MUST NOT change the other-notes count (R5).
+
+#### Scenario: Coexistence (C13)
+
+- GIVEN Wed 09:05
+- WHEN Today renders
+- THEN "Without a reminder · 9" and "11 other notes on the back of the pad" both show
 
 ## Out of scope (replaces the slice-1 list)
 

@@ -134,7 +134,7 @@ On narrow screens, tapping a row MUST open an action sheet with Done (or Undo fo
 
 ### Requirement: Optimistic updates and failure
 
-Every action MUST update the viewed page immediately, on any day and with or without a tag filter, using the same day-page rules (R3, R4, R5, R12 and the another-day rule), then reconcile with the server. Counts, other notes and filter sections MUST stay consistent after the patch. On failure the previous page MUST be restored, the viewed page refetched, and one line from messages shown. A `401` on any mutation MUST end the session and show "session expired".
+Every action MUST update the viewed page immediately, on any day and with or without a tag filter, using the same day-page rules (R3, R4, R5, R12 and the another-day rule), then reconcile with the server. Counts, other notes and filter sections MUST stay consistent after the patch. [PR1] Capture without a time MUST also update the undated list optimistically: the pending note first, the count plus one, the row limit kept (R19, `undated-list`); settling swaps the pending row for the server note. On failure the previous page MUST be restored, the viewed page refetched, and one line from messages shown. A `401` on any mutation MUST end the session and show "session expired".
 
 #### Scenario: Failure rollback
 
@@ -159,3 +159,9 @@ Every action MUST update the viewed page immediately, on any day and with or wit
 - GIVEN the token expired
 - WHEN any action returns `401`
 - THEN the user returns to sign-in with "session expired"
+
+#### Scenario: Undated parity [PR1]
+
+- GIVEN C13 and a capture without a time (C14)
+- WHEN the optimistic page is computed
+- THEN its undated count and rows equal the next `GET /today`; the snooze, done and undo actions leave the undated list unchanged
