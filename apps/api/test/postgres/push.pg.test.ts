@@ -205,7 +205,15 @@ describe.skipIf(!DB_URL)('Postgres push scheduler statements (real database)', (
   })
 
   describe('backfill migration', () => {
-    const run = async () => (await pool.query(readFileSync(MIGRATION, 'utf8'))).rowCount
+    // The migration is global, so other pg files' notes may change too: assert only this user's rows.
+    const run = async () => {
+      await pool.query(readFileSync(MIGRATION, 'utf8'))
+    }
+    const anaRows = () =>
+      q<{ id: string; due_at: Date | null; notified_due_at: Date | null }>(
+        'select id, due_at, notified_due_at from notes where user_id = $1 order by id',
+        [ANA],
+      )
 
     it('marks only overdue open reminders, leaves due_at, and a second run is a no-op', async () => {
       await q(
@@ -221,20 +229,15 @@ describe.skipIf(!DB_URL)('Postgres push scheduler statements (real database)', (
       )
       await q(`insert into notes (id, user_id, title) values ($1, $2, 'plain')`, [nid(4), ANA])
 
-      const before = await q<{ id: string; due_at: Date | null }>(
-        'select id, due_at from notes where user_id = $1 order by id',
-        [ANA],
-      )
-      expect(await run()).toBe(1)
+      const before = await anaRows()
+      await run()
 
-      const after = await q<{ id: string; due_at: Date | null; notified_due_at: Date | null }>(
-        'select id, due_at, notified_due_at from notes where user_id = $1 order by id',
-        [ANA],
-      )
+      const after = await anaRows()
       expect(after.map((r) => r.due_at)).toEqual(before.map((r) => r.due_at))
       expect(after.map((r) => r.notified_due_at !== null)).toEqual([true, false, false, false])
       expect(after[0]!.notified_due_at).toEqual(after[0]!.due_at)
-      expect(await run()).toBe(0)
+      await run()
+      expect(await anaRows()).toEqual(after)
     })
   })
 
