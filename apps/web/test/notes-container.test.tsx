@@ -41,6 +41,8 @@ function renderNotes(
         onSignOut={() => undefined}
         noteId={null}
         loadNote={() => new Promise(() => undefined)}
+        noteApi={{ save: () => Promise.reject(new Error('unexpected save')) }}
+        startInEdit={false}
         onOpenNote={() => undefined}
         onCloseNote={() => undefined}
       />

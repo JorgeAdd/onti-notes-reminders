@@ -44,6 +44,8 @@ function setup(
       <NoteContainer
         id={ID}
         load={load}
+        api={{ save: () => Promise.reject(new Error('unexpected save')) }}
+        startInEdit={false}
         onClose={onClose}
         onSessionExpired={onSessionExpired}
         onSignOut={() => undefined}
@@ -126,11 +128,12 @@ it('ends the session on a 401', async () => {
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 })
 
-it('hints esc only, and esc and the Back button close the view', async () => {
+it('hints e and esc, and esc and the Back button close the view', async () => {
   const { user, onClose } = setup(() => Promise.resolve(detail()))
   await screen.findByRole('heading', { level: 1 })
+  expect(footer()).toHaveTextContent(messages.note.hints.edit)
   expect(footer()).toHaveTextContent(messages.note.hints.back)
-  expect(footer()).not.toHaveTextContent(/edit|delete/i)
+  expect(footer()).not.toHaveTextContent(/delete/i)
 
   await user.keyboard('{Escape}')
   expect(onClose).toHaveBeenCalledTimes(1)
@@ -138,17 +141,18 @@ it('hints esc only, and esc and the Back button close the view', async () => {
   expect(onClose).toHaveBeenCalledTimes(2)
 })
 
-it('x, s, z and other keys do nothing and send no request', async () => {
+it('x, s, z and other keys do nothing and send no request (e and d have their own tests)', async () => {
   const load = vi.fn<Load>().mockResolvedValue(detail())
   const fetchSpy = vi.spyOn(globalThis, 'fetch')
   const { user, onClose } = setup(load)
   await screen.findByRole('heading', { level: 1 })
-  await user.keyboard('xszed')
+  await user.keyboard('xszrw')
   expect(onClose).not.toHaveBeenCalled()
   expect(load).toHaveBeenCalledTimes(1)
   expect(fetchSpy).not.toHaveBeenCalled()
   expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual([
     messages.today.signOut,
+    messages.note.edit.open,
     messages.note.back,
   ])
 })

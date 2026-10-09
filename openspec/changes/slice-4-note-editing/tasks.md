@@ -123,8 +123,8 @@ Global checks for every commit:
 
 ### Commit 2.6 `feat(web): edit mode in the note view` (2b)
 
-- [ ] 2.6.1 RED `note-edit.test.tsx` (design Testing PR2 row 7, cache invalidation spies).
-- [ ] 2.6.2 GREEN `NoteEditForm.tsx` + CSS, `use-note-actions.ts`, `NoteContainer` modes, `messages.ts`.
+- [x] 2.6.1 RED `note-edit.test.tsx` (design Testing PR2 row 7, cache invalidation spies).
+- [x] 2.6.2 GREEN `NoteEditForm.tsx` + CSS, `use-note-actions.ts`, `NoteContainer` modes, `messages.ts`.
 
 ### Commit 2.7 `feat(web): inline delete confirm` (2c)
 

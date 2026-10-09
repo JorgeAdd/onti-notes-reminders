@@ -39,6 +39,18 @@
   composes: back from '../notes/NotesPage.module.css';
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* The Edit button is a 44 px ink-outlined target like Back. */
+.action {
+  composes: back from '../notes/NotesPage.module.css';
+}
+
+.action:focus-visible,
 .back:focus-visible {
   outline: var(--focus-ring);
 }
