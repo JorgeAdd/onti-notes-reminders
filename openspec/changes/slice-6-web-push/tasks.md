@@ -80,10 +80,10 @@ Global checks for every commit:
 
 ### Commit c5: `feat(api): send pushes with web-push` (~130 + lockfile)
 
-- [ ] 5.1 Add `web-push` to `apps/api` `dependencies` and `@types/web-push` to `devDependencies`.
-- [ ] 5.2 RED: `apps/api/test/web-push-sender.test.ts`: `sent`; 404 and 410 `gone`; 500, 429, no-status error `failed`; options carry VAPID, `TTL` 3600, `urgency`, `timeout`.
-- [ ] 5.3 RED: `apps/api/test/web-push-interop.test.ts`: default import exposes `sendNotification` and `generateVAPIDKeys`; static check that `web-push` stays in `dependencies` (tsup externalizes only those).
-- [ ] 5.4 GREEN: `infrastructure/push/web-push-sender.ts` (decision 8).
+- [x] 5.1 Add `web-push` to `apps/api` `dependencies` and `@types/web-push` to `devDependencies`.
+- [x] 5.2 RED: `apps/api/test/web-push-sender.test.ts`: `sent`; 404 and 410 `gone`; 500, 429, no-status error `failed`; options carry VAPID, `TTL` 3600, `urgency`, `timeout`.
+- [x] 5.3 RED: `apps/api/test/web-push-interop.test.ts`: default import exposes `sendNotification` and `generateVAPIDKeys`; static check that `web-push` stays in `dependencies` (tsup externalizes only those).
+- [x] 5.4 GREEN: `infrastructure/push/web-push-sender.ts` (decision 8).
 - [ ] 5.5 Build check: `npm run build -w @onti/api`; `dist/main.js` keeps `from "web-push"` external; the `node --input-type=module` import from `apps/api` prints `function`. Record in the PR.
 
 ### Commit c6: `feat(api): push config and interval scheduler` (~200)
