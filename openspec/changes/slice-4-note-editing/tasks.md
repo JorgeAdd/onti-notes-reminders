@@ -67,10 +67,10 @@ Global checks for every commit:
 
 ### Commit 1.5 `feat(web): read-only note view in All notes` (1b)
 
-- [ ] 1.5.1 RED `api.test.ts` `fetchNote`; `query-client.test.ts` no retry on 404.
-- [ ] 1.5.2 GREEN `lib/api.ts`, `lib/query-client.ts`.
-- [ ] 1.5.3 RED `note-view.test.tsx` (loading, 404 + Back, 5xx retry, 401, content, `h1` focus, `esc` hint only), `note-open-flow.test.tsx` (row opens, `esc` keeps search, second `esc` Today, sign-out resets), `notes-row.test.tsx` button rows.
-- [ ] 1.5.4 GREEN `features/note/{NoteContainer,NotePage,NoteStatusline}.tsx` + CSS, `query-keys.ts`, `AppView` in `App.tsx`, `NotesContainer`, `NoteList`, `NoteRow`, `messages.ts`.
+- [x] 1.5.1 RED `api.test.ts` `fetchNote`; `query-client.test.ts` no retry on 404.
+- [x] 1.5.2 GREEN `lib/api.ts`, `lib/query-client.ts`.
+- [x] 1.5.3 RED `note-view.test.tsx` (loading, 404 + Back, 5xx retry, 401, content, `h1` focus, `esc` hint only), `note-open-flow.test.tsx` (row opens, `esc` keeps search, second `esc` Today, sign-out resets), `notes-row.test.tsx` button rows.
+- [x] 1.5.4 GREEN `features/note/{NoteContainer,NotePage,NoteStatusline}.tsx` + CSS, `query-keys.ts`, `AppView` in `App.tsx`, `NotesContainer`, `NoteList`, `NoteRow`, `messages.ts`.
 
 ### Commit 1.6 `feat(api): undated set in GET /today` (1c)
 

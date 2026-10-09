@@ -1,0 +1,15 @@
+.desk {
+  composes: desk from '../today/TodayStatus.module.css';
+}
+
+.page {
+  composes: page from '../today/TodayStatus.module.css';
+}
+
+.message {
+  composes: message from '../today/TodayStatus.module.css';
+}
+
+.button {
+  composes: retry from '../today/TodayStatus.module.css';
+}

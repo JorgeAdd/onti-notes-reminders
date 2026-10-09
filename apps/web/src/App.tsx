@@ -6,6 +6,7 @@ import { AuthContainer } from './features/auth/AuthContainer'
 import { TodayContainer } from './features/today/TodayContainer'
 import {
   captureNote,
+  fetchNote,
   fetchToday,
   markNoteDone,
   patchTimezone,
@@ -19,12 +20,16 @@ import { supabase } from './lib/supabase'
 const importNotes = () => import('./features/notes/NotesContainer')
 const NotesContainer = lazy(() => importNotes().then((m) => ({ default: m.NotesContainer })))
 
+/** Two views, no router and no URL state: a refresh returns to today. The note lives inside All notes. */
+type AppView = { view: 'today' } | { view: 'notes'; noteId: string | null }
+const TODAY: AppView = { view: 'today' }
+const NOTES: AppView = { view: 'notes', noteId: null }
+
 export function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [ready, setReady] = useState(false)
   const [expired, setExpired] = useState(false)
-  // Two views, no router and no URL state (Q6): a refresh returns to today.
-  const [view, setView] = useState<'today' | 'notes'>('today')
+  const [view, setView] = useState<AppView>(TODAY)
 
   useEffect(() => {
     supabase.auth
@@ -40,7 +45,7 @@ export function App() {
   }, [])
 
   // Signing out resets the view (adjusted while rendering, not in an effect).
-  if (session === null && view !== 'today') setView('today')
+  if (session === null && view.view !== 'today') setView(TODAY)
 
   const accessToken = session?.access_token
   useEffect(() => {
@@ -58,7 +63,10 @@ export function App() {
     (term: string, tag: string | null) => searchNotes(accessToken ?? '', term, tag),
     [accessToken],
   )
-  const showToday = useCallback(() => setView('today'), [])
+  const loadNote = useCallback((id: string) => fetchNote(accessToken ?? '', id), [accessToken])
+  const showToday = useCallback(() => setView(TODAY), [])
+  const openNote = useCallback((noteId: string) => setView({ view: 'notes', noteId }), [])
+  const closeNote = useCallback(() => setView(NOTES), [])
   const syncTimezone = useCallback(
     (timezone: string) => patchTimezone(accessToken ?? '', timezone),
     [accessToken],
@@ -85,13 +93,17 @@ export function App() {
 
   if (!ready) return null
   if (!session) return <AuthContainer expired={expired} />
-  return view === 'notes' ? (
+  return view.view === 'notes' ? (
     <Suspense fallback={null}>
       <NotesContainer
         load={loadNotes}
         onSessionExpired={onSessionExpired}
         onBack={showToday}
         onSignOut={signOut}
+        noteId={view.noteId}
+        loadNote={loadNote}
+        onOpenNote={openNote}
+        onCloseNote={closeNote}
       />
     </Suspense>
   ) : (
@@ -101,7 +113,7 @@ export function App() {
       onSignOut={signOut}
       syncTimezone={syncTimezone}
       reminders={reminders}
-      onOpenSearch={() => setView('notes')}
+      onOpenSearch={() => setView(NOTES)}
     />
   )
 }

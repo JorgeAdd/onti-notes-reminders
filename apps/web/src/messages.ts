@@ -119,6 +119,19 @@ export const messages = {
   },
   /** Slice 8: the three-state theme override (SG18). */
   theme: { label: 'Theme', system: 'System', light: 'Light', dark: 'Dark' },
+  /** Slice 4: the note view inside All notes (SG20). */
+  note: {
+    loading: 'Opening your note…',
+    notFound: 'This note is not here any more.',
+    loadError: 'This note could not be loaded.',
+    retry: 'Try again',
+    back: 'Back to all notes',
+    noReminder: 'no reminder',
+    created: (when: string) => `created ${when}`,
+    done: 'done',
+    statusHead: 'NOTE',
+    hints: { back: 'esc back' },
+  },
   /** Slice 5: the All notes and search view. */
   notes: {
     done: 'done',
