@@ -9,6 +9,7 @@ export type KeyCommand =
   | { type: 'undo' }
   | { type: 'snooze'; preset: SnoozePreset }
   | { type: 'capture' }
+  | { type: 'edit' }
   | { type: 'day'; delta: 1 | -1 }
   | { type: 'today' }
   | { type: 'tags' }
@@ -18,6 +19,7 @@ export type KeyHint =
   | 'done'
   | 'undo'
   | 'snooze'
+  | 'edit'
   | 'hour'
   | 'tomorrow'
   | 'cancel'
@@ -71,6 +73,7 @@ export function reduceKey(
     return { state: idle, command: { type: 'clearFilter' } }
   }
   if (key === 'c') return { state: idle, command: { type: 'capture' } }
+  if (key === 'e' && target !== null) return { state: idle, command: { type: 'edit' } }
   if (key === 'x' && target === 'open') return { state: idle, command: { type: 'done' } }
   if (key === 'z' && target === 'done') return { state: idle, command: { type: 'undo' } }
   if (key === 's' && target === 'open') return { state: { pending: 's' }, command: null }
@@ -88,6 +91,8 @@ export function availableKeys(context: {
   /** `#` works (the account has tags); `filterActive` adds the esc that clears it. */
   tags?: boolean
   filterActive?: boolean
+  /** `e` works: the app can open a note, so a focused row adds the edit hint. */
+  edit?: boolean
 }): KeyHint[] {
   if (context.armed && context.hasRows) return ['hour', 'tomorrow', 'cancel']
   const days: KeyHint[] = [
@@ -97,7 +102,8 @@ export function availableKeys(context: {
     ...(context.tags && context.filterActive ? (['clear'] as const) : []),
   ]
   if (!context.hasRows) return ['capture', ...days]
-  if (context.target === 'open') return ['move', 'done', 'snooze', 'capture', ...days]
-  if (context.target === 'done') return ['move', 'undo', 'capture', ...days]
+  const edit: KeyHint[] = context.edit ? ['edit'] : []
+  if (context.target === 'open') return ['move', 'done', 'snooze', ...edit, 'capture', ...days]
+  if (context.target === 'done') return ['move', 'undo', ...edit, 'capture', ...days]
   return ['move', 'capture', ...days]
 }

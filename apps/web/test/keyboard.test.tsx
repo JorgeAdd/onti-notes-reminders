@@ -18,7 +18,11 @@ const SEND = 'Send rate-limit numbers to the infra team'
 
 const pending = () => new Promise<NoteResponse>(() => undefined)
 
-function setup(today: TodayResponse = c4Response(), api: Partial<ReminderApi> = {}) {
+function setup(
+  today: TodayResponse = c4Response(),
+  api: Partial<ReminderApi> = {},
+  onOpenNote?: (id: string, edit?: boolean) => void,
+) {
   const reminders: ReminderApi = {
     snooze: vi.fn(pending),
     done: vi.fn(pending),
@@ -37,6 +41,7 @@ function setup(today: TodayResponse = c4Response(), api: Partial<ReminderApi> = 
         syncTimezone={() => Promise.resolve()}
         reminders={reminders}
         browserTimeZone={() => 'America/Mexico_City'}
+        {...(onOpenNote ? { onOpenNote } : {})}
       />
     </QueryClientProvider>,
   )
@@ -330,5 +335,93 @@ describe('motion and focus use tokens only (rules 8-10, SG13, SG15, SG16)', () =
     expect(all).toContain('var(--motion-whichkey-delay)')
     expect(all).toContain('var(--motion-fade)')
     expect(all).toContain('var(--focus-ring)')
+  })
+})
+
+describe('e opens the focused row in edit mode (slice 4)', () => {
+  async function withOpen() {
+    const onOpenNote = vi.fn<(id: string, edit?: boolean) => void>()
+    const view = setup(c4Response(), {}, onOpenNote)
+    await screen.findByRole('heading', { level: 1 })
+    return { ...view, onOpenNote }
+  }
+
+  it('e on a focused open row opens that note with edit on, and nothing is written', async () => {
+    const { user, today, onOpenNote, reminders } = await withOpen()
+    await user.keyboard('j')
+    await user.keyboard('e')
+    expect(onOpenNote).toHaveBeenCalledTimes(1)
+    expect(onOpenNote.mock.calls[0]?.[1]).toBe(true)
+    expect([...today.carried.flatMap((g) => g.items), ...today.rail].map((i) => i.id)).toContain(
+      onOpenNote.mock.calls[0]?.[0],
+    )
+    expect(reminders.done).not.toHaveBeenCalled()
+    expect(reminders.snooze).not.toHaveBeenCalled()
+  })
+
+  it('opens the row that is focused: a different row gives a different id', async () => {
+    const { user, onOpenNote } = await withOpen()
+    await user.keyboard('j')
+    await user.keyboard('e')
+    await user.keyboard('j')
+    await user.keyboard('e')
+    expect(onOpenNote).toHaveBeenCalledTimes(2)
+    expect(onOpenNote.mock.calls[0]?.[0]).not.toBe(onOpenNote.mock.calls[1]?.[0])
+  })
+
+  it('e on a done row works too', async () => {
+    const base = c4Response()
+    const group = base.carried[0]!
+    const doneItem = { ...group.items[0]!, doneAt: new Date('2026-10-06T22:00:00.000Z') }
+    const today = {
+      ...base,
+      carried: [{ ...group, items: [doneItem, ...group.items.slice(1)] }, ...base.carried.slice(1)],
+    }
+    const onOpenNote = vi.fn<(id: string, edit?: boolean) => void>()
+    const { user } = setup(today, {}, onOpenNote)
+    await screen.findByRole('heading', { level: 1 })
+    await user.keyboard('j')
+    expect(footer()).toHaveTextContent(messages.statusline.keys.undo)
+    await user.keyboard('e')
+    expect(onOpenNote).toHaveBeenCalledExactlyOnceWith(doneItem.id, true)
+  })
+
+  it('e with no focused row does nothing', async () => {
+    const { user, onOpenNote } = await withOpen()
+    await user.keyboard('e')
+    expect(onOpenNote).not.toHaveBeenCalled()
+  })
+
+  it('hints e only while a row is focused and the app can open notes', async () => {
+    const { user } = await withOpen()
+    expect(footer()).not.toHaveTextContent(messages.statusline.keys.edit)
+    await user.keyboard('j')
+    expect(footer()).toHaveTextContent(messages.statusline.keys.edit)
+  })
+
+  it('does not hint e when the container cannot open notes', async () => {
+    const { user } = await ready()
+    await user.keyboard('j')
+    expect(footer()).not.toHaveTextContent(messages.statusline.keys.edit)
+    await user.keyboard('e')
+  })
+
+  it('is off while the capture bar is open: typing e inserts the letter', async () => {
+    const { user, onOpenNote } = await withOpen()
+    await user.keyboard('j')
+    await user.keyboard('c')
+    const input = await screen.findByLabelText(messages.capture.label)
+    await user.keyboard('e')
+    expect(onOpenNote).not.toHaveBeenCalled()
+    expect(input).toHaveValue('e')
+  })
+
+  it('is off while the tag bar is open', async () => {
+    const { user, onOpenNote } = await withOpen()
+    await user.keyboard('j')
+    await user.keyboard('#')
+    expect(await screen.findByRole('group', { name: messages.filter.label })).toBeInTheDocument()
+    await user.keyboard('e')
+    expect(onOpenNote).not.toHaveBeenCalled()
   })
 })

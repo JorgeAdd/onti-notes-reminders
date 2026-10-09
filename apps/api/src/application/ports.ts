@@ -33,6 +33,17 @@ export interface NewNote {
   tags: { slug: string; name: string }[]
 }
 
+/**
+ * What an edit stores (R20). Each present field replaces the stored one; `tags` already carries
+ * derived names; `reminder` is the R8 step (pure, synchronous, runs under the row lock).
+ */
+export interface NotePatch {
+  title?: string
+  body?: string
+  tags?: { slug: string; name: string }[]
+  reminder?: (reminder: Reminder) => Reminder
+}
+
 /** One row of the notes listing: the head of the body only (the use case builds the excerpt). */
 export interface NoteListRow {
   id: string
@@ -69,6 +80,17 @@ export interface NoteRepository {
    * not the caller's (R15, C11): the two look the same.
    */
   findOwn(identity: Identity, id: string): Promise<NoteDetail | null>
+  /**
+   * Applies `patch` to the caller's note in ONE transaction under a row lock (R20). Null when the
+   * id is unknown or not the caller's (R15). A throw from `patch.reminder` rolls everything back.
+   * Tags are replaced as a set; an existing tag keeps its stored name. Returns the stored detail.
+   */
+  updateOwn(identity: Identity, id: string, patch: NotePatch): Promise<NoteDetail | null>
+  /**
+   * Permanently deletes the caller's note with its tag links (R20). False when the id is unknown
+   * or not the caller's (R15).
+   */
+  deleteOwn(identity: Identity, id: string): Promise<boolean>
   /**
    * The caller's notes newest first (`created_at desc, id desc`), at most `limit`. With terms, only
    * notes matching EVERY term as a word prefix on title or body; no terms means no filter. `total`

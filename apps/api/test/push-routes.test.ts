@@ -18,6 +18,8 @@ import { buildServer } from '../src/infrastructure/http/server'
 import { HmacActionTokens } from '../src/infrastructure/push/hmac-action-tokens'
 import { ANA, InMemoryNotes, InMemoryProfiles, JORGE, noteId, noteRecord } from './fakes'
 import { InMemorySubscriptions, MutableClock } from './push-fakes'
+import { makeDeleteNote } from '../src/application/delete-note'
+import { makeUpdateNote } from '../src/application/update-note'
 
 const SECRET = 's'.repeat(32)
 const ORIGIN = 'https://app.example'
@@ -62,6 +64,8 @@ function harness(options: { withPush?: boolean } = {}) {
       snoozeNote: makeSnoozeNote({ clock, notes, profiles }),
       markDone: makeMarkDone({ clock, notes }),
       undoDone: makeUndoDone({ notes }),
+      updateNote: makeUpdateNote({ clock, notes, profiles }),
+      deleteNote: makeDeleteNote({ notes }),
     },
     corsOrigins: [ORIGIN],
     searchNotes: makeSearchNotes({ clock, notes, profiles }),

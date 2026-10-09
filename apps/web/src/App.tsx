@@ -1,4 +1,4 @@
-import type { CaptureRequest, SnoozePreset } from '@onti/shared'
+import type { CaptureRequest, NoteUpdateRequest, SnoozePreset } from '@onti/shared'
 import type { Session } from '@supabase/supabase-js'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import type { DayView } from './features/today/day-view'
@@ -6,6 +6,7 @@ import { AuthContainer } from './features/auth/AuthContainer'
 import { TodayContainer } from './features/today/TodayContainer'
 import {
   captureNote,
+  deleteNote,
   fetchNote,
   fetchToday,
   markNoteDone,
@@ -13,6 +14,7 @@ import {
   searchNotes,
   snoozeNote,
   undoNoteDone,
+  updateNote,
 } from './lib/api'
 import { supabase } from './lib/supabase'
 
@@ -21,9 +23,9 @@ const importNotes = () => import('./features/notes/NotesContainer')
 const NotesContainer = lazy(() => importNotes().then((m) => ({ default: m.NotesContainer })))
 
 /** Two views, no router and no URL state: a refresh returns to today. The note lives inside All notes. */
-type AppView = { view: 'today' } | { view: 'notes'; noteId: string | null }
+type AppView = { view: 'today' } | { view: 'notes'; noteId: string | null; edit: boolean }
 const TODAY: AppView = { view: 'today' }
-const NOTES: AppView = { view: 'notes', noteId: null }
+const NOTES: AppView = { view: 'notes', noteId: null, edit: false }
 
 export function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -64,8 +66,18 @@ export function App() {
     [accessToken],
   )
   const loadNote = useCallback((id: string) => fetchNote(accessToken ?? '', id), [accessToken])
+  const noteApi = useMemo(
+    () => ({
+      save: (id: string, patch: NoteUpdateRequest) => updateNote(accessToken ?? '', id, patch),
+      remove: (id: string) => deleteNote(accessToken ?? '', id),
+    }),
+    [accessToken],
+  )
   const showToday = useCallback(() => setView(TODAY), [])
-  const openNote = useCallback((noteId: string) => setView({ view: 'notes', noteId }), [])
+  const openNote = useCallback(
+    (noteId: string, edit = false) => setView({ view: 'notes', noteId, edit }),
+    [],
+  )
   const closeNote = useCallback(() => setView(NOTES), [])
   const syncTimezone = useCallback(
     (timezone: string) => patchTimezone(accessToken ?? '', timezone),
@@ -102,6 +114,8 @@ export function App() {
         onSignOut={signOut}
         noteId={view.noteId}
         loadNote={loadNote}
+        noteApi={noteApi}
+        startInEdit={view.edit}
         onOpenNote={openNote}
         onCloseNote={closeNote}
       />

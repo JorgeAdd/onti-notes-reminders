@@ -80,6 +80,16 @@ _Source: slice 8 archive report_
 Deferred, not in slice 4. The note view opens from All notes, the "Without a reminder" list and `e` on Today, but its state is not in the URL: there is still no router, so a refresh returns to Today.
 _Source: product decision, 2026-10-08 (prompt `prompts/durante/16-slices-4-and-6-in-parallel.md`)_
 
+### Note view: check reach of the header buttons on phones
+
+SG20 places Edit, Delete and Back in the view header at every width (one layout). If the manual smoke at 375x667 shows the header buttons are hard to reach one-handed, consider a touch bottom bar (it would need an SG20 change first).
+_Source: slice 4 PR2 apply and verify_
+
+### `esc` after `e` from Today lands in the All notes list
+
+`e` on a Today row opens the note in edit mode; leaving it goes to the All notes list, not back to Today (the view state has no `from` field). A cheap follow-up if it feels wrong.
+_Source: slice 4 design, accepted UX costs_
+
 ## Suggestions
 
 ### Bundle size optimization

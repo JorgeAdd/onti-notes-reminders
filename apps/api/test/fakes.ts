@@ -3,6 +3,7 @@ import type { Identity } from '../src/domain/identity'
 import type {
   NewNote,
   NoteListRow,
+  NotePatch,
   NoteRepository,
   Profile,
   ProfileRepository,
@@ -137,6 +138,51 @@ export class InMemoryNotes implements NoteRepository {
     const row = this.rows.get(id)
     if (!row || row.ownerId !== identity.userId) return Promise.resolve(null)
     return Promise.resolve({ ...row.note, body: row.body })
+  }
+
+  /**
+   * Mirrors the adapter: all-or-nothing (a throw from `reminder` keeps the old row), a tag the
+   * caller already has keeps its stored name, and a patch that changes nothing writes nothing.
+   */
+  updateOwn(identity: Identity, id: string, patch: NotePatch): Promise<NoteDetail | null> {
+    const row = this.rows.get(id)
+    if (!row || row.ownerId !== identity.userId) return Promise.resolve(null)
+    try {
+      const reminder = patch.reminder ? patch.reminder(row.note) : row.note
+      const knownNames = new Map(
+        [...this.rows.values()]
+          .filter((r) => r.ownerId === identity.userId)
+          .flatMap((r) => r.note.tags.map((tag): [string, string] => [tag.slug, tag.name])),
+      )
+      const next: NoteRecord = {
+        ...row.note,
+        title: patch.title ?? row.note.title,
+        tags: patch.tags
+          ? patch.tags.map(({ slug, name }) => ({ slug, name: knownNames.get(slug) ?? name }))
+          : row.note.tags,
+        dueAt: reminder.dueAt,
+        originalDueAt: reminder.originalDueAt,
+        snoozeCount: reminder.snoozeCount,
+        doneAt: reminder.doneAt,
+        notifiedDueAt: reminder.notifiedDueAt,
+      }
+      const body = patch.body ?? row.body
+      if (JSON.stringify([next, body]) !== JSON.stringify([row.note, row.body])) {
+        row.note = next
+        row.body = body
+        this.writes.push(id)
+      }
+      return Promise.resolve({ ...row.note, body: row.body })
+    } catch (error) {
+      return Promise.reject(error instanceof Error ? error : new Error(String(error)))
+    }
+  }
+
+  deleteOwn(identity: Identity, id: string): Promise<boolean> {
+    const row = this.rows.get(id)
+    if (!row || row.ownerId !== identity.userId) return Promise.resolve(false)
+    this.rows.delete(id)
+    return Promise.resolve(true)
   }
 
   listOwn(identity: Identity): Promise<NoteRecord[]> {

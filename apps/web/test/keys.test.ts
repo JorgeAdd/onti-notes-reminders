@@ -197,3 +197,49 @@ describe('# and esc · the tag filter keys (R12)', () => {
     ).toEqual(['hour', 'tomorrow', 'cancel'])
   })
 })
+
+describe('reduceKey · e opens the note in edit mode (slice 4)', () => {
+  it.each(['open', 'done'] as const)('e with a %s target -> edit', (target) => {
+    expect(reduceKey(idle, 'e', target)).toEqual({ state: idle, command: { type: 'edit' } })
+  })
+
+  it('e with no focused row does nothing', () => {
+    expect(reduceKey(idle, 'e', null)).toEqual({ state: idle, command: null })
+  })
+
+  it('e inside the snooze menu only disarms it', () => {
+    expect(reduceKey(armed, 'e', 'open')).toEqual({ state: idle, command: null })
+  })
+
+  it('leaves the other keys alone: d is not a Today key', () => {
+    for (const target of ['open', 'done', null] as const) {
+      expect(reduceKey(idle, 'd', target).command).toBeNull()
+    }
+    expect(reduceKey(idle, 'x', 'open').command).toEqual({ type: 'done' })
+  })
+})
+
+describe('availableKeys · the e hint (slice 4)', () => {
+  const base = { hasRows: true, armed: false, edit: true } as const
+
+  it('an open item adds e after s; a done item adds it after z', () => {
+    expect(availableKeys({ ...base, target: 'open' })).toEqual([
+      'move',
+      'done',
+      'snooze',
+      'edit',
+      'capture',
+    ])
+    expect(availableKeys({ ...base, target: 'done' })).toEqual(['move', 'undo', 'edit', 'capture'])
+  })
+
+  it('no focused row, the armed menu, or an unavailable edit show no e hint', () => {
+    expect(availableKeys({ ...base, target: null })).toEqual(['move', 'capture'])
+    expect(availableKeys({ ...base, target: 'open', armed: true })).toEqual([
+      'hour',
+      'tomorrow',
+      'cancel',
+    ])
+    expect(availableKeys({ hasRows: true, target: 'open', armed: false })).not.toContain('edit')
+  })
+})
