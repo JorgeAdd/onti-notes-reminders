@@ -159,8 +159,8 @@ Global checks for every commit:
 
 ### Commit c15: `feat(web): guarded open-the-app fallback` (~180)
 
-- [ ] 18.1 RED: `apps/web/test/push-bridge.test.tsx`: URL cleared first; same `due_at` and open → JWT mutation; changed `due_at`, done note, unknown action, bad `due` → nothing, Today shown; `onti:action` runs the same guard; `onti:refetch` invalidates.
-- [ ] 18.2 GREEN: `features/push/PushBridge.tsx`; rendered by `App` while signed in.
+- [x] 18.1 RED: `apps/web/test/push-bridge.test.tsx`: URL cleared first; same `due_at` and open → JWT mutation; changed `due_at`, done note, unknown action, bad `due` → nothing, Today shown; `onti:action` runs the same guard; `onti:refetch` invalidates.
+- [x] 18.2 GREEN: `features/push/PushBridge.tsx`; rendered by `App` while signed in.
 
 ### Commit c16: `feat(web): unsubscribe this browser on sign-out` (~120)
 

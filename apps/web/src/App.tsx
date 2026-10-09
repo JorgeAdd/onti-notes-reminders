@@ -3,6 +3,7 @@ import type { Session } from '@supabase/supabase-js'
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import type { DayView } from './features/today/day-view'
 import { AuthContainer } from './features/auth/AuthContainer'
+import { PushBridge } from './features/push/PushBridge'
 import { TodayContainer } from './features/today/TodayContainer'
 import {
   captureNote,
@@ -105,30 +106,35 @@ export function App() {
 
   if (!ready) return null
   if (!session) return <AuthContainer expired={expired} />
-  return view.view === 'notes' ? (
-    <Suspense fallback={null}>
-      <NotesContainer
-        load={loadNotes}
-        onSessionExpired={onSessionExpired}
-        onBack={showToday}
-        onSignOut={signOut}
-        noteId={view.noteId}
-        loadNote={loadNote}
-        noteApi={noteApi}
-        startInEdit={view.edit}
-        onOpenNote={openNote}
-        onCloseNote={closeNote}
-      />
-    </Suspense>
-  ) : (
-    <TodayContainer
-      load={load}
-      onSessionExpired={onSessionExpired}
-      onSignOut={signOut}
-      syncTimezone={syncTimezone}
-      reminders={reminders}
-      onOpenSearch={() => setView(NOTES)}
-      onOpenNote={openNote}
-    />
+  return (
+    <>
+      <PushBridge accessToken={session.access_token} onSessionExpired={onSessionExpired} />
+      {view.view === 'notes' ? (
+        <Suspense fallback={null}>
+          <NotesContainer
+            load={loadNotes}
+            onSessionExpired={onSessionExpired}
+            onBack={showToday}
+            onSignOut={signOut}
+            noteId={view.noteId}
+            loadNote={loadNote}
+            noteApi={noteApi}
+            startInEdit={view.edit}
+            onOpenNote={openNote}
+            onCloseNote={closeNote}
+          />
+        </Suspense>
+      ) : (
+        <TodayContainer
+          load={load}
+          onSessionExpired={onSessionExpired}
+          onSignOut={signOut}
+          syncTimezone={syncTimezone}
+          reminders={reminders}
+          onOpenSearch={() => setView(NOTES)}
+          onOpenNote={openNote}
+        />
+      )}
+    </>
   )
 }
