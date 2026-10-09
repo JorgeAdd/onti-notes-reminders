@@ -2,6 +2,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { App } from './App'
+import { registerServiceWorker } from './features/push/register-sw'
 import { createQueryClient } from './lib/query-client'
 import './styles/global.css'
 
@@ -16,3 +17,5 @@ createRoot(root).render(
     </QueryClientProvider>
   </StrictMode>,
 )
+
+void registerServiceWorker()

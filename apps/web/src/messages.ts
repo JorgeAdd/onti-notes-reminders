@@ -194,4 +194,14 @@ export const messages = {
     statusTail: (shown: number, total: number) => `· ${shown} of ${total}`,
     hints: { search: '/ search', tags: '# tag', clear: 'esc clear filter', back: 'esc back' },
   },
+  /** Slice 6: the opt-in notification control (date column and phone bar). */
+  notifications: {
+    enable: 'Turn on notifications',
+    turnOff: 'Turn off notifications',
+    on: 'Notifications are on.',
+    denied:
+      'Notifications are blocked in this browser. Your reminders still appear in Today. To get notified, allow notifications for this site in your browser settings.',
+    unsupported: 'This browser cannot show notifications. Your reminders still appear in Today.',
+    failed: 'Could not turn on notifications. Try again.',
+  },
 } as const
