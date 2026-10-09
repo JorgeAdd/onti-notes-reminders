@@ -73,6 +73,13 @@ _Source: slice 8 verify report_
 The headless screenshots at 1280 and 375 px did not show the keyboard focus ring on the segmented theme control. Check Tab focus in a real browser, light and dark.
 _Source: slice 8 archive report_
 
+## Deferred from Slice 9
+
+### SG10 lists `↵` open/fold body, but no Today key does it
+
+SG10 includes `↵` open/fold body. No key handler on Today implements it (Enter only works on a native button), so this is drift that predates slice 9. The help follows the code and omits it. Either implement the key or drop it from SG10.
+_Source: slice 9 design, risks and contradictions_
+
 ## Deferred from Slice 4
 
 ### Manual smoke of PR1 and PR2 (pending)
@@ -145,6 +152,13 @@ _Source: slice 6 verify report PR2 (untested 400-versus-401 edge); code check at
 - The failure line uses `role="alert"`.
 - `background_color` comes from the page token, not the `--color-desk` value the design lists.
   _Source: slice 6 verify report PR3, W5 and design notes_
+
+## Planned for v2
+
+### Customize keys and buttons
+
+Let users change the keyboard keys and the touch buttons. The slice 9 help already says it is coming in v2. Needs its own grilling: per-device or per-account storage, conflicts with the R11 capture grammar and the key layers, and how the help and the statusline hints follow the custom keys (they are built from `KeyHint` today).
+_Source: maintainer request, 2026-10-09 (slice 9 smoke)_
 
 ## Suggestions
 

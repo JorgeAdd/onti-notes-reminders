@@ -19,6 +19,22 @@
   margin-left: auto;
 }
 
+/* Slice 9 · the help button: a 44 px target at every width, ink only (SG13). */
+.help {
+  min-height: var(--size-target);
+  min-width: var(--size-target);
+  background: none;
+  color: var(--color-ink);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  font: var(--text-meta-strong);
+  cursor: pointer;
+}
+
+.help:focus-visible {
+  outline: var(--focus-ring);
+}
+
 .hints {
   display: flex;
   gap: var(--space-md);

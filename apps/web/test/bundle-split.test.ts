@@ -1,4 +1,4 @@
-/** ADR-002 · the markdown libraries live only in the lazy chunk [static scan of src/**]. */
+/** ADR-002 · the markdown libraries live only in the lazy chunk; slice 9 · so does the help [static scan of src/**]. */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { describe, expect, it } from 'vitest'
@@ -36,5 +36,14 @@ describe('bundle split', () => {
   it('uses no raw-HTML or GFM plugin (C10, R14)', () => {
     const source = read(join(SRC, 'features/note/MarkdownBody.tsx'))
     expect(source).not.toMatch(/rehype-raw|remark-gfm/)
+  })
+
+  it('reaches the help only through a dynamic import() in DayPage', () => {
+    const outside = files.filter((path) => !name(path).startsWith('features/help/'))
+    const importers = outside.filter((path) => /['"][^'"]*help\/[\w-]+['"]/.test(read(path)))
+    expect(importers.map(name)).toEqual(['features/today/DayPage.tsx'])
+    const source = read(importers[0]!)
+    expect(source).toMatch(/lazy\(\s*\(\)\s*=>\s*import\(['"]\.\.\/help\/HelpDialog['"]\)\s*\)/)
+    expect(source).not.toMatch(/^import[^\n]*\/help\//m)
   })
 })

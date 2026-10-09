@@ -1,7 +1,9 @@
 import { render, screen } from '@testing-library/react'
-import { expect, it } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { expect, it, vi } from 'vitest'
 import { Statusline } from '../src/features/today/Statusline'
 import { messages } from '../src/messages'
+import { blocks, props, readSrc, resolve, tokens } from './css-tokens'
 import { c4Response } from './today-fixture'
 
 const today = c4Response()
@@ -66,4 +68,66 @@ it('hints c for capture from messages', () => {
 it('shows the menu keys while a snooze is armed', () => {
   hinted(['hour', 'tomorrow', 'cancel'])
   expect(screen.getByRole('contentinfo')).toHaveTextContent(messages.statusline.keys.cancel)
+})
+
+const withHelp = (onHelp?: (from: HTMLElement) => void) =>
+  render(
+    <Statusline
+      now={today.now}
+      timezone={today.timezone}
+      todayCount={4}
+      carriedCount={2}
+      totalCount={15}
+      {...(onHelp ? { onHelp } : {})}
+    />,
+  )
+
+it('has no help button without a handler', () => {
+  withHelp()
+  expect(screen.queryByRole('button')).not.toBeInTheDocument()
+})
+
+it('shows a "?" help button that calls back with the element', async () => {
+  const onHelp = vi.fn()
+  withHelp(onHelp)
+  const button = screen.getByRole('button', { name: messages.help.open })
+  expect(button).toHaveTextContent(messages.help.button)
+  expect(button).toHaveAttribute('aria-haspopup', 'dialog')
+  expect(screen.getByRole('contentinfo')).toContainElement(button)
+  await userEvent.click(button)
+  expect(onHelp).toHaveBeenCalledTimes(1)
+  expect(onHelp).toHaveBeenCalledWith(button)
+})
+
+it('keeps the button apart from the key hints: it is not one of them', () => {
+  render(
+    <Statusline
+      now={today.now}
+      timezone={today.timezone}
+      todayCount={4}
+      carriedCount={2}
+      totalCount={15}
+      hints={['move', 'capture']}
+      onHelp={() => undefined}
+    />,
+  )
+  const button = screen.getByRole('button', { name: messages.help.open })
+  expect(screen.getByText(messages.statusline.keys.move)).not.toContainElement(button)
+})
+
+it('styles the button as a 44 px target with the ink focus ring, visible at every width [static]', () => {
+  const css = readSrc('features/today/Statusline.module.css')
+  const root = tokens().root
+  const help = props(blocks(css).find((b) => b.header === '.help')!.body)
+  expect(resolve(help['min-height']!, root)).toBe('44px')
+  expect(resolve(help['min-width']!, root)).toBe('44px')
+  expect(props(blocks(css).find((b) => b.header === '.help:focus-visible')!.body)['outline']).toBe(
+    'var(--focus-ring)',
+  )
+  const hidden = blocks(blocks(css).find((b) => b.header === '@media (max-width: 640px)')!.body)
+    .filter((b) => props(b.body)['display'] === 'none')
+    .map((b) => b.header)
+    .join(',')
+  expect(hidden).not.toContain('.help')
+  expect(css).not.toMatch(/--color-date|--core-/)
 })

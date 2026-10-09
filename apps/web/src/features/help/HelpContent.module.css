@@ -1,0 +1,51 @@
+.content {
+  display: grid;
+  gap: var(--space-xl);
+  padding: var(--space-lg);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.heading {
+  margin: 0;
+  font: var(--text-label);
+  color: var(--color-ink-muted);
+}
+
+.rows,
+.examples {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row,
+.example {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.line,
+.input {
+  font: var(--text-meta-strong);
+}
+
+.detail,
+.shows {
+  margin: 0;
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+}
+
+/* A closing note, not a control: the feature ships in v2. */
+.soon {
+  margin: 0;
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+}

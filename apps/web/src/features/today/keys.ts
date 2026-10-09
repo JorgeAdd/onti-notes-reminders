@@ -14,6 +14,7 @@ export type KeyCommand =
   | { type: 'today' }
   | { type: 'tags' }
   | { type: 'clearFilter' }
+  | { type: 'help' }
 export type KeyHint =
   | 'move'
   | 'done'
@@ -72,6 +73,8 @@ export function reduceKey(
   if (key === 'Escape' && context.filterActive) {
     return { state: idle, command: { type: 'clearFilter' } }
   }
+  // Help is context-free; whether it opens is the page's call (it is off while a bar is open).
+  if (key === '?') return { state: idle, command: { type: 'help' } }
   if (key === 'c') return { state: idle, command: { type: 'capture' } }
   if (key === 'e' && target !== null) return { state: idle, command: { type: 'edit' } }
   if (key === 'x' && target === 'open') return { state: idle, command: { type: 'done' } }

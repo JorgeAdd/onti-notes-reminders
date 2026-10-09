@@ -107,6 +107,50 @@ export const messages = {
       search: '/ search',
     },
   },
+  /** Slice 9: the "How it works" help (`?` on Today). Key rows reuse `statusline.keys`. */
+  help: {
+    title: 'How it works',
+    open: 'How it works',
+    /** The statusline button's glyph; `open` is its accessible name. */
+    button: '?',
+    emptyHint: 'Press ? to see how it works',
+    emptyHintTouch: 'Tap ? to see how it works',
+    close: 'Close',
+    /** Closing note: the feature is planned for v2 (docs/backlog.md), nothing to click. */
+    comingInV2: 'Customize keys and buttons — coming in v2',
+    sections: { capture: 'Capture', days: 'Days', note: 'On a note', find: 'Find' },
+    /** Second line of a row, where the key alone is not enough. */
+    detail: {
+      captureCancel: 'closes the capture bar',
+      today: 'from another day',
+      snooze: 'then h or t',
+      cancel: 'closes the snooze menu',
+      edit: 'opens the focused note for editing',
+      delete: 'in the note view: ↵ confirms, esc cancels',
+      search: 'all notes and search',
+    },
+    captureCancel: 'esc cancel capture',
+    helpKey: '? how it works',
+    /** R11 examples: `shows` is true at any moment; help-examples.test.ts runs each through the parser. */
+    examples: [
+      { input: 'Call back 17:00', shows: 'today 17:00, or tomorrow once it has passed' },
+      { input: 'Call back today 08:00', shows: 'today 08:00, even if it has passed (shown late)' },
+      { input: 'Call back tomorrow 9:00', shows: 'tomorrow 09:00' },
+      { input: 'Stretch +30m', shows: '30 minutes from now' },
+      { input: 'Review PR +2h', shows: '2 hours from now' },
+      { input: 'Call back #client-a', shows: 'tagged client-a, no reminder' },
+      { input: 'Buy milk', shows: 'a note with no reminder' },
+    ],
+    /** On a phone the touch lines replace the key rows. */
+    touch: {
+      capture: [
+        'Tap + Capture to write a note. Insert Today 17:00, +1 h or Tomorrow 9:00 with one tap.',
+      ],
+      days: ['Use Previous day and Next day in the date column, then Today to come back.'],
+      note: ['Tap a note, then choose Done or a snooze time. Open a note to edit or delete it.'],
+      find: ['Tap Search for all notes. Tap Tags to filter by tag.'],
+    },
+  },
   errors: {
     generic: 'Something went wrong. Please try again.',
     dismiss: 'Dismiss',
