@@ -20,10 +20,10 @@ const note = (over: Partial<NoteListItem> = {}): NoteListItem => ({
   ...over,
 })
 
-const renderRow = (item: NoteListItem) =>
+const renderRow = (item: NoteListItem, onOpen: (id: string) => void = () => undefined) =>
   render(
     <ul>
-      <NoteRow note={item} now={now} timezone={TZ} />
+      <NoteRow note={item} now={now} timezone={TZ} onOpen={onOpen} />
     </ul>,
   )
 
@@ -41,7 +41,7 @@ it('has no due label, no tags and no excerpt line when the note has none', () =>
   const { container } = renderRow(note({ dueAt: null, tags: [], excerpt: '' }))
   const row = screen.getByRole('listitem')
   expect(row).toHaveTextContent(/^Staging URL and test accounts$/)
-  expect(container.querySelector('p')).toBeNull()
+  expect(container.querySelector('p, [class*=excerpt]')).toBeNull()
 })
 
 it('strikes a done title and says "done" to assistive technology', () => {
@@ -59,28 +59,39 @@ it('renders an excerpt full of markup literally: no element, no handler', () => 
   expect(container.querySelector('img, b')).toBeNull()
 })
 
-it('is read-only: not focusable, no handlers, keys do nothing (x, s, z)', async () => {
-  const onClick = vi.fn()
+it('is one button per row: Enter and click open the note, x, s and z do nothing', async () => {
+  const onOpen = vi.fn()
   const { container } = render(
-    <div onClick={onClick}>
-      <NoteList notes={[note()]} now={now} timezone={TZ} />
-    </div>,
+    <NoteList notes={[note()]} now={now} timezone={TZ} onOpen={onOpen} />,
   )
   const row = screen.getByRole('listitem')
-  expect(row).not.toHaveAttribute('tabindex')
-  expect(row.getAttributeNames().filter((name) => name.startsWith('on'))).toEqual([])
-  expect(container.querySelectorAll('button, a, input, [tabindex]')).toHaveLength(0)
+  const button = within(row).getByRole('button', { name: /Staging URL and test accounts/ })
+  expect(container.querySelectorAll('button, a, input, [tabindex]')).toHaveLength(1)
+  expect(button).toHaveAttribute('type', 'button')
+
   await userEvent.keyboard('xsz')
-  expect(row).not.toHaveFocus()
-  expect(document.body).toHaveFocus()
+  expect(onOpen).not.toHaveBeenCalled()
+
+  await userEvent.tab()
+  expect(button).toHaveFocus()
+  await userEvent.keyboard('{Enter}')
+  await userEvent.click(button)
+  expect(onOpen).toHaveBeenNthCalledWith(1, '11111111-1111-4111-8111-111111111111')
+  expect(onOpen).toHaveBeenCalledTimes(2)
 })
 
 it('lists the notes in the order given', () => {
   const second = note({ id: '22222222-2222-4222-8222-222222222222', title: 'Second' })
-  render(<NoteList notes={[note(), second]} now={now} timezone={TZ} />)
+  render(<NoteList notes={[note(), second]} now={now} timezone={TZ} onOpen={() => undefined} />)
   const rows = screen.getAllByRole('listitem')
   expect(rows[0]).toHaveTextContent('Staging URL')
   expect(rows[1]).toHaveTextContent('Second')
+})
+
+it('gives the row button a 44 px target and a visible focus ring [static]', () => {
+  const css = readFileSync('src/features/notes/NoteRow.module.css', 'utf8')
+  expect(css).toMatch(/min-height:\s*var\(--size-target\)/)
+  expect(css).toMatch(/:focus-visible[^{]*\{[^}]*var\(--focus-ring\)/)
 })
 
 it('styles rows with tokens only and never the vermilion date colour', () => {

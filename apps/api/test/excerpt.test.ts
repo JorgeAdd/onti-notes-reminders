@@ -44,4 +44,17 @@ describe('excerptOf', () => {
     expect(kept).toBe('😀'.repeat(kept.length / 2))
     expect(kept.length / 2).toBe(59)
   })
+
+  it('strips markdown markers (R14): emphasis, link syntax, bullets, headings', () => {
+    expect(excerptOf('**bold** and [link](https://x.y)')).toBe('bold and link')
+    expect(excerptOf('# Plan\n- one\n- _two_ `three`')).toBe('Plan one two three')
+  })
+
+  it('keeps raw HTML as text', () => {
+    expect(excerptOf('<img src=x onerror=alert(1)>')).toBe('<img src=x onerror=alert(1)>')
+  })
+
+  it('keeps the link text of a link cut by the 400-character head', () => {
+    expect(excerptOf('see [runbook](http://x.y/lo')).toBe('see runbook')
+  })
 })

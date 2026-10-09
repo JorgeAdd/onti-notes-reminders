@@ -1,0 +1,74 @@
+/* The label style of "Still open from" (CarriedGroup .title), no panel and no accent. */
+.group {
+  display: grid;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
+.title {
+  margin: 0;
+  font: var(--text-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row,
+.more,
+.mobile {
+  width: 100%;
+  min-height: var(--size-target);
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.row {
+  display: grid;
+  align-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) 0;
+}
+
+.row:focus-visible,
+.more:focus-visible,
+.mobile:focus-visible {
+  outline: var(--focus-ring);
+}
+
+.name {
+  overflow: hidden;
+  font: var(--text-body);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tags {
+  overflow: hidden;
+  font: var(--text-meta);
+  color: var(--color-ink-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.more,
+.mobile {
+  padding: 0;
+  font: var(--text-meta-strong);
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  /* The phone's column is a two-column grid beside the date block: the link takes the full row. */
+  .mobile {
+    grid-column: 1 / -1;
+  }
+}

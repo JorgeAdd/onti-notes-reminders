@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { parseCalendarDate } from './domain/calendar-date'
 import { TAG_SLUG } from './domain/tag'
+import { UNDATED_ROWS } from './domain/undated'
 import { instant } from './instant'
 
 /** A real calendar date `YYYY-MM-DD` from 2000-01-01 to 2099-12-31 (R1). */
@@ -34,6 +35,14 @@ const otherItemSchema = todayItemSchema.extend({
   originalDueAt: instant.nullable(),
 })
 
+/** R19 · one row of "Without a reminder": no reminder fields, but the creation time that orders it. */
+const undatedItemSchema = z.object({
+  id: z.uuid(),
+  title: z.string().min(1),
+  tags: z.array(z.object({ name: z.string().min(1), slug: z.string().min(1) })),
+  createdAt: instant,
+})
+
 /** GET /today — the day page as the server decides it (R1–R5); the client decides how time reads. */
 export const todayResponseSchema = z.object({
   now: instant,
@@ -49,6 +58,11 @@ export const todayResponseSchema = z.object({
   hiddenCount: z.number().int().nonnegative(),
   /** R12 · filtered only: matching notes that are not on the page. Empty when unfiltered. */
   others: z.array(otherItemSchema),
+  /** R19 · the undated set of the whole account: the same for any viewed day and any tag filter. */
+  undated: z.object({
+    count: z.number().int().nonnegative(),
+    items: z.array(undatedItemSchema).max(UNDATED_ROWS),
+  }),
   window: z.object({ start: instant, end: instant }),
   openCount: z.number().int().nonnegative(),
   anyDoneToday: z.boolean(),

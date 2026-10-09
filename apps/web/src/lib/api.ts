@@ -1,6 +1,8 @@
 import {
+  noteDetailResponseSchema,
   noteResponseSchema,
   type CaptureRequest,
+  type NoteDetailResponse,
   timezoneResponseSchema,
   todayResponseSchema,
   type NoteResponse,
@@ -109,4 +111,9 @@ export async function searchNotes(
   if (tag !== null) params.set('tag', tag)
   const query = params.size === 0 ? '' : `?${params}`
   return notesListResponseSchema.parse(await request('GET', `/notes${query}`, accessToken))
+}
+
+/** C11 · one of the caller's notes with its body; another user's note and an unknown id are 404. */
+export async function fetchNote(accessToken: string, id: string): Promise<NoteDetailResponse> {
+  return noteDetailResponseSchema.parse(await request('GET', `/notes/${id}`, accessToken))
 }

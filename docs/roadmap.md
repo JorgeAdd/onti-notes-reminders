@@ -54,8 +54,15 @@ Done 2026-10-08. Day navigation keys (`[`, `]`, `t`) and tag filter (`#`) with U
 Creation ships with capture in slice 2; this slice covers the rest of the
 note lifecycle.
 
-- Edit and delete notes.
-- Manual reschedule and reminder removal (R8).
+- Note view in All notes, opened from an All notes row, a "Without a
+  reminder" row, or `e` on a focused Today row (which opens it straight in
+  edit mode):
+  - Edit the title, body and tags (`#slug` grammar); last write wins.
+  - Manual reschedule and reminder removal (R8); rescheduling a done note
+    reopens it.
+  - Delete with an inline confirm ("Delete? ↵ confirm · esc cancel"); a
+    hard delete.
+  - Keys `e` and `d` only in the note view (SG10).
 - Basic markdown body, always sanitized; raw HTML is never rendered (R14).
 - "Without a reminder" list in the date column (R19, matrix C13 and C14):
   - Desktop: below Sign out, header "Without a reminder · {n}" in the
@@ -71,6 +78,12 @@ note lifecycle.
     note at the top).
   - Tokens only, copy in the messages module, 44 px targets, no internal
     IDs (CLAUDE.md rules 8, 11, 12, 13).
+- Ships as two PRs:
+  - Read side first (PR1, built, awaiting merge): `createdAt` on notes, the
+    R19 list, `GET /notes/:id` with the C11 `404`, markdown (R14, C10)
+    rendered lazily with react-markdown + rehype-sanitize (ADR-002), and a
+    read-only note view. Excerpts in All notes lose their markdown markers.
+  - Then the write side: editing, reschedule and removal, delete.
 
 ## Slice 5 — All notes and search
 

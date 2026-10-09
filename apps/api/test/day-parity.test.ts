@@ -34,6 +34,7 @@ const tagged = (note: FixtureNote, id: string): NoteRecord => ({
   snoozeCount: note.snoozeCount,
   doneAt: note.doneAt,
   notifiedDueAt: note.notifiedDueAt,
+  createdAt: note.createdAt,
 })
 
 /** Fixture ids ('N4') are not UUIDs; the stored notes get stable ones by position. */
@@ -117,6 +118,7 @@ describe('optimistic patch equals the real use case', () => {
       snoozeCount: 0,
       doneAt: null,
       notifiedDueAt: null,
+      createdAt: NOW,
     }
     const wire: NoteResponse = {
       id: note.id,
@@ -126,6 +128,7 @@ describe('optimistic patch equals the real use case', () => {
       originalDueAt: note.originalDueAt,
       snoozeCount: 0,
       doneAt: null,
+      createdAt: note.createdAt,
     }
     const change: ReminderChange = { type: 'insert', note: wire }
     const patched = applyReminderChange(await world().page(query), change, NOW)

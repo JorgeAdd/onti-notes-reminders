@@ -7,6 +7,7 @@ import {
   snoozeTomorrow,
   undoDone,
 } from './domain/reminder'
+import { insertUndated } from './domain/undated'
 import type { NoteResponse, SnoozePreset } from './notes'
 import type { OtherItem, TodayItem, TodayResponse } from './today'
 
@@ -61,6 +62,7 @@ export function applyReminderChange(
   let hiddenCount = page.hiddenCount
   let added = 0 // notes the page cannot see (unfiltered: they raise `otherCount`)
   let tags = page.tags
+  let undated = page.undated // R19: only an insert without a time moves it
   if (change.type === 'insert') {
     const { note, replacesId } = change
     const incoming: DayNote = { ...note, notifiedDueAt: null }
@@ -70,6 +72,10 @@ export function applyReminderChange(
     else if (replacesId === undefined) hiddenCount += 1
     if (!filtered && replacesId === undefined) added = 1
     tags = summarizeTags([{ tags: page.tags }, incoming])
+    // Independent of the viewed day and tag: a note the filter hides still joins the list.
+    if (note.dueAt === null && note.doneAt === null) {
+      undated = insertUndated(undated, note, replacesId)
+    }
   } else {
     notes = known.map((n) => (n.id === change.id ? applyToNote(n, change, now, page.timezone) : n))
   }
@@ -82,6 +88,7 @@ export function applyReminderChange(
     tag: page.tag,
     hiddenCount,
     tags,
+    undated,
   })
   if (filtered) return rebuilt
   // Unfiltered: the page only knows its own items, the rest of the account stays "other".

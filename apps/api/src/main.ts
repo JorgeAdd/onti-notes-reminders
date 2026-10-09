@@ -1,5 +1,6 @@
 import { makeCaptureNote } from './application/capture-note'
 import { makeGetMe } from './application/get-me'
+import { makeGetNote } from './application/get-note'
 import { makeGetToday } from './application/get-today'
 import { makeMarkDone } from './application/mark-done'
 import { makeSearchNotes } from './application/search-notes'
@@ -34,6 +35,7 @@ const app = buildServer({
   corsOrigins: config.CORS_ORIGINS,
   logger: true,
   searchNotes: makeSearchNotes({ clock, notes, profiles }),
+  getNote: makeGetNote({ clock, notes, profiles }),
 })
 
 async function shutdown() {

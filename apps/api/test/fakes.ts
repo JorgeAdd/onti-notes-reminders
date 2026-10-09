@@ -7,7 +7,7 @@ import type {
   Profile,
   ProfileRepository,
 } from '../src/application/ports'
-import type { NoteRecord } from '../src/domain/note'
+import type { NoteDetail, NoteRecord } from '../src/domain/note'
 
 export const JORGE: Identity = {
   userId: '7b0c5a2e-3f4d-4c1a-9e8b-2d6f0a1b3c4d',
@@ -69,6 +69,7 @@ export function noteRecord(n: number, overrides: Partial<NoteRecord> = {}): Note
     snoozeCount: 0,
     doneAt: null,
     notifiedDueAt: null,
+    createdAt: new Date(0),
     ...overrides,
   }
 }
@@ -77,9 +78,14 @@ interface OwnedNote {
   ownerId: string
   note: NoteRecord
   body?: string
+  /** Overrides `note.createdAt` (the fake keeps one creation time per note). */
   createdAt?: Date
 }
-type StoredNote = Required<OwnedNote>
+interface StoredNote {
+  ownerId: string
+  note: NoteRecord
+  body: string
+}
 
 /** The words a stored note offers to a search: the fake's stand-in for Postgres' `simple` parser. */
 const wordsOf = (text: string): string[] =>
@@ -101,14 +107,11 @@ export class InMemoryNotes implements NoteRepository {
   private nextId = 1000
   private readonly rows = new Map<string, StoredNote>()
 
-  /** `body` defaults to empty; `createdAt` defaults to the insertion order (later is newer). */
+  /** `body` defaults to empty; a note keeps its `createdAt` (epoch by default: ties order by id). */
   constructor(owned: OwnedNote[] = []) {
     for (const row of owned) {
-      this.rows.set(row.note.id, {
-        body: '',
-        createdAt: new Date(this.rows.size),
-        ...row,
-      })
+      const note = row.createdAt ? { ...row.note, createdAt: row.createdAt } : row.note
+      this.rows.set(note.id, { ownerId: row.ownerId, note, body: row.body ?? '' })
     }
   }
 
@@ -123,15 +126,17 @@ export class InMemoryNotes implements NoteRepository {
       tags: input.tags.map(({ slug, name }) => ({ slug, name })),
       dueAt: input.dueAt,
       originalDueAt: input.dueAt,
-    }
-    this.rows.set(note.id, {
-      ownerId: identity.userId,
-      note,
-      body: '',
       createdAt: new Date(this.rows.size),
-    })
+    }
+    this.rows.set(note.id, { ownerId: identity.userId, note, body: '' })
     this.created.push({ ownerId: identity.userId, input })
     return Promise.resolve(note)
+  }
+
+  findOwn(identity: Identity, id: string): Promise<NoteDetail | null> {
+    const row = this.rows.get(id)
+    if (!row || row.ownerId !== identity.userId) return Promise.resolve(null)
+    return Promise.resolve({ ...row.note, body: row.body })
   }
 
   listOwn(identity: Identity): Promise<NoteRecord[]> {
@@ -185,7 +190,9 @@ export class InMemoryNotes implements NoteRepository {
     })
     const rows = matches
       .sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime() || (a.note.id < b.note.id ? 1 : -1),
+        (a, b) =>
+          b.note.createdAt.getTime() - a.note.createdAt.getTime() ||
+          (a.note.id < b.note.id ? 1 : -1),
       )
       .slice(0, query.limit)
       .map((r) => ({

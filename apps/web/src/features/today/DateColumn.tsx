@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { messages } from '../../messages'
 import { ThemeControl } from '../theme/ThemeControl'
 import styles from './DateColumn.module.css'
@@ -16,6 +17,8 @@ interface Props {
   nav?: (DayNavState & { mobile: boolean }) | undefined
   /** Today only: the theme control sits above Sign out (not on All notes). */
   showTheme?: boolean
+  /** R19: the "Without a reminder" list (or its phone link), below Sign out. */
+  undated?: ReactNode
 }
 
 export function DateColumn({
@@ -26,6 +29,7 @@ export function DateColumn({
   onSignOut,
   nav,
   showTheme = false,
+  undated = null,
 }: Props) {
   const { day, weekday, month } = calendarDateBlock(date, timezone)
   return (
@@ -45,6 +49,7 @@ export function DateColumn({
           {messages.today.signOut}
         </button>
       </div>
+      {undated}
     </aside>
   )
 }
