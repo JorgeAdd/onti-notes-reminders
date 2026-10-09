@@ -19,7 +19,7 @@ import { ValidationError } from '../src/application/errors'
 import type { Clock, Profile } from '../src/application/ports'
 import type { NoteRecord } from '../src/domain/note'
 import type { Identity } from '../src/domain/identity'
-import { InMemoryNotes, profileReturning } from './fakes'
+import { ANA, InMemoryNotes, JORGE, profileReturning } from './fakes'
 
 const IDENTITY: Identity = { userId: 'jorge', email: null, claims: {} }
 const UUID = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`
@@ -225,5 +225,102 @@ describe('getToday · tag filter (C8, Thu 8 14:30, #client-b)', () => {
     await expect(today([], '2026-10-08 14:30', undefined, { tag: 'client-b' })).rejects.toThrow(
       ValidationError,
     )
+  })
+})
+
+describe('getToday · without a reminder (R19, C13, C14)', () => {
+  const C13_TITLES = [
+    '1:1 with manager: topics',
+    'API keys rotate every 90 days',
+    'Diego prefers async updates on Slack',
+    'Domain glossary',
+    'PR review checklist',
+    'Read: Postgres partial indexes',
+    'Review agenda: search, exports, roles',
+    'Shortcut cheat sheet for the team',
+  ]
+  const WED = '2026-10-07 09:05'
+  const captured: FixtureNote = {
+    ...byId(BEFORE_CAPTURE, 'N7'),
+    id: 'N16',
+    title: 'Export format questions',
+    createdAt: at(WED),
+  }
+
+  it('C13 · Wed 7 09:05: "Without a reminder · 9", 8 rows, and still 11 other notes (R5)', async () => {
+    const page = await today(n1Done, WED)
+    expect(page.undated.count).toBe(9)
+    expect(titles(page.undated.items)).toEqual(C13_TITLES)
+    expect(page.otherCount).toBe(11)
+  })
+
+  it('carries id, tags and the creation time of each row, as the wire schema encodes them', async () => {
+    const page = await today(n1Done, WED)
+    const first = page.undated.items[0]!
+    expect(first.tags).toEqual([{ slug: 'personal', name: 'Personal' }])
+    expect(first.createdAt).toEqual(at('2026-10-01 10:00'))
+    const wire = z.encode(todayResponseSchema, page)
+    expect(wire.undated.items[0]!.createdAt).toBe('2026-10-01T16:00:00.000Z')
+    expect(todayResponseSchema.safeParse(wire).success).toBe(true)
+  })
+
+  it('C14 · a capture without a time: 16 notes, "Without a reminder · 10", new note first, 12 other', async () => {
+    const page = await today([...n1Done, captured], WED)
+    expect(page.undated.count).toBe(10)
+    expect(titles(page.undated.items)).toEqual([
+      'Export format questions',
+      ...C13_TITLES.slice(0, 7),
+    ])
+    expect(page.openCount).toBe(4)
+    expect(page.otherCount).toBe(12)
+  })
+
+  it('is the same set for any viewed day and for a tag filter', async () => {
+    const base = (await today(n1Done, WED)).undated
+    for (const query of [
+      { date: '2026-10-09' },
+      { date: '2026-10-05' },
+      { tag: 'client-b' },
+      { tag: 'personal' },
+      { date: '2026-10-09', tag: 'client-a' },
+    ] satisfies DayQuery[]) {
+      expect((await today(n1Done, WED, undefined, query)).undated).toEqual(base)
+    }
+  })
+
+  it('leaves out a done note and a note with a reminder', async () => {
+    const n7Done = replace(n1Done, { ...byId(n1Done, 'N7'), doneAt: at('2026-10-07 08:00') })
+    const page = await today(n7Done, WED)
+    expect(page.undated.count).toBe(8)
+    expect(titles(page.undated.items)).not.toContain('API keys rotate every 90 days')
+    expect(titles(page.undated.items)).not.toContain(N1.title)
+  })
+
+  it('is empty when every note has a reminder, and for a new account', async () => {
+    const dated = n1Done.filter((n) => n.dueAt !== null)
+    expect((await today(dated, WED)).undated).toEqual({ count: 0, items: [] })
+    expect((await today([], WED)).undated).toEqual({ count: 0, items: [] })
+  })
+
+  it("never shows another user's notes, and counts only the caller's (R15)", async () => {
+    const anaNote: NoteRecord = {
+      ...toRecord(captured, 900),
+      title: 'Ana private idea',
+    }
+    const repo = new InMemoryNotes([
+      ...n1Done.map((note, index) => ({ ownerId: JORGE.userId, note: toRecord(note, index) })),
+      { ownerId: ANA.userId, note: anaNote },
+    ])
+    const getToday = makeGetToday({
+      clock: { now: () => at(WED) },
+      notes: repo,
+      profiles: profileReturning({ timezone: 'America/Mexico_City' }),
+    })
+    const asJorge = await getToday(JORGE)
+    expect(asJorge.undated.count).toBe(9)
+    expect(titles(asJorge.undated.items)).toEqual(C13_TITLES)
+    const asAna = await getToday(ANA)
+    expect(asAna.undated).toMatchObject({ count: 1 })
+    expect(titles(asAna.undated.items)).toEqual(['Ana private idea'])
   })
 })

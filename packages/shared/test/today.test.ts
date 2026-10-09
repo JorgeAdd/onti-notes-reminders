@@ -18,6 +18,17 @@ const wire = {
   ],
   hiddenCount: 0,
   others: [],
+  undated: {
+    count: 9,
+    items: [
+      {
+        id: '7a1f2b7a-1d0e-4a57-8d0a-7a2f4e9b3c33',
+        title: '1:1 with manager: topics',
+        tags: [{ name: 'Personal', slug: 'personal' }],
+        createdAt: '2026-10-01T16:00:00.000Z',
+      },
+    ],
+  },
   carried: [
     {
       day: '2026-10-06T06:00:00.000Z',
@@ -46,6 +57,33 @@ const wire = {
     },
   ],
 }
+
+describe('todayResponseSchema undated (R19)', () => {
+  it('decodes the undated block with its creation instants and round-trips the wire', () => {
+    const parsed = todayResponseSchema.parse(wire)
+    expect(parsed.undated.count).toBe(9)
+    expect(parsed.undated.items[0]!.createdAt).toEqual(new Date('2026-10-01T16:00:00.000Z'))
+    expect(z.encode(todayResponseSchema, parsed).undated).toEqual(wire.undated)
+  })
+
+  it('requires the block: an API that forgets it must fail, not look like zero', () => {
+    expect(todayResponseSchema.safeParse({ ...wire, undated: undefined }).success).toBe(false)
+  })
+
+  it.each([
+    ['a negative count', { count: -1, items: [] }],
+    [
+      'more than 8 items',
+      { count: 9, items: Array.from({ length: 9 }, () => wire.undated.items[0]) },
+    ],
+    [
+      'an item without createdAt',
+      { count: 1, items: [{ ...wire.undated.items[0], createdAt: undefined }] },
+    ],
+  ])('rejects %s', (_label, undated) => {
+    expect(todayResponseSchema.safeParse({ ...wire, undated }).success).toBe(false)
+  })
+})
 
 describe('todayResponseSchema (decision 1)', () => {
   it('parse decodes ISO strings to Dates (open question 3 confirmed)', () => {

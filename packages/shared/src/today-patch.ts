@@ -82,6 +82,7 @@ export function applyReminderChange(
     tag: page.tag,
     hiddenCount,
     tags,
+    undated: page.undated,
   })
   if (filtered) return rebuilt
   // Unfiltered: the page only knows its own items, the rest of the account stays "other".

@@ -74,9 +74,9 @@ Global checks for every commit:
 
 ### Commit 1.6 `feat(api): undated set in GET /today` (1c)
 
-- [ ] 1.6.1 RED `packages/shared/test/undated.test.ts` (`selectUndated` C13 order, 9 with 8 rows, tiebreaks; `insertUndated`); `today.test.ts` `undated` required.
-- [ ] 1.6.2 GREEN `shared/src/domain/undated.ts`, `todayResponseSchema`, `buildDayResponse(…, undated)`.
-- [ ] 1.6.3 RED `apps/api/test/today.test.ts`: C13, C14, same set for `date`/`tag`, Ana isolated. GREEN `get-today.ts`.
+- [x] 1.6.1 RED `packages/shared/test/undated.test.ts` (`selectUndated` C13 order, 9 with 8 rows, tiebreaks; `insertUndated`); `today.test.ts` `undated` required.
+- [x] 1.6.2 GREEN `shared/src/domain/undated.ts`, `todayResponseSchema`, `buildDayResponse(…, undated)`.
+- [x] 1.6.3 RED `apps/api/test/today.test.ts`: C13, C14, same set for `date`/`tag`, Ana isolated. GREEN `get-today.ts`.
 
 ### Commit 1.7 `feat(web): optimistic undated parity` (1c)
 

@@ -9,6 +9,8 @@ import {
   buildDayResponse,
   filterByTag,
   markDone,
+  NO_UNDATED,
+  selectUndated,
   snoozeOneHour,
   snoozeTomorrow,
   summarizeTags,
@@ -20,6 +22,9 @@ import {
 import { at, BEFORE_CAPTURE, replace, TZ, type FixtureNote } from './fixtures/jorge-week'
 
 const NOW = at('2026-10-07 09:05')
+
+/** The undated block of a plain-note insert joins the parity in the next commit (insertUndated). */
+const sansUndated = (page: TodayResponse): TodayResponse => ({ ...page, undated: NO_UNDATED })
 
 /** A viewed page: `date: null` is today. */
 interface View {
@@ -45,6 +50,7 @@ function respond(notes: FixtureNote[], view: View = TODAY, now = NOW): TodayResp
     tag: view.tag,
     hiddenCount,
     tags: summarizeTags(own),
+    undated: selectUndated(own),
   })
 }
 
@@ -142,7 +148,7 @@ describe('applyReminderChange · parity with the server page (jorge-week, Wed 7 
       { type: 'insert', note: toResponse(created) },
       NOW,
     )
-    expect(patched).toEqual(respond([...BEFORE_CAPTURE, created]))
+    expect(sansUndated(patched)).toEqual(sansUndated(respond([...BEFORE_CAPTURE, created])))
     expect(patched.otherCount).toBe(respond(BEFORE_CAPTURE).otherCount + 1)
   })
 
@@ -176,7 +182,7 @@ describe('applyReminderChange · parity with the server page (jorge-week, Wed 7 
       { type: 'insert', note: toResponse(real), replacesId: 'temp-1' },
       NOW,
     )
-    expect(settled).toEqual(respond([...BEFORE_CAPTURE, real]))
+    expect(sansUndated(settled)).toEqual(sansUndated(respond([...BEFORE_CAPTURE, real])))
   })
 })
 
@@ -323,7 +329,7 @@ describe('applyReminderChange · insert on a filtered view', () => {
   it('a matching note without a date joins others', () => {
     const created = fixtureNote('NX', 'Idea', null, 'client-a')
     const patched = insertOn(created)
-    expect(patched).toEqual(respond([...WEEK, created], view))
+    expect(sansUndated(patched)).toEqual(sansUndated(respond([...WEEK, created], view)))
     expect(patched.others.map((o) => o.id)).toContain('NX')
   })
 
@@ -356,7 +362,7 @@ describe('applyReminderChange · insert on a filtered view', () => {
     const real = fixtureNote('NX', 'Call back', null, 'client-a')
     const temp = { ...real, id: 'temp-1' }
     const settled = insertOn(real, 'temp-1', insertOn(temp))
-    expect(settled).toEqual(respond([...WEEK, real], view))
+    expect(sansUndated(settled)).toEqual(sansUndated(respond([...WEEK, real], view)))
   })
 })
 

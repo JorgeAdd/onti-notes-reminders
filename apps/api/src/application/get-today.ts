@@ -1,6 +1,7 @@
 import {
   buildDayResponse,
   filterByTag,
+  selectUndated,
   summarizeTags,
   type DayQuery,
   type TodayResponse,
@@ -39,6 +40,8 @@ export function makeGetToday({ clock, notes, profiles }: GetTodayDeps) {
       tag,
       hiddenCount,
       tags: summarizeTags(own),
+      // R19: from the whole account, before the tag filter and for any viewed day.
+      undated: selectUndated(own),
     })
   }
 }

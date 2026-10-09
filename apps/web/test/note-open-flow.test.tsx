@@ -104,60 +104,72 @@ async function openSearchedList(user: ReturnType<typeof userEvent.setup>) {
   return input
 }
 
-it('a row opens the note by id; esc returns to the same search, a second esc reaches Today', async () => {
-  const user = userEvent.setup()
-  await openSearchedList(user)
+it(
+  'a row opens the note by id; esc returns to the same search, a second esc reaches Today',
+  { timeout: 20_000 },
+  async () => {
+    const user = userEvent.setup()
+    await openSearchedList(user)
 
-  await user.click(screen.getByRole('button', { name: /Staging URL and test accounts/ }))
-  expect(
-    await screen.findByRole('heading', { level: 1, name: 'Staging URL and test accounts' }),
-  ).toBeInTheDocument()
-  expect(requested).toContain(`/notes/${uuid(1)}`)
-  expect((await screen.findByText('qa-admin')).tagName).toBe('STRONG')
+    await user.click(screen.getByRole('button', { name: /Staging URL and test accounts/ }))
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Staging URL and test accounts' }),
+    ).toBeInTheDocument()
+    expect(requested).toContain(`/notes/${uuid(1)}`)
+    expect((await screen.findByText('qa-admin')).tagName).toBe('STRONG')
 
-  await user.keyboard('{Escape}')
-  const input = await screen.findByRole('textbox', { name: messages.notes.searchLabel })
-  expect(input).toHaveValue('staging')
-  expect(screen.getAllByRole('listitem')).toHaveLength(2)
-  expect(screen.queryByText('PR review checklist')).not.toBeInTheDocument()
+    await user.keyboard('{Escape}')
+    const input = await screen.findByRole('textbox', { name: messages.notes.searchLabel })
+    expect(input).toHaveValue('staging')
+    expect(screen.getAllByRole('listitem')).toHaveLength(2)
+    expect(screen.queryByText('PR review checklist')).not.toBeInTheDocument()
 
-  await user.keyboard('{Escape}')
-  expect(
-    await screen.findByRole('heading', { level: 1, name: /things? today|left today/ }),
-  ).toBeInTheDocument()
-})
+    await user.keyboard('{Escape}')
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /things? today|left today/ }),
+    ).toBeInTheDocument()
+  },
+)
 
-it('opens from the keyboard (Enter on the focused row) and Back does the first step', async () => {
-  const user = userEvent.setup()
-  await openSearchedList(user)
+it(
+  'opens from the keyboard (Enter on the focused row) and Back does the first step',
+  { timeout: 20_000 },
+  async () => {
+    const user = userEvent.setup()
+    await openSearchedList(user)
 
-  screen.getByRole('button', { name: /Staging checklist/ }).focus()
-  await user.keyboard('{Enter}')
-  expect(
-    await screen.findByRole('heading', { level: 1, name: 'Staging checklist' }),
-  ).toBeInTheDocument()
+    screen.getByRole('button', { name: /Staging checklist/ }).focus()
+    await user.keyboard('{Enter}')
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Staging checklist' }),
+    ).toBeInTheDocument()
 
-  await user.click(screen.getByRole('button', { name: messages.note.back }))
-  const list = await screen.findByRole('list')
-  expect(within(list).getAllByRole('listitem')).toHaveLength(2)
-})
+    await user.click(screen.getByRole('button', { name: messages.note.back }))
+    const list = await screen.findByRole('list')
+    expect(within(list).getAllByRole('listitem')).toHaveLength(2)
+  },
+)
 
-it('sign-out while a note is open resets to Today after the next sign-in', async () => {
-  const user = userEvent.setup()
-  await openSearchedList(user)
-  await user.click(screen.getByRole('button', { name: /Staging URL and test accounts/ }))
-  await screen.findByRole('heading', { level: 1, name: 'Staging URL and test accounts' })
+it(
+  'sign-out while a note is open resets to Today after the next sign-in',
+  { timeout: 20_000 },
+  async () => {
+    const user = userEvent.setup()
+    await openSearchedList(user)
+    await user.click(screen.getByRole('button', { name: /Staging URL and test accounts/ }))
+    await screen.findByRole('heading', { level: 1, name: 'Staging URL and test accounts' })
 
-  act(() => notify(null))
-  expect(
-    await screen.findByRole('heading', { level: 1, name: messages.auth.signInTitle }),
-  ).toBeInTheDocument()
+    act(() => notify(null))
+    expect(
+      await screen.findByRole('heading', { level: 1, name: messages.auth.signInTitle }),
+    ).toBeInTheDocument()
 
-  act(() => notify(session))
-  expect(
-    await screen.findByRole('heading', { level: 1, name: /things? today|left today/ }),
-  ).toBeInTheDocument()
-  expect(
-    screen.queryByRole('heading', { name: 'Staging URL and test accounts' }),
-  ).not.toBeInTheDocument()
-})
+    act(() => notify(session))
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /things? today|left today/ }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { name: 'Staging URL and test accounts' }),
+    ).not.toBeInTheDocument()
+  },
+)

@@ -28,6 +28,7 @@ const body = {
   tags: [{ slug: 'client-a', name: 'Client A' }],
   hiddenCount: 0,
   others: [],
+  undated: { count: 0, items: [] },
   carried: [],
   rail: [
     {

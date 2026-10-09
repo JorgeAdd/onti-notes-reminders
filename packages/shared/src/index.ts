@@ -45,6 +45,7 @@ export * from './domain/plain-text'
 export * from './domain/reminder'
 export * from './domain/tag'
 export * from './domain/time'
+export * from './domain/undated'
 export { CAPTURE_LIMITS, isValidTimeZone } from './timezone'
 export {
   noteListItemSchema,
