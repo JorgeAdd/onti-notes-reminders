@@ -53,9 +53,9 @@ function isFastifyClientError(error: unknown): boolean {
   return typeof status === 'number' && status >= 400 && status < 500
 }
 
-/** `{note}` on the wire: the reminder state without the notification bookkeeping. */
+/** `{note}` on the wire: the reminder state and creation time, without the notification bookkeeping. */
 function noteBody(note: NoteRecord) {
-  const { id, title, tags, dueAt, originalDueAt, snoozeCount, doneAt } = note
+  const { id, title, tags, dueAt, originalDueAt, snoozeCount, doneAt, createdAt } = note
   return z.encode(noteResponseSchema, {
     id,
     title,
@@ -64,6 +64,7 @@ function noteBody(note: NoteRecord) {
     originalDueAt,
     snoozeCount,
     doneAt,
+    createdAt,
   })
 }
 

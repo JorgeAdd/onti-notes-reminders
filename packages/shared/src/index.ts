@@ -8,9 +8,14 @@ export {
 export { instant } from './instant'
 export {
   captureRequestSchema,
+  NOTE_LIMITS,
+  noteDetailResponseSchema,
+  noteDetailSchema,
   noteResponseSchema,
   snoozeRequestSchema,
   type CaptureRequest,
+  type NoteDetail,
+  type NoteDetailResponse,
   type NoteResponse,
   type SnoozePreset,
   type SnoozeRequest,

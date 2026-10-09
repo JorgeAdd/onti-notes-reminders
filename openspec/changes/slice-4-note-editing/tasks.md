@@ -48,8 +48,8 @@ Global checks for every commit:
 
 ### Commit 1.2 `feat(shared): createdAt on the note wire type` (1a)
 
-- [ ] 1.2.1 RED `packages/shared/test/notes.test.ts`: note without `createdAt` rejected; detail schemas, `NOTE_LIMITS.bodyMax` 20000.
-- [ ] 1.2.2 GREEN `shared/src/notes.ts`; `NoteRecord.createdAt`; repo selects `created_at`; `InMemoryNotes`; fixtures (`day-parity`, `server.test`, `today-fixture`, `api.test`, `capture-flow`, `search-*`); temp note `createdAt` in `use-reminder-actions.ts`.
+- [x] 1.2.1 RED `packages/shared/test/notes.test.ts`: note without `createdAt` rejected; detail schemas, `NOTE_LIMITS.bodyMax` 20000.
+- [x] 1.2.2 GREEN `shared/src/notes.ts`; `NoteRecord.createdAt`; repo selects `created_at`; `InMemoryNotes`; fixtures (`day-parity`, `server.test`, `today-fixture`, `api.test`, `capture-flow`, `search-*`); temp note `createdAt` in `use-reminder-actions.ts`.
 
 ### Commit 1.3 `feat(api): GET /notes/:id with the C11 404` (1a)
 

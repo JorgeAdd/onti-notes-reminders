@@ -48,6 +48,7 @@ const JORGE_NOTES: NoteRecord[] = [
   snoozeCount: n.snoozeCount,
   doneAt: n.doneAt,
   notifiedDueAt: n.notifiedDueAt,
+  createdAt: n.createdAt,
 }))
 
 /** Owner-scoped, like RLS; fresh per server so writes never leak between tests. */

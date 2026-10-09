@@ -30,6 +30,7 @@ const saved = (patch: Partial<NoteResponse> = {}): NoteResponse => ({
   originalDueAt: new Date('2026-10-07T23:00:00.000Z'),
   snoozeCount: 0,
   doneAt: null,
+  createdAt: new Date('2026-10-07T15:05:00.000Z'),
   ...patch,
 })
 

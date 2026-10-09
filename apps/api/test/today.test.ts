@@ -34,6 +34,7 @@ function toRecord(note: FixtureNote, index: number): NoteRecord {
     snoozeCount: note.snoozeCount,
     doneAt: note.doneAt,
     notifiedDueAt: note.notifiedDueAt,
+    createdAt: note.createdAt,
   }
 }
 

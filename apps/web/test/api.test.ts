@@ -176,6 +176,7 @@ describe('post and the reminder calls (Decision 10)', () => {
     originalDueAt: '2026-10-07T15:30:00.000Z',
     snoozeCount: 1,
     doneAt: null,
+    createdAt: '2026-10-01T16:00:00.000Z',
   }
 
   it('post sends no Content-Type without a body', async () => {
@@ -238,6 +239,7 @@ describe('captureNote (R11)', () => {
     originalDueAt: '2026-10-06T23:00:00.000Z',
     snoozeCount: 0,
     doneAt: null,
+    createdAt: '2026-10-06T22:00:00.000Z',
   }
 
   it('POSTs the structured payload with slugs and an ISO instant, and decodes the note', async () => {

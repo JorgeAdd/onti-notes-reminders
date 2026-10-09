@@ -77,6 +77,7 @@ const toResponse = (note: FixtureNote): NoteResponse => ({
   originalDueAt: note.originalDueAt,
   snoozeCount: note.snoozeCount,
   doneAt: note.doneAt,
+  createdAt: note.createdAt,
 })
 
 /** What the server does to the full list for one change. */

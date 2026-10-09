@@ -21,6 +21,7 @@ export class PostgresNoteRepository implements NoteRepository {
           'snooze_count',
           'done_at',
           'notified_due_at',
+          'created_at',
         ])
         .where('user_id', '=', identity.userId)
         .execute()
@@ -49,6 +50,7 @@ export class PostgresNoteRepository implements NoteRepository {
         snoozeCount: row.snooze_count,
         doneAt: row.done_at,
         notifiedDueAt: row.notified_due_at,
+        createdAt: row.created_at,
       }))
     })
   }
@@ -90,6 +92,7 @@ export class PostgresNoteRepository implements NoteRepository {
           'snooze_count',
           'done_at',
           'notified_due_at',
+          'created_at',
         ])
         .executeTakeFirstOrThrow()
 
@@ -113,6 +116,7 @@ export class PostgresNoteRepository implements NoteRepository {
         snoozeCount: note.snooze_count,
         doneAt: note.done_at,
         notifiedDueAt: note.notified_due_at,
+        createdAt: note.created_at,
       }
     })
   }
@@ -134,6 +138,7 @@ export class PostgresNoteRepository implements NoteRepository {
           'snooze_count',
           'done_at',
           'notified_due_at',
+          'created_at',
         ])
         .where('id', '=', id)
         .where('user_id', '=', identity.userId)
@@ -175,7 +180,7 @@ export class PostgresNoteRepository implements NoteRepository {
         .orderBy('tags.slug')
         .execute()
 
-      return { id: row.id, title: row.title, tags, ...next }
+      return { id: row.id, title: row.title, tags, createdAt: row.created_at, ...next }
     })
   }
 
