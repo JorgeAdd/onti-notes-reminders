@@ -87,7 +87,9 @@ Done 2026-10-08. All notes view with full-text word-prefix search (`/` key), exc
   over the note, user, `due_at`, allowed actions and a 24 h expiry, carried
   in the encrypted push payload and sent to
   `POST /push-actions/{done|snooze}`. On any failure the click opens the
-  app (`/?action=...`), where the normal JWT path runs the action.
+  app (`/?action=...` with the note id and `due_at`), where the normal JWT
+  path runs the action only if Today still shows that note open with the
+  same `due_at`.
 - A one-time backfill migration marks the currently overdue open reminders
   as notified, so the first scheduler tick sends no burst.
 - Opt-in permission control in the date column, under the theme control,

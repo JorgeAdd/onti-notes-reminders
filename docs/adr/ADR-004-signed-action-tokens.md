@@ -36,7 +36,22 @@ the service worker has nothing to authenticate with.
    snooze is "+1 h" (R7).
 5. **Any failure falls back to the app.** If the call fails for any
    reason (expired token, changed `due_at`, network), the notification
-   click opens `/?action=...`, where the normal JWT path runs the action.
+   click opens the app with the action, the note id and the
+   notification's `due_at` (`/?action=...&note=...&due=...`, or a message
+   to an already open window). The app runs the action through the normal
+   JWT path only if Today still shows that note open with the same
+   `due_at`; otherwise it just opens Today and changes nothing. A replayed
+   tap therefore never acts twice (C15).
+6. **Error codes for `POST /push-actions/*`** (R15: another user's resource
+   is `404`, never `403`):
+
+   | Status | When                                                                                      |
+   | ------ | ----------------------------------------------------------------------------------------- |
+   | `401`  | Missing, malformed, forged or expired token                                               |
+   | `404`  | Unknown note, another user's note, or an action the token does not allow                  |
+   | `409`  | Only when the note's `due_at` changed (a replayed or stale tap), or snooze on a done note |
+
+   Done on a note that is already done is a no-op success (R9).
 
 ## Consequences
 
