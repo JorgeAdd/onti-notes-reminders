@@ -72,10 +72,10 @@ Global checks for every commit:
 
 ## Commit 7 `feat(web): open help from Today` (unit 7)
 
-- [ ] 7.1 RED `statusline.test.tsx`: no button without `onHelp`; with it a "?" button (`aria-haspopup`, label from messages, 44 px CSS) calls back with the element; shown at every width. RED `empty-state.test.tsx`: hint text key vs touch, plain text not a button, every empty variant.
-- [ ] 7.2 GREEN `Statusline.tsx`/`.module.css` (button, 44 px bar), `EmptyState.tsx` (`hint` prop).
-- [ ] 7.3 RED `apps/web/test/today-help-flow.test.tsx`: `?` and button open; none on load; `?` while open keeps one dialog; `c / # [ j x` inert; capture bar typing `?` does not open; esc returns focus to row or button; esc does not clear a tag filter; mobile hides `MobileBar` and restores it; All notes and note view have no `?`.
-- [ ] 7.4 GREEN `TodayContainer.tsx` (`helpOpen`, `returnTo`, `openHelp(from)`, `bar.open`, `searchAvailable`), `DayPage.tsx` (lazy `HelpDialog` under `Suspense fallback={null}`, hide `MobileBar` while open, transparent backdrop on mobile, pass `hint` to `EmptyState`).
+- [x] 7.1 RED `statusline.test.tsx`: no button without `onHelp`; with it a "?" button (`aria-haspopup`, label from messages, 44 px CSS) calls back with the element; shown at every width. RED `empty-state.test.tsx`: hint text key vs touch, plain text not a button, every empty variant.
+- [x] 7.2 GREEN `Statusline.tsx`/`.module.css` (button, 44 px bar), `EmptyState.tsx` (`hint` prop).
+- [x] 7.3 RED `apps/web/test/today-help-flow.test.tsx`: `?` and button open; none on load; `?` while open keeps one dialog; `c / # [ j x` inert; capture bar typing `?` does not open; esc returns focus to row or button; esc does not clear a tag filter; mobile hides `MobileBar` and restores it; All notes and note view have no `?`.
+- [x] 7.4 GREEN `TodayContainer.tsx` (`helpOpen`, `returnTo`, `openHelp(from)`, `bar.open`, `searchAvailable`), `DayPage.tsx` (lazy `HelpDialog` under `Suspense fallback={null}`, hide `MobileBar` while open, transparent backdrop on mobile, pass `hint` to `EmptyState`).
 
 ## Commit 8 `test(web): pin the lazy help chunk` and docs (unit 8)
 

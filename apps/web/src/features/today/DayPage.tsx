@@ -29,6 +29,8 @@ const noop = () => undefined
 const CommandBar = lazy(() => import('./CommandBar').then((m) => ({ default: m.CommandBar })))
 // The tag bar loads the same way, on the first `#`.
 const TagBar = lazy(() => import('./TagBar').then((m) => ({ default: m.TagBar })))
+// The help loads on the first `?` or tap of the statusline button.
+const HelpDialog = lazy(() => import('../help/HelpDialog'))
 
 /** The open command bar: what it starts with and what it reports back. */
 export interface CaptureBar {
@@ -94,6 +96,9 @@ interface Props {
   tagBar?: TagBarState | null
   /** Phone width: the bottom bar's Tags button; omitted when the account has no tags. */
   onOpenTags?: (() => void) | undefined
+  /** Slice 9: the open help (`?`), and what opens it; without the opener there is no button or hint. */
+  help?: { onClose: () => void; returnTo: HTMLElement | null } | null
+  onOpenHelp?: ((from: HTMLElement | null) => void) | undefined
 }
 
 /** The page frame: date column, header and the area the day's items fill. */
@@ -116,6 +121,8 @@ export function DayPage({
   nav,
   tagBar = null,
   onOpenTags,
+  help = null,
+  onOpenHelp,
 }: Props) {
   const date = loading?.date ?? today.date
   const isToday = loading?.isToday ?? today.isToday
@@ -160,7 +167,11 @@ export function DayPage({
         <PageHeader title={loading ? messages.day.loading(dayText) : pageTitle(today)} />
         <main className={styles.main} aria-busy={loading ? 'true' : undefined}>
           {empty ? (
-            <EmptyState hasNotes={totalCount > 0} day={today.isToday ? undefined : dayText} />
+            <EmptyState
+              hasNotes={totalCount > 0}
+              day={today.isToday ? undefined : dayText}
+              {...(onOpenHelp ? { hint: mobile ? ('touch' as const) : ('key' as const) } : {})}
+            />
           ) : (
             <>
               {today.carried.map((group) => (
@@ -207,8 +218,13 @@ export function DayPage({
             <TagBar tags={today.tags} mobile={mobile} {...tagBar} />
           </Suspense>
         )}
+        {help === null ? null : (
+          <Suspense fallback={null}>
+            <HelpDialog {...help} />
+          </Suspense>
+        )}
         {sheet === null ? null : <ActionSheet now={now} timezone={today.timezone} {...sheet} />}
-        {mobile && capture === null && sheet === null && tagBar === null ? (
+        {mobile && capture === null && sheet === null && tagBar === null && help === null ? (
           <MobileBar
             onSearch={onOpenSearch}
             onTags={onOpenTags}
@@ -227,6 +243,7 @@ export function DayPage({
           isToday={isToday}
           loading={loading !== null}
           mode={tag === null ? undefined : messages.statusline.filterMode(tag)}
+          onHelp={onOpenHelp}
         />
       </div>
     </div>

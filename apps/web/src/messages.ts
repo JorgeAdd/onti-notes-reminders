@@ -111,6 +111,10 @@ export const messages = {
   help: {
     title: 'How it works',
     open: 'How it works',
+    /** The statusline button's glyph; `open` is its accessible name. */
+    button: '?',
+    emptyHint: 'Press ? to see how it works',
+    emptyHintTouch: 'Tap ? to see how it works',
     close: 'Close',
     sections: { capture: 'Capture', days: 'Days', note: 'On a note', find: 'Find' },
     /** Second line of a row, where the key alone is not enough. */

@@ -18,9 +18,11 @@ interface Props {
   loading?: boolean
   /** The mode label; NORMAL unless a tag filter is applied. */
   mode?: string | undefined
+  /** Slice 9: opens the help; the button exists only when the page can open it. */
+  onHelp?: ((from: HTMLElement) => void) | undefined
 }
 
-/** Decision 13 · the footer landmark: mode, weekday + day, counts, hints for the keys that work, and the ticking clock. */
+/** Decision 13 · the footer landmark: mode, weekday + day, counts, hints for the keys that work, the help button, and the ticking clock. */
 export function Statusline({
   now,
   timezone,
@@ -32,6 +34,7 @@ export function Statusline({
   isToday = true,
   loading = false,
   mode = messages.statusline.mode,
+  onHelp,
 }: Props) {
   const counts = isToday
     ? messages.statusline.counts(todayCount, carriedCount, totalCount)
@@ -48,6 +51,17 @@ export function Statusline({
           <span key={hint}>{messages.statusline.keys[hint]}</span>
         ))}
       </span>
+      {onHelp ? (
+        <button
+          type="button"
+          className={styles.help}
+          aria-haspopup="dialog"
+          aria-label={messages.help.open}
+          onClick={(event) => onHelp(event.currentTarget)}
+        >
+          {messages.help.button}
+        </button>
+      ) : null}
       <span className={styles.clock}>{clockTime(now, timezone)}</span>
     </footer>
   )

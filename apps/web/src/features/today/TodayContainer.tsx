@@ -75,6 +75,14 @@ export function TodayContainer({
   const [viewMessage, setViewMessage] = useState<string | null>(null)
   const [bar, setBar] = useState<Pick<CaptureBar, 'draft' | 'notice'> | null>(null)
   const [tagBarOpen, setTagBarOpen] = useState(false)
+  // Slice 9 · help is one flag, like the bars. `returnTo` is kept here so a desktop/mobile
+  // remount of the dialog does not lose it: the button itself, else the focused row.
+  const [help, setHelp] = useState<{ returnTo: HTMLElement | null } | null>(null)
+  const openHelp = useCallback((from: HTMLElement | null) => {
+    const active = document.activeElement
+    const focused = active instanceof HTMLElement && active !== document.body ? active : null
+    setHelp((open) => open ?? { returnTo: from ?? focused })
+  }, [])
   const actions = useReminderActions({
     api: reminders,
     now,
@@ -104,8 +112,9 @@ export function TodayContainer({
     data,
     actions,
     {
-      open: bar !== null || tagBarOpen,
+      open: bar !== null || tagBarOpen || help !== null,
       onOpen: openBar,
+      onHelp: () => openHelp(null),
       mobile,
       // The page on screen is not the page of the key yet: no row action until it lands.
       blocked: isPlaceholderData,
@@ -113,12 +122,13 @@ export function TodayContainer({
     onOpenNote ? (id) => onOpenNote(id, true) : undefined,
     days,
   )
-  // `/` works exactly when the key layer does (no bar, tag bar or sheet open), no snooze menu is
-  // armed and no placeholder page is on screen; so does its hint.
+  // `/` works exactly when the key layer does (no bar, tag bar, help or sheet open), no snooze
+  // menu is armed and no placeholder page is on screen; so does its hint.
   const searchAvailable =
     onOpenSearch !== undefined &&
     bar === null &&
     !tagBarOpen &&
+    help === null &&
     sheet === null &&
     !armed &&
     !isPlaceholderData
@@ -211,6 +221,8 @@ export function TodayContainer({
           mobile={mobile}
           onOpenCapture={openBar}
           onOpenSearch={onOpenSearch}
+          onOpenHelp={openHelp}
+          help={help === null ? null : { ...help, onClose: () => setHelp(null) }}
           {...(onOpenNote ? { onOpenNote: (id: string) => onOpenNote(id) } : {})}
           sheet={sheet}
           loading={loading}
