@@ -147,9 +147,9 @@ Global checks for every commit:
 
 ### Commit c13: `feat(web): manifest, icons and worker registration` (~130 + PNGs)
 
-- [ ] 16.1 RED: `apps/web/test/pwa-assets.test.ts`: manifest fields; PNG signatures and sizes; `theme_color`/`background_color` equal light-mode tokens (parity, narrow rule 8 exception); `vercel.json` headers and unchanged rewrite; `index.html` links.
-- [ ] 16.2 RED: `apps/web/test/register-sw.test.ts`: skipped without `serviceWorker` or key; scope `/`, `updateViaCache: 'none'`, `update()`; `env` treats `''` as absent.
-- [ ] 16.3 GREEN: `manifest.webmanifest`, icons, `index.html`, `vercel.json`, `lib/env.ts`, `features/push/register-sw.ts`, `main.tsx`.
+- [x] 16.1 RED: `apps/web/test/pwa-assets.test.ts`: manifest fields; PNG signatures and sizes; `theme_color`/`background_color` equal light-mode tokens (parity, narrow rule 8 exception); `vercel.json` headers and unchanged rewrite; `index.html` links.
+- [x] 16.2 RED: `apps/web/test/register-sw.test.ts`: skipped without `serviceWorker` or key; scope `/`, `updateViaCache: 'none'`, `update()`; `env` treats `''` as absent.
+- [x] 16.3 GREEN: `manifest.webmanifest`, icons, `index.html`, `vercel.json`, `lib/env.ts`, `features/push/register-sw.ts`, `main.tsx`.
 
 ### Commit c14: `feat(web): opt-in notification control` (~420)
 
