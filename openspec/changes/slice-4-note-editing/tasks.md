@@ -99,8 +99,8 @@ Global checks for every commit:
 
 ### Commit 2.1 `feat(shared): note update request and clearReminder` (2a)
 
-- [ ] 2.1.1 RED `notes.test.ts`: `{}` rejected, blank title 400, `''` body ok, body 20001 rejected, U+0000, `dueAt` three states; `rules.test.ts` `clearReminder`, R8 reopen.
-- [ ] 2.1.2 GREEN `noteUpdateRequestSchema`, `clearReminder` in `domain/reminder.ts`.
+- [x] 2.1.1 RED `notes.test.ts`: `{}` rejected, blank title 400, `''` body ok, body 20001 rejected, U+0000, `dueAt` three states; `rules.test.ts` `clearReminder`, R8 reopen.
+- [x] 2.1.2 GREEN `noteUpdateRequestSchema`, `clearReminder` in `domain/reminder.ts`.
 
 ### Commit 2.2 `feat(api): update and delete note use cases` (2a)
 

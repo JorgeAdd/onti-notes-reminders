@@ -1,9 +1,12 @@
 /** Edge cases of the general rules, beyond the scenario rows. */
 import { describe, expect, it } from 'vitest'
 import {
+  clearReminder,
   formatDuration,
+  isNotificationDue,
   markDone,
   NO_REMINDER,
+  markNotified,
   parseCapture,
   relativeTo,
   reschedule,
@@ -154,5 +157,39 @@ describe('R7 · snoozeDue previews what a snooze will do', () => {
   it('equals the due time the snooze functions produce', () => {
     expect(snoozeDue('hour', now, TZ)).toEqual(snoozeOneHour(open, now).dueAt)
     expect(snoozeDue('tomorrow', now, TZ)).toEqual(snoozeTomorrow(open, now, TZ).dueAt)
+  })
+})
+
+describe('R8 · remove the reminder and reschedule (note editing, R20)', () => {
+  const scheduled = () => reschedule(NO_REMINDER, at('2026-10-06 16:00'))
+
+  it('clearReminder clears every field, so the note is undated again (R19)', () => {
+    const busy = {
+      ...markNotified(snoozeOneHour(scheduled(), at('2026-10-07 09:05'))),
+      doneAt: at('2026-10-07 10:00'),
+    }
+    expect(busy.notifiedDueAt).not.toBeNull()
+    expect(clearReminder()).toEqual(NO_REMINDER)
+    expect(clearReminder()).toEqual({
+      dueAt: null,
+      originalDueAt: null,
+      snoozeCount: 0,
+      doneAt: null,
+      notifiedDueAt: null,
+    })
+  })
+
+  it('clearReminder returns a fresh object each time', () => {
+    expect(clearReminder()).not.toBe(NO_REMINDER)
+    expect(clearReminder()).not.toBe(clearReminder())
+  })
+
+  it('reschedule keeps notifiedDueAt: a different value re-arms, the same value does not (R10)', () => {
+    const notified = markNotified(scheduled())
+    const moved = reschedule(notified, at('2026-10-09 10:00'))
+    expect(moved.notifiedDueAt).toEqual(at('2026-10-06 16:00'))
+    expect(isNotificationDue(moved, at('2026-10-09 10:00'))).toBe(true)
+    const same = reschedule(notified, at('2026-10-06 16:00'))
+    expect(isNotificationDue(same, at('2026-10-06 16:30'))).toBe(false)
   })
 })
