@@ -67,8 +67,8 @@ Global checks for every commit:
 
 ## Commit 6 `style(web): help dialog tokens and fade` (unit 6)
 
-- [ ] 6.1 RED `apps/web/test/help-css.test.ts`: no `--core-*`, raw hex, px font size or raw duration; no vermilion (`--color-date`); keyframes touch only `opacity`; resolved duration <= 150 ms normal and reduced; close button `--size-target`; `--focus-ring`.
-- [ ] 6.2 GREEN `features/help/{HelpDialog,HelpContent}.module.css`: scrim, card width, sticky header on mobile, `--motion-crossfade` and `--ease-paper`.
+- [x] 6.1 RED `apps/web/test/help-css.test.ts`: no `--core-*`, raw hex, px font size or raw duration; no vermilion (`--color-date`); keyframes touch only `opacity`; resolved duration <= 150 ms normal and reduced; close button `--size-target`; `--focus-ring`.
+- [x] 6.2 GREEN `features/help/{HelpDialog,HelpContent}.module.css`: scrim, card width, sticky header on mobile, `--motion-crossfade` and `--ease-paper`.
 
 ## Commit 7 `feat(web): open help from Today` (unit 7)
 
