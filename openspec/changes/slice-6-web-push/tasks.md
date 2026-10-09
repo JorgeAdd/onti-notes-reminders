@@ -119,9 +119,9 @@ Global checks for every commit:
 
 ### Commit c10: `feat(api): subscribe and unsubscribe a browser` (~230)
 
-- [ ] 11.1 RED: `apps/api/test/push-subscriptions.test.ts`: new row; repeat is one row; Ana's endpoint reassigned to Jorge, Ana has none, response equals first-time; unsubscribe own; another user's is a no-op success; pruned stays gone.
-- [ ] 11.2 RED `[pg]`: `apps/api/test/postgres/push-subscriptions.pg.test.ts`: the one owner-role upsert swaps; Ana cannot read or delete Jorge's row as `authenticated`.
-- [ ] 11.3 GREEN: `push-ports.ts` `SubscriptionRepository`; `application/push-subscribe.ts`; adapter `subscribe` (single owner statement, verified `sub`) and `unsubscribe` (`asUser`); request schemas in `packages/shared/src/push.ts`; fakes.
+- [x] 11.1 RED: `apps/api/test/push-subscriptions.test.ts`: new row; repeat is one row; Ana's endpoint reassigned to Jorge, Ana has none, response equals first-time; unsubscribe own; another user's is a no-op success; pruned stays gone.
+- [x] 11.2 RED `[pg]`: `apps/api/test/postgres/push-subscriptions.pg.test.ts`: the one owner-role upsert swaps; Ana cannot read or delete Jorge's row as `authenticated`.
+- [x] 11.3 GREEN: `push-ports.ts` `SubscriptionRepository`; `application/push-subscribe.ts`; adapter `subscribe` (single owner statement, verified `sub`) and `unsubscribe` (`asUser`); request schemas in `packages/shared/src/push.ts`; fakes.
 
 ### Commit c11: `feat(api): push subscription and action routes` (~235)
 

@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { actionClaimsSchema, PUSH_ACTIONS, PUSH_COPY, pushPayloadSchema } from '../src'
+import {
+  actionClaimsSchema,
+  PUSH_ACTIONS,
+  PUSH_COPY,
+  pushActionRequestSchema,
+  pushPayloadSchema,
+  pushSubscriptionRequestSchema,
+  pushUnsubscribeRequestSchema,
+} from '../src'
 
 const NOTE = '00000000-0000-4000-8000-000000000001'
 const USER = '7b0c5a2e-3f4d-4c1a-9e8b-2d6f0a1b3c4d'
@@ -71,5 +79,58 @@ describe('actionClaimsSchema', () => {
     ['another version', { ...claims, v: 2 }],
   ])('rejects %s', (_label, value) => {
     expect(actionClaimsSchema.safeParse(value).success).toBe(false)
+  })
+})
+
+const ENDPOINT = 'https://fcm.googleapis.com/fcm/send/abc-123'
+const subscription = { endpoint: ENDPOINT, keys: { p256dh: 'BNc_-x0', auth: 'k8Jq-_9' } }
+
+describe('pushSubscriptionRequestSchema', () => {
+  it('accepts a browser subscription and ignores extra fields', () => {
+    expect(pushSubscriptionRequestSchema.parse({ ...subscription, expirationTime: null })).toEqual(
+      subscription,
+    )
+  })
+
+  it.each([
+    ['no keys.auth', { ...subscription, keys: { p256dh: 'BNc' } }],
+    ['no keys', { endpoint: ENDPOINT }],
+    ['an http endpoint', { ...subscription, endpoint: 'http://push.example.com/x' }],
+    ['an IPv4 host', { ...subscription, endpoint: 'https://203.0.113.9/x' }],
+    ['an IPv6 host', { ...subscription, endpoint: 'https://[2001:db8::1]/x' }],
+    ['localhost', { ...subscription, endpoint: 'https://localhost/x' }],
+    ['userinfo', { ...subscription, endpoint: 'https://user:pw@push.example.com/x' }],
+    [
+      'a 2049-char endpoint',
+      { ...subscription, endpoint: `https://p.example.com/${'a'.repeat(2027)}` },
+    ],
+    ['a non-base64url key', { ...subscription, keys: { p256dh: 'a b', auth: 'x' } }],
+  ])('rejects %s', (_label, value) => {
+    expect(pushSubscriptionRequestSchema.safeParse(value).success).toBe(false)
+  })
+
+  it('accepts a 2048-char endpoint', () => {
+    const endpoint = `https://p.example.com/${'a'.repeat(2026)}`
+    expect(endpoint).toHaveLength(2048)
+    expect(pushSubscriptionRequestSchema.safeParse({ ...subscription, endpoint }).success).toBe(
+      true,
+    )
+  })
+})
+
+describe('pushUnsubscribeRequestSchema and pushActionRequestSchema', () => {
+  it('unsubscribe takes the same endpoint rules', () => {
+    expect(pushUnsubscribeRequestSchema.parse({ endpoint: ENDPOINT })).toEqual({
+      endpoint: ENDPOINT,
+    })
+    expect(
+      pushUnsubscribeRequestSchema.safeParse({ endpoint: 'http://x.example.com' }).success,
+    ).toBe(false)
+  })
+
+  it('the action body is a non-empty token string', () => {
+    expect(pushActionRequestSchema.parse({ token: 'a.b' })).toEqual({ token: 'a.b' })
+    expect(pushActionRequestSchema.safeParse({ token: '' }).success).toBe(false)
+    expect(pushActionRequestSchema.safeParse({}).success).toBe(false)
   })
 })

@@ -1,4 +1,5 @@
 import type { ActionClaims, PushPayload } from '@onti/shared'
+import type { Identity } from '../domain/identity'
 
 /** A reminder the scheduler claimed, with what the notification needs (no other table is read). */
 export interface ClaimedReminder {
@@ -33,6 +34,26 @@ export interface SubscriptionStore {
   /** Counts one more consecutive failure and deletes the row once it reaches `maxFailures`. */
   registerFailure(id: string, maxFailures: number): Promise<void>
   remove(id: string): Promise<void>
+}
+
+/** What a browser registers. */
+export interface NewSubscription {
+  endpoint: string
+  p256dh: string
+  auth: string
+  userAgent: string | null
+}
+
+/** The user's view of subscriptions (routes). */
+export interface SubscriptionRepository {
+  /**
+   * Stores the endpoint for `userId` (the verified JWT subject) with a clean failure count. An
+   * endpoint another user holds is reassigned to the caller by the same single upsert (ADR-001
+   * amendment); the outcome never tells the two cases apart.
+   */
+  subscribe(userId: string, input: NewSubscription): Promise<void>
+  /** Deletes the caller's row for the endpoint; another user's or an unknown one is a no-op. */
+  unsubscribe(identity: Identity, endpoint: string): Promise<void>
 }
 
 export type SendOutcome = { kind: 'sent' } | { kind: 'gone' } | { kind: 'failed' }
