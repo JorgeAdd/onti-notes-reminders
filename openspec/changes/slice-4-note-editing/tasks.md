@@ -60,10 +60,10 @@ Global checks for every commit:
 
 ### Commit 1.4 `feat(web): lazy markdown body with the R14 allowlist` (1b)
 
-- [ ] 1.4.1 Add `react-markdown`, `rehype-sanitize` to `apps/web/package.json` (check React 19 peers).
-- [ ] 1.4.2 RED `apps/web/test/markdown-body.test.tsx`: C10 layers (a)-(c), hostile link table, rel and target, no images, plain fallback pending and on import failure; `bundle-split.test.ts`.
-- [ ] 1.4.3 GREEN `features/note/{MarkdownBody,NoteBody}.tsx` (boundary, `PlainBody`).
-- [ ] 1.4.4 `docs/CONTRACT.md`: C10 proven; drop it from "Still `todo`".
+- [x] 1.4.1 Add `react-markdown`, `rehype-sanitize` to `apps/web/package.json` (check React 19 peers).
+- [x] 1.4.2 RED `apps/web/test/markdown-body.test.tsx`: C10 layers (a)-(c), hostile link table, rel and target, no images, plain fallback pending and on import failure; `bundle-split.test.ts`.
+- [x] 1.4.3 GREEN `features/note/{MarkdownBody,NoteBody}.tsx` (boundary, `PlainBody`).
+- [x] 1.4.4 `docs/CONTRACT.md`: C10 proven; drop it from "Still `todo`".
 
 ### Commit 1.5 `feat(web): read-only note view in All notes` (1b)
 

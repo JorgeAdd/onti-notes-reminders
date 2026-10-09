@@ -1,0 +1,63 @@
+.body {
+  font: var(--text-body);
+  overflow-wrap: anywhere;
+}
+
+.body > :first-child {
+  margin-block-start: 0;
+}
+
+.body > :last-child {
+  margin-block-end: 0;
+}
+
+.body p,
+.body ul,
+.body ol,
+.body pre,
+.body blockquote {
+  margin-block: 0 var(--space-md);
+}
+
+.body ul,
+.body ol {
+  padding-inline-start: var(--space-xl);
+}
+
+.heading {
+  font-weight: 700;
+}
+
+/* SG20: links stay ink with an underline, never an accent. */
+.body a {
+  color: var(--color-ink);
+  text-decoration: underline;
+}
+
+.body a:focus-visible {
+  outline: var(--focus-ring);
+}
+
+/* SG20: inline code and code blocks in Plex Mono on the soft role. */
+.body code {
+  padding: 0 var(--space-xs);
+  background: var(--color-soft);
+  font: var(--text-meta);
+}
+
+.body pre {
+  padding: var(--space-md);
+  background: var(--color-soft);
+  overflow-x: auto;
+}
+
+.body pre code {
+  padding: 0;
+  background: none;
+}
+
+.body blockquote {
+  padding-inline-start: var(--space-md);
+  border-inline-start: 2px solid var(--color-rule);
+  color: var(--color-ink-muted);
+}
