@@ -41,10 +41,10 @@ Global checks for every commit:
 
 ### Commit 1.1 `feat(api): strip markdown markers from excerpts` (1a)
 
-- [ ] 1.1.1 RED `packages/shared/test/plain-text.test.ts`: design Testing PR1 row 1 cases, 20000-char hostile input returns.
-- [ ] 1.1.2 GREEN `packages/shared/src/domain/plain-text.ts` (`markdownToPlainText`), export in `index.ts`.
-- [ ] 1.1.3 RED `apps/api/test/excerpt.test.ts` markers stripped; `search-notes.test.ts` `stag` finds `**staging**` (R13).
-- [ ] 1.1.4 GREEN `apps/api/src/domain/excerpt.ts` uses the helper.
+- [x] 1.1.1 RED `packages/shared/test/plain-text.test.ts`: design Testing PR1 row 1 cases, 20000-char hostile input returns.
+- [x] 1.1.2 GREEN `packages/shared/src/domain/plain-text.ts` (`markdownToPlainText`), export in `index.ts`.
+- [x] 1.1.3 RED `apps/api/test/excerpt.test.ts` markers stripped; `search-notes.test.ts` `stag` finds `**staging**` (R13).
+- [x] 1.1.4 GREEN `apps/api/src/domain/excerpt.ts` uses the helper.
 
 ### Commit 1.2 `feat(shared): createdAt on the note wire type` (1a)
 
