@@ -2,6 +2,7 @@
 
 - Status: Accepted
 - Date: 2026-10-06
+- Amended: 2026-10-08 (push subscription reassignment)
 
 ## Context
 
@@ -30,7 +31,8 @@ leaves business rules (snooze, "today", notifications) in the browser.
    `set local role authenticated` and `request.jwt.claims` set to the
    verified claims, so a missing `where user_id = …` in a query still
    cannot read or write another user's rows. Only the reminder scheduler
-   runs with the owner role, because it works across users.
+   runs with the owner role, because it works across users, plus the one
+   statement named in the 2026-10-08 amendment below.
 6. **The Data API is closed to the browser:** the `public` schema is
    removed from Supabase's exposed schemas, and `anon` has no table
    privileges.
@@ -51,6 +53,29 @@ leaves business rules (snooze, "today", notifications) in the browser.
 - A public demo account exists for reviewers (credentials in README.md).
 - Verified on the real project (2026-10-07): sign-up → ES256 token →
   local API `GET /me` → profile read as `authenticated` through RLS.
+
+## Amendment 2026-10-08 — push subscription reassignment
+
+Besides the reminder scheduler, exactly one more statement may run with the
+owner role: in `POST /push-subscriptions`, after the JWT is verified, a
+single upsert on the push endpoint that reassigns an endpoint currently
+owned by another user to the caller (the verified `sub`). It is one
+statement, and the response is identical whether or not the endpoint
+already existed, so nothing about the other user leaks (R15).
+
+Why:
+
+- A browser has exactly one push endpoint. When a second person signs in
+  on the same browser, the endpoint already belongs to the first user.
+- RLS blocks the reassignment: as `authenticated`, the caller cannot see or
+  update the other user's row, and an insert then hits the unique index on
+  the endpoint.
+- Refusing the subscription would leave shared browsers without pushes, and
+  keeping the old owner would send the first user's reminders to the second
+  person.
+
+Every other user request still runs as `authenticated` with the verified
+claims; unsubscribe, for example, deletes only the caller's own row.
 
 ## Alternatives considered
 
