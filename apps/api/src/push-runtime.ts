@@ -1,8 +1,11 @@
 import type { Kysely } from 'kysely'
-import type { Clock } from './application/ports'
+import type { Clock, NoteRepository } from './application/ports'
 import { makeDispatchDue } from './application/dispatch-due'
+import { makePushActions } from './application/push-actions'
 import type { PushLog } from './application/push-ports'
+import { makeSubscriptionActions } from './application/push-subscribe'
 import type { Database } from './infrastructure/db/database'
+import type { PushDeps } from './infrastructure/http/push-routes'
 import { PostgresPushSubscriptions } from './infrastructure/db/postgres-push-subscriptions'
 import { PostgresReminderClaimer } from './infrastructure/db/postgres-reminder-claimer'
 import { HmacActionTokens } from './infrastructure/push/hmac-action-tokens'
@@ -51,4 +54,27 @@ export function createPushRuntime(deps: PushRuntimeDeps): PushRuntime | null {
       log.error('push tick failed', { error: error instanceof Error ? error.message : 'unknown' }),
   })
   return { scheduler }
+}
+
+export interface PushRouteDepsInput {
+  push: PushConfig | null
+  db: Kysely<Database>
+  clock: Clock
+  notes: NoteRepository
+}
+
+/** The HTTP side of push: token verification, action use cases and subscriptions. `undefined` when push is off. */
+export function createPushRouteDeps({
+  push,
+  db,
+  clock,
+  notes,
+}: PushRouteDepsInput): PushDeps | undefined {
+  if (push === null) return undefined
+  return {
+    tokens: new HmacActionTokens(push.actionSecret),
+    clock,
+    actions: makePushActions({ clock, notes }),
+    subscriptions: makeSubscriptionActions({ subscriptions: new PostgresPushSubscriptions(db) }),
+  }
 }

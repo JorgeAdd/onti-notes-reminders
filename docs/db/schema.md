@@ -133,8 +133,9 @@ serves the scan. A claim bumps `updated_at` through the trigger.
 owner of a claimed reminder and writes the outcome of each send to
 `push_subscriptions` as the owner role. The ADR-001 amendment (2026-10-08)
 allows exactly one more owner-role statement: the subscribe upsert that
-reassigns an endpoint from another user to the caller, which ships with the
-subscription routes.
+reassigns an endpoint from another user to the caller (`POST /push-subscriptions`,
+keyed on the unique `endpoint`, with `failure_count` back to 0 and the owner
+taken from the verified JWT). Unsubscribing runs as `authenticated`.
 
 **Failure policy.** A `404` or `410` from the push service deletes the row. Any
 other failure adds one to `failure_count` and deletes the row when it reaches 5

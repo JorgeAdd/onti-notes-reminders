@@ -8,9 +8,11 @@ import {
 } from 'kysely'
 import { describe, expect, it, vi } from 'vitest'
 import type { PushConfig } from '../src/push-config'
-import { createPushRuntime } from '../src/push-runtime'
+import { createPushRouteDeps, createPushRuntime } from '../src/push-runtime'
 import type { Database } from '../src/infrastructure/db/database'
 import type { IntervalTimer } from '../src/infrastructure/push/scheduler'
+import { HmacActionTokens } from '../src/infrastructure/push/hmac-action-tokens'
+import { InMemoryNotes } from './fakes'
 import { MutableClock, RecordingLog } from './push-fakes'
 
 const config: PushConfig = {
@@ -117,5 +119,42 @@ describe('createPushRuntime', () => {
     expect(log.errors.length).toBeGreaterThanOrEqual(2)
     expect(log.errors[0]!.message).toBe('push tick failed')
     expect(JSON.stringify(log.errors)).not.toContain(config.actionSecret)
+  })
+})
+
+describe('createPushRouteDeps', () => {
+  const now = new Date('2026-10-06T17:00:00Z')
+  const build = (push: PushConfig | null) => {
+    const { db, queries } = recordingDb()
+    const deps = createPushRouteDeps({
+      push,
+      db,
+      clock: new MutableClock(now),
+      notes: new InMemoryNotes(),
+    })
+    return { deps, queries }
+  }
+
+  it('is absent when push is not configured, so the server registers no push route', () => {
+    const { deps, queries } = build(null)
+    expect(deps).toBeUndefined()
+    expect(queries).toEqual([])
+  })
+
+  it('verifies tokens minted with the configured secret and rejects another secret', () => {
+    const { deps } = build(config)
+    const claims = {
+      v: 1 as const,
+      noteId: '00000000-0000-4000-8000-000000000001',
+      userId: '7b0c5a2e-3f4d-4c1a-9e8b-2d6f0a1b3c4d',
+      dueAt: now.getTime(),
+      actions: ['done' as const],
+      exp: now.getTime() / 1000 + 60,
+    }
+    expect(
+      deps!.tokens.verify(new HmacActionTokens(config.actionSecret).sign(claims), now),
+    ).toEqual(claims)
+    expect(deps!.tokens.verify(new HmacActionTokens('z'.repeat(32)).sign(claims), now)).toBeNull()
+    expect(deps!.clock.now()).toEqual(now)
   })
 })

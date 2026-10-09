@@ -125,9 +125,9 @@ Global checks for every commit:
 
 ### Commit c11: `feat(api): push subscription and action routes` (~235)
 
-- [ ] 12.1 RED: `apps/api/test/push-routes.test.ts`: subscribe 400 (no `keys.auth`, http, IP host), 401 no token; actions 401 same body for missing, malformed, forged, expired; 404 same body for disallowed action, unknown note, another user's note (never 403); 409 only `due_at_changed` and `not_open`; `push` absent gives 404; CORS preflight; action token as bearer on `/notes/:id/done` is 401.
-- [ ] 12.2 GREEN: `infrastructure/http/push-routes.ts`; `server.ts` optional `push?`; `main.ts` passes it.
-- [ ] 12.3 `docs/CONTRACT.md`: move C15 from "Still todo" to the Slice 6 table; add C3 (from the notification) row, both citing c9 and c11 tests (rule 23).
+- [x] 12.1 RED: `apps/api/test/push-routes.test.ts`: subscribe 400 (no `keys.auth`, http, IP host), 401 no token; actions 401 same body for missing, malformed, forged, expired; 404 same body for disallowed action, unknown note, another user's note (never 403); 409 only `due_at_changed` and `not_open`; `push` absent gives 404; CORS preflight; action token as bearer on `/notes/:id/done` is 401.
+- [x] 12.2 GREEN: `infrastructure/http/push-routes.ts`; `server.ts` optional `push?`; `main.ts` passes it.
+- [x] 12.3 `docs/CONTRACT.md`: move C15 from "Still todo" to the Slice 6 table; add C3 (from the notification) row, both citing c9 and c11 tests (rule 23).
 
 ### PR2 close
 

@@ -14,7 +14,7 @@ import { createDatabase } from './infrastructure/db/database'
 import { PostgresNoteRepository } from './infrastructure/db/postgres-note-repository'
 import { PostgresProfileRepository } from './infrastructure/db/postgres-profile-repository'
 import { buildServer } from './infrastructure/http/server'
-import { createPushRuntime } from './push-runtime'
+import { createPushRouteDeps, createPushRuntime } from './push-runtime'
 
 const config = loadConfig()
 const db = createDatabase(config.DATABASE_URL)
@@ -36,6 +36,8 @@ const app = buildServer({
   corsOrigins: config.CORS_ORIGINS,
   logger: true,
   searchNotes: makeSearchNotes({ clock, notes, profiles }),
+  // Push routes exist only when push is configured.
+  push: createPushRouteDeps({ push: config.push, db, clock, notes }),
 })
 
 // Push is off unless all five push variables are set (no sender, no scheduler).
