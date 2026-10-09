@@ -52,7 +52,7 @@ function setup({
       <NoteContainer
         id={ID}
         load={load}
-        api={{ save }}
+        api={{ save, remove: () => Promise.reject(new Error('unexpected delete')) }}
         startInEdit={startInEdit}
         onClose={onClose}
         onSessionExpired={onSessionExpired}

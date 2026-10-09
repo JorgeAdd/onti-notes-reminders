@@ -136,7 +136,16 @@ export const messages = {
     created: (when: string) => `created ${when}`,
     done: 'done',
     statusHead: 'NOTE',
-    hints: { back: 'esc back', edit: 'e edit' },
+    hints: { back: 'esc back', edit: 'e edit', delete: 'd delete' },
+    /** PR2: the inline delete confirm (SG20, no modal). */
+    delete: {
+      open: 'Delete',
+      statusHead: 'DELETE?',
+      prompt: 'Delete? ↵ confirm · esc cancel',
+      confirm: 'Confirm delete',
+      cancel: 'Keep note',
+      failed: 'Could not delete this note. It is still here.',
+    },
     /** PR2: edit mode (SG20). */
     edit: {
       open: 'Edit',

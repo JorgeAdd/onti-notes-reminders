@@ -44,7 +44,10 @@ function setup(
       <NoteContainer
         id={ID}
         load={load}
-        api={{ save: () => Promise.reject(new Error('unexpected save')) }}
+        api={{
+          save: () => Promise.reject(new Error('unexpected save')),
+          remove: () => Promise.reject(new Error('unexpected delete')),
+        }}
         startInEdit={false}
         onClose={onClose}
         onSessionExpired={onSessionExpired}
@@ -128,12 +131,12 @@ it('ends the session on a 401', async () => {
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 })
 
-it('hints e and esc, and esc and the Back button close the view', async () => {
+it('hints e, d and esc, and esc and the Back button close the view', async () => {
   const { user, onClose } = setup(() => Promise.resolve(detail()))
   await screen.findByRole('heading', { level: 1 })
   expect(footer()).toHaveTextContent(messages.note.hints.edit)
   expect(footer()).toHaveTextContent(messages.note.hints.back)
-  expect(footer()).not.toHaveTextContent(/delete/i)
+  expect(footer()).toHaveTextContent(messages.note.hints.delete)
 
   await user.keyboard('{Escape}')
   expect(onClose).toHaveBeenCalledTimes(1)
@@ -153,6 +156,7 @@ it('x, s, z and other keys do nothing and send no request (e and d have their ow
   expect(screen.getAllByRole('button').map((b) => b.textContent)).toEqual([
     messages.today.signOut,
     messages.note.edit.open,
+    messages.note.delete.open,
     messages.note.back,
   ])
 })

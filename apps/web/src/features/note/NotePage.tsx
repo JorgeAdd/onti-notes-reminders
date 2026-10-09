@@ -8,6 +8,7 @@ import { DateColumn } from '../today/DateColumn'
 import { NoteBody } from './NoteBody'
 import styles from './NotePage.module.css'
 import { NoteStatusline, type NoteMode } from './NoteStatusline'
+import { StatuslineConfirm } from './StatuslineConfirm'
 
 interface Props {
   now: Date
@@ -20,6 +21,11 @@ interface Props {
   message: string | null
   onDismissMessage: () => void
   onEdit: () => void
+  onDelete: () => void
+  /** The confirm's two touch buttons; `↵` and `esc` go through the container's key layer. */
+  onConfirmDelete: () => void
+  onCancelDelete: () => void
+  deleting: boolean
   onBack: () => void
   onSignOut: () => void
 }
@@ -34,18 +40,28 @@ export function NotePage({
   message,
   onDismissMessage,
   onEdit,
+  onDelete,
+  onConfirmDelete,
+  onCancelDelete,
+  deleting,
   onBack,
   onSignOut,
 }: Props) {
   const heading = useRef<HTMLHeadingElement>(null)
+  const root = useRef<HTMLDivElement>(null)
   // On open, and on return from edit mode, focus moves to the heading (SG13, spec "Accessibility").
   useEffect(() => {
     if (mode === 'read') heading.current?.focus()
   }, [mode])
+  // Entering the confirm moves focus off the Delete button to the view root, so `↵` reaches the
+  // key layer (which ignores fields) and can never also click a focused button (Decision 22).
+  useEffect(() => {
+    if (mode === 'confirmDelete') root.current?.focus()
+  }, [mode])
   const done = note.doneAt !== null
   const title = <span>{note.title}</span>
   return (
-    <div className={styles.desk}>
+    <div className={styles.desk} ref={root} tabIndex={-1}>
       <div className={styles.page}>
         <DateColumn
           date={localCalendarDate(now, timezone)}
@@ -61,9 +77,14 @@ export function NotePage({
           </h1>
           <div className={styles.actions}>
             {mode === 'read' ? (
-              <button className={styles.action} type="button" onClick={onEdit}>
-                {messages.note.edit.open}
-              </button>
+              <>
+                <button className={styles.action} type="button" onClick={onEdit}>
+                  {messages.note.edit.open}
+                </button>
+                <button className={styles.action} type="button" onClick={onDelete}>
+                  {messages.note.delete.open}
+                </button>
+              </>
             ) : null}
             <button className={styles.back} type="button" onClick={onBack}>
               {messages.note.back}
@@ -93,7 +114,17 @@ export function NotePage({
       </div>
       <div className={styles.dock}>
         {message === null ? null : <ActionMessage message={message} onDismiss={onDismissMessage} />}
-        <NoteStatusline now={now} timezone={timezone} mode={mode} />
+        {mode === 'confirmDelete' ? (
+          <StatuslineConfirm
+            now={now}
+            timezone={timezone}
+            busy={deleting}
+            onConfirm={onConfirmDelete}
+            onCancel={onCancelDelete}
+          />
+        ) : (
+          <NoteStatusline now={now} timezone={timezone} mode={mode} />
+        )}
       </div>
     </div>
   )

@@ -2,7 +2,7 @@ import { messages } from '../../messages'
 import { clockTime } from '../today/format'
 import styles from './NoteStatusline.module.css'
 
-export type NoteMode = 'read' | 'edit'
+export type NoteMode = 'read' | 'edit' | 'confirmDelete'
 
 interface Props {
   now: Date
@@ -24,6 +24,7 @@ export function NoteStatusline({ now, timezone, mode }: Props) {
         ) : (
           <>
             <span>{note.hints.edit}</span>
+            <span>{note.hints.delete}</span>
             <span>{note.hints.back}</span>
           </>
         )}

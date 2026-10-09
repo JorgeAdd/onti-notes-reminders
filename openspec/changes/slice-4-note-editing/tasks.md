@@ -128,7 +128,7 @@ Global checks for every commit:
 
 ### Commit 2.7 `feat(web): inline delete confirm` (2c)
 
-- [ ] 2.7.1 RED `note-delete.test.tsx` (`d`, `↵`, `esc` stays, 404 gone, no double fire, `d` elsewhere inert). GREEN `StatuslineConfirm.tsx`.
+- [x] 2.7.1 RED `note-delete.test.tsx` (`d`, `↵`, `esc` stays, 404 gone, no double fire, `d` elsewhere inert). GREEN `StatuslineConfirm.tsx`.
 
 ### Commit 2.8 `feat(web): e on a focused Today row opens edit` (2c)
 

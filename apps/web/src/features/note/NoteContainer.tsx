@@ -49,11 +49,20 @@ export function NoteContainer({
     id,
     onSessionExpired,
     onSaved: () => setMode('read'),
+    onDeleted: onClose,
+    onDeleteFailed: () => setMode('read'),
   })
   useKeyboardLayer(true, (key) => {
     if (mode === 'edit') return key === 'Escape' ? (setMode('read'), true) : false
+    if (mode === 'confirmDelete') {
+      // `Enter` is consumed even while the DELETE is in flight, so nothing fires twice.
+      if (key === 'Enter') return actions.removing ? true : (actions.remove(), true)
+      if (key === 'Escape') return actions.removing ? true : (setMode('read'), true)
+      return false
+    }
     if (key === 'Escape') return (onClose(), true)
     if (key === 'e') return (setMode('edit'), true)
+    if (key === 'd') return (setMode('confirmDelete'), true)
     return false
   })
 
@@ -98,6 +107,10 @@ export function NoteContainer({
       message={actions.message}
       onDismissMessage={actions.dismissMessage}
       onEdit={() => setMode('edit')}
+      onDelete={() => setMode('confirmDelete')}
+      onConfirmDelete={actions.remove}
+      onCancelDelete={() => setMode('read')}
+      deleting={actions.removing}
       onBack={onClose}
       onSignOut={onSignOut}
     />

@@ -6,6 +6,7 @@ import { AuthContainer } from './features/auth/AuthContainer'
 import { TodayContainer } from './features/today/TodayContainer'
 import {
   captureNote,
+  deleteNote,
   fetchNote,
   fetchToday,
   markNoteDone,
@@ -68,6 +69,7 @@ export function App() {
   const noteApi = useMemo(
     () => ({
       save: (id: string, patch: NoteUpdateRequest) => updateNote(accessToken ?? '', id, patch),
+      remove: (id: string) => deleteNote(accessToken ?? '', id),
     }),
     [accessToken],
   )

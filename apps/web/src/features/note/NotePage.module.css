@@ -78,3 +78,8 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* The view root takes focus programmatically in the delete confirm; it is not a control. */
+.desk:focus {
+  outline: none;
+}
