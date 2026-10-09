@@ -14,8 +14,8 @@ and its reminder, and every morning see only what matters today.
 - App: https://onti-notes-reminders.vercel.app
 - API health: https://api-production-810ca.up.railway.app/health
 - Demo account (public on purpose, for reviewers):
-  - Email: `demo.jorge@onti-notes.dev`
-  - Password: `Demo-Notes-2026!`
+  - Email: `demo@onti.dev`
+  - Password: `demo1234`
 
 Sign-up is open and needs no email confirmation (ADR-001). The demo account is
 seeded with the 15-note scenario from `docs/product/scenario-dataset.md`, so
