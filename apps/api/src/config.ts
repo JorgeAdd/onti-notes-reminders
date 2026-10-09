@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { loadPushConfig, type PushConfig } from './push-config'
 
 const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
@@ -15,8 +16,11 @@ const envSchema = z.object({
     ),
 })
 
-export type Config = z.infer<typeof envSchema>
+export type Config = z.infer<typeof envSchema> & {
+  /** `null` when no push variable is set: push is disabled. */
+  push: PushConfig | null
+}
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
-  return envSchema.parse(env)
+  return { ...envSchema.parse(env), push: loadPushConfig(env) }
 }

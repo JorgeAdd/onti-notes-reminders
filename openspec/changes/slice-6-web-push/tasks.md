@@ -88,10 +88,10 @@ Global checks for every commit:
 
 ### Commit c6: `feat(api): push config and interval scheduler` (~200)
 
-- [ ] 6.1 RED: `apps/api/test/push-config.test.ts`: none → `null`; all five → config; each missing name listed; `''` unset; short secret and bad subject named; error text never contains a value.
-- [ ] 6.2 GREEN: `apps/api/src/push-config.ts`; `config.ts` gains `push`.
-- [ ] 6.3 RED: `apps/api/test/scheduler.test.ts`: `start` ticks at once and arms once; no overlap in flight; a rejecting run is logged and the next fire runs; `stop` cancels and awaits.
-- [ ] 6.4 GREEN: `infrastructure/push/scheduler.ts` (`createScheduler`, `systemTimer` with `unref`).
+- [x] 6.1 RED: `apps/api/test/push-config.test.ts`: none → `null`; all five → config; each missing name listed; `''` unset; short secret and bad subject named; error text never contains a value.
+- [x] 6.2 GREEN: `apps/api/src/push-config.ts`; `config.ts` gains `push`.
+- [x] 6.3 RED: `apps/api/test/scheduler.test.ts`: `start` ticks at once and arms once; no overlap in flight; a rejecting run is logged and the next fire runs; `stop` cancels and awaits.
+- [x] 6.4 GREEN: `infrastructure/push/scheduler.ts` (`createScheduler`, `systemTimer` with `unref`).
 
 ### Commit c7: `feat(db): backfill notified_due_at and claim due reminders` (~200)
 
