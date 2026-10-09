@@ -104,13 +104,13 @@ Global checks for every commit:
 
 ### Commit 2.2 `feat(api): update and delete note use cases` (2a)
 
-- [ ] 2.2.1 RED `update-note.test.ts` (title/body, tags replaced with derived names, R8 reschedule, null clears, foreign 404, throw rolls back), `delete-note.test.ts`.
-- [ ] 2.2.2 GREEN `NotePatch`, fake `updateOwn`/`deleteOwn`, `application/{update-note,delete-note}.ts`.
+- [x] 2.2.1 RED `update-note.test.ts` (title/body, tags replaced with derived names, R8 reschedule, null clears, foreign 404, throw rolls back), `delete-note.test.ts`.
+- [x] 2.2.2 GREEN `NotePatch`, fake `updateOwn`/`deleteOwn`, `application/{update-note,delete-note}.ts`.
 
 ### Commit 2.3 `feat(api): PATCH and DELETE /notes/:id` (2a)
 
 - [ ] 2.3.1 RED `note-write-route.test.ts`: 200, 400 cases, 404 (Ana, unknown, non-UUID), 401, DELETE 204 then 404, last write wins.
-- [ ] 2.3.2 GREEN Postgres `updateOwn`/`deleteOwn`, routes, `main.ts`; `postgres/note-update.pg.test.ts` (orphan tags not listed, cascade, RLS).
+- [ ] 2.3.2 GREEN routes, `main.ts` (Postgres `updateOwn`/`deleteOwn` and `postgres/note-update.pg.test.ts` landed in 2.2: the port change breaks typecheck otherwise).
 - [ ] 2.3.3 `docs/CONTRACT.md`: R20 from `todo` to proven with these test paths (rule 23).
 
 ### Commit 2.4 `refactor(shared): readDue and parseTagList` (2b)

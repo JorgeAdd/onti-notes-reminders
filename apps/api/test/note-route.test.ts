@@ -40,6 +40,8 @@ const failingNotes: NoteRepository = {
   mutateReminder: () => Promise.reject(new Error('connection refused: postgres://secret')),
   searchOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
   findOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
+  updateOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
+  deleteOwn: () => Promise.reject(new Error('connection refused: postgres://secret')),
 }
 
 function server(

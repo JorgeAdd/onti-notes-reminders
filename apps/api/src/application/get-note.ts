@@ -1,5 +1,6 @@
 import type { NoteDetailResponse } from '@onti/shared'
 import type { Identity } from '../domain/identity'
+import type { NoteDetail } from '../domain/note'
 import { NotFoundError } from './errors'
 import type { Clock, NoteRepository, ProfileRepository } from './ports'
 import { resolveTimezone } from './timezone'
@@ -8,6 +9,20 @@ export interface GetNoteDeps {
   clock: Clock
   notes: NoteRepository
   profiles: ProfileRepository
+}
+
+/** The wire answer for one note. Named fields: `notifiedDueAt` (bookkeeping) never leaves the API. */
+export function toNoteDetailResponse(
+  now: Date,
+  timezone: string,
+  found: NoteDetail,
+): NoteDetailResponse {
+  const { id, title, tags, dueAt, originalDueAt, snoozeCount, doneAt, createdAt, body } = found
+  return {
+    now,
+    timezone,
+    note: { id, title, tags, dueAt, originalDueAt, snoozeCount, doneAt, createdAt, body },
+  }
 }
 
 export function makeGetNote({ clock, notes, profiles }: GetNoteDeps) {
@@ -23,23 +38,7 @@ export function makeGetNote({ clock, notes, profiles }: GetNoteDeps) {
       notes.findOwn(identity, id),
     ])
     if (found === null) throw new NotFoundError('Note not found')
-    // Named fields: the notification bookkeeping (`notifiedDueAt`) never leaves the API.
-    const { title, tags, dueAt, originalDueAt, snoozeCount, doneAt, createdAt, body } = found
-    return {
-      now,
-      timezone: resolveTimezone(profile),
-      note: {
-        id: found.id,
-        title,
-        tags,
-        dueAt,
-        originalDueAt,
-        snoozeCount,
-        doneAt,
-        createdAt,
-        body,
-      },
-    }
+    return toNoteDetailResponse(now, resolveTimezone(profile), found)
   }
 }
 
