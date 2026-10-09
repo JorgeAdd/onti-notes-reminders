@@ -80,10 +80,10 @@ _Source: slice 8 archive report_
 Deferred, not in slice 4. The note view opens from All notes, the "Without a reminder" list and `e` on Today, but its state is not in the URL: there is still no router, so a refresh returns to Today.
 _Source: product decision, 2026-10-08 (prompt `prompts/durante/16-slices-4-and-6-in-parallel.md`)_
 
-### Note view: Edit and Delete sit in the header, not a touch bottom bar
+### Note view: check reach of the header buttons on phones
 
-SG20 describes a bottom bar `Edit · Delete` on touch. The write-side PR puts both buttons in the header next to Back, on every width, to keep one layout. Revisit if the manual smoke at 375x667 shows reach problems.
-_Source: slice 4 PR2 apply_
+SG20 places Edit, Delete and Back in the view header at every width (one layout). If the manual smoke at 375x667 shows the header buttons are hard to reach one-handed, consider a touch bottom bar (it would need an SG20 change first).
+_Source: slice 4 PR2 apply and verify_
 
 ### `esc` after `e` from Today lands in the All notes list
 
