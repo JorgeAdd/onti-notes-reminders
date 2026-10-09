@@ -90,6 +90,11 @@ _Source: slice 8 archive report_
 Notes with no reminder and not done, newest first, in the date column (desktop) or as a link (mobile), opening All notes. Defined by CONTRACT R19 (rows C13, C14); scope in `docs/roadmap.md`, Slice 4.
 _Source: product decision, 2026-10-08 (prompt `prompts/antes/21-slice-4-without-a-reminder.md`)_
 
+### Deep link to a note (`?note=` URL state)
+
+Deferred, not in slice 4. The note view opens from All notes, the "Without a reminder" list and `e` on Today, but its state is not in the URL: there is still no router, so a refresh returns to Today.
+_Source: product decision, 2026-10-08 (prompt `prompts/durante/16-slices-4-and-6-in-parallel.md`)_
+
 ## Suggestions
 
 ### Bundle size optimization
