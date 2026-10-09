@@ -108,7 +108,7 @@ Global checks for every commit:
 ### PR1 close
 
 - [x] 9.1 Final `npm run verify` and `npm run build`; PR body: forecast, `size:exception`, build check, pg output.
-- [ ] 9.2 Manual smoke (local): API with push config logs ticks; without it, no scheduler. Real delivery is checked after PR2 and PR3.
+- [ ] 9.2 Manual smoke (local): API with push config logs ticks; without it, no scheduler. Real delivery is checked after PR2 and PR3. — pending: not done yet (2026-10-09).
 
 ## PR2 — subscription and action endpoints (~665 lines, within budget)
 
@@ -132,7 +132,7 @@ Global checks for every commit:
 ### PR2 close
 
 - [x] 13.1 Final `npm run verify` (api 418 passed + 37 skipped, web 459, shared 290 + 3 todo; api 455 passed with a throwaway database) and `npm run build` green; PR body with forecast. Actual size is about 1,140 added lines against the 800 budget, so PR2 needs `size:exception` or a split (human decision).
-- [ ] 13.2 Manual smoke: `curl` subscribe twice with two users (one row, new owner); action with a forged token 401.
+- [ ] 13.2 Manual smoke: `curl` subscribe twice with two users (one row, new owner); action with a forged token 401. — pending: not done yet (2026-10-09).
 
 ## PR3 — web: worker, manifest, control, bridge, sign-out (~1,080 lines, `size:exception`)
 
@@ -170,14 +170,14 @@ Global checks for every commit:
 ### PR3 close
 
 - [x] 20.1 Final `npm run verify` (api 491 passed + 49 skipped, web 693, shared 396 + 3 todo) and `npm run build` green; main JS 619.02 kB (178.98 kB gzip); PR body with `size:exception`.
-- [ ] 20.2 Manual: four bar targets at 375 px without horizontal scroll; if not, move phones to the date column only.
-- [ ] 20.3 Manual smoke after deploy (not CI): delivery within 30 s with the app closed; Done and "+1 h" from the notification; second tap opens Today and changes nothing; denied copy; sign-out removes the row; iOS installed PWA best effort.
+- [ ] 20.2 Manual: four bar targets at 375 px without horizontal scroll; if not, move phones to the date column only. — pending: not done yet (2026-10-09).
+- [ ] 20.3 Manual smoke after deploy (not CI): delivery within 30 s with the app closed; Done and "+1 h" from the notification; second tap opens Today and changes nothing; denied copy; sign-out removes the row; iOS installed PWA best effort. — pending: not done yet (2026-10-09).
 
 ## HUMAN-only setup (the agent never does these)
 
-- [ ] H1 HUMAN: generate VAPID keys (`npx web-push generate-vapid-keys`).
-- [ ] H2 HUMAN: apply `20261008180000_backfill_notified_due_at.sql` to Supabase BEFORE the Railway deploy that sets the VAPID config.
-- [ ] H3 HUMAN: Railway: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `PUSH_ACTION_SECRET` (>= 32 chars), `API_PUBLIC_URL`; `CORS_ORIGINS` includes the Vercel origin.
-- [ ] H4 HUMAN: Railway runs a single, non-sleeping instance.
-- [ ] H5 HUMAN: Vercel `VITE_VAPID_PUBLIC_KEY`, then redeploy before PR3 smoke.
-- [ ] H6 HUMAN: approve each push and merge (rule 6).
+- [ ] H1 HUMAN: generate VAPID keys (`npx web-push generate-vapid-keys`). — pending: not done yet (2026-10-09).
+- [ ] H2 HUMAN: apply `20261008180000_backfill_notified_due_at.sql` to Supabase BEFORE the Railway deploy that sets the VAPID config. — pending: not done yet (2026-10-09).
+- [ ] H3 HUMAN: Railway: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `PUSH_ACTION_SECRET` (>= 32 chars), `API_PUBLIC_URL`; `CORS_ORIGINS` includes the Vercel origin. — pending: not done yet (2026-10-09).
+- [ ] H4 HUMAN: Railway runs a single, non-sleeping instance. — pending: not done yet (2026-10-09).
+- [ ] H5 HUMAN: Vercel `VITE_VAPID_PUBLIC_KEY`, then redeploy before PR3 smoke. — pending: not done yet (2026-10-09).
+- [x] H6 HUMAN: approve each push and merge (rule 6). Pushes and merges approved; PRs #20, #22 and #24 merged.
