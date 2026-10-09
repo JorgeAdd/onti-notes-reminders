@@ -34,6 +34,7 @@ import type { UndoDone } from '../../application/undo-done'
 import type { UpdateNote } from '../../application/update-note'
 import type { Identity } from '../../domain/identity'
 import type { NoteRecord } from '../../domain/note'
+import { registerPushRoutes, type PushDeps } from './push-routes'
 
 export interface ServerDeps {
   verifier: TokenVerifier
@@ -52,6 +53,8 @@ export interface ServerDeps {
   logger?: boolean
   searchNotes: SearchNotes
   getNote: GetNote
+  /** Push routes exist only when provided (push configured). */
+  push?: PushDeps | undefined
 }
 
 const BEARER = /^Bearer\s+(\S+)$/i
@@ -93,6 +96,7 @@ export function buildServer({
   logger = false,
   searchNotes,
   getNote,
+  push,
 }: ServerDeps) {
   const app = Fastify({ logger })
 
@@ -126,6 +130,8 @@ export function buildServer({
   })
 
   app.get('/health', () => ({ status: 'ok' }))
+
+  if (push) registerPushRoutes(app, push, authenticate)
 
   app.get('/me', async (request) => {
     const identity = await authenticate(request)

@@ -21,7 +21,8 @@ export class NotFoundError extends Error {
   }
 }
 
-export type ConflictReason = 'not_open' | 'no_reminder'
+/** `due_at_changed`: a notification action whose `due_at` no longer matches the note (replayed or stale tap). */
+export type ConflictReason = 'not_open' | 'no_reminder' | 'due_at_changed'
 
 /** The note is not in a state that allows the action (HTTP 409). */
 export class ConflictError extends Error {

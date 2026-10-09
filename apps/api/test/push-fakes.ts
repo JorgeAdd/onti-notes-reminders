@@ -9,13 +9,16 @@ import type { Clock } from '../src/application/ports'
 import type {
   ActionTokens,
   ClaimedReminder,
+  NewSubscription,
   PushLog,
   PushSender,
   PushSubscription,
   ReminderClaimer,
   SendOutcome,
+  SubscriptionRepository,
   SubscriptionStore,
 } from '../src/application/push-ports'
+import type { Identity } from '../src/domain/identity'
 import { noteId } from './fakes'
 
 /** A clock the test moves by hand. */
@@ -154,6 +157,38 @@ export class InMemorySubscriptionStore implements SubscriptionStore {
 
   remove(id: string): Promise<void> {
     this.rows.delete(id)
+    return Promise.resolve()
+  }
+}
+
+export interface UserSubscription extends NewSubscription {
+  userId: string
+  failureCount: number
+}
+
+/** The user side like the adapter: one row per endpoint, subscribe reassigns it, delete is owner-scoped. */
+export class InMemorySubscriptions implements SubscriptionRepository {
+  private readonly rows = new Map<string, UserSubscription>()
+
+  row(endpoint: string): UserSubscription | undefined {
+    return this.rows.get(endpoint)
+  }
+
+  forUser(userId: string): UserSubscription[] {
+    return [...this.rows.values()].filter((r) => r.userId === userId)
+  }
+
+  all(): UserSubscription[] {
+    return [...this.rows.values()]
+  }
+
+  subscribe(userId: string, input: NewSubscription): Promise<void> {
+    this.rows.set(input.endpoint, { ...input, userId, failureCount: 0 })
+    return Promise.resolve()
+  }
+
+  unsubscribe(identity: Identity, endpoint: string): Promise<void> {
+    if (this.rows.get(endpoint)?.userId === identity.userId) this.rows.delete(endpoint)
     return Promise.resolve()
   }
 }

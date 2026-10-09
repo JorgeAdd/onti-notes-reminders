@@ -114,24 +114,24 @@ Global checks for every commit:
 
 ### Commit c9: `feat(api): done and +1 h from a notification token` (~200)
 
-- [ ] 10.1 RED: `apps/api/test/push-actions.test.ts`: C3 done stamps the clock; done twice keeps `done_at`; C15 10:05 → 11:05, count 2, original Tue 18:00; replay `due_at_changed`; rescheduled `due_at_changed`; snooze on done `not_open`; unknown and another user's note `NotFoundError`; DST D3; token route equals JWT route.
-- [ ] 10.2 GREEN: `application/push-actions.ts` (decisions 13, 14; check inside the row lock).
+- [x] 10.1 RED: `apps/api/test/push-actions.test.ts`: C3 done stamps the clock; done twice keeps `done_at`; C15 10:05 → 11:05, count 2, original Tue 18:00; replay `due_at_changed`; rescheduled `due_at_changed`; snooze on done `not_open`; unknown and another user's note `NotFoundError`; DST D3; token route equals JWT route.
+- [x] 10.2 GREEN: `application/push-actions.ts` (decisions 13, 14; check inside the row lock).
 
 ### Commit c10: `feat(api): subscribe and unsubscribe a browser` (~230)
 
-- [ ] 11.1 RED: `apps/api/test/push-subscriptions.test.ts`: new row; repeat is one row; Ana's endpoint reassigned to Jorge, Ana has none, response equals first-time; unsubscribe own; another user's is a no-op success; pruned stays gone.
-- [ ] 11.2 RED `[pg]`: `apps/api/test/postgres/push-subscriptions.pg.test.ts`: the one owner-role upsert swaps; Ana cannot read or delete Jorge's row as `authenticated`.
-- [ ] 11.3 GREEN: `push-ports.ts` `SubscriptionRepository`; `application/push-subscribe.ts`; adapter `subscribe` (single owner statement, verified `sub`) and `unsubscribe` (`asUser`); request schemas in `packages/shared/src/push.ts`; fakes.
+- [x] 11.1 RED: `apps/api/test/push-subscriptions.test.ts`: new row; repeat is one row; Ana's endpoint reassigned to Jorge, Ana has none, response equals first-time; unsubscribe own; another user's is a no-op success; pruned stays gone.
+- [x] 11.2 RED `[pg]`: `apps/api/test/postgres/push-subscriptions.pg.test.ts`: the one owner-role upsert swaps; Ana cannot read or delete Jorge's row as `authenticated`.
+- [x] 11.3 GREEN: `push-ports.ts` `SubscriptionRepository`; `application/push-subscribe.ts`; adapter `subscribe` (single owner statement, verified `sub`) and `unsubscribe` (`asUser`); request schemas in `packages/shared/src/push.ts`; fakes.
 
 ### Commit c11: `feat(api): push subscription and action routes` (~235)
 
-- [ ] 12.1 RED: `apps/api/test/push-routes.test.ts`: subscribe 400 (no `keys.auth`, http, IP host), 401 no token; actions 401 same body for missing, malformed, forged, expired; 404 same body for disallowed action, unknown note, another user's note (never 403); 409 only `due_at_changed` and `not_open`; `push` absent gives 404; CORS preflight; action token as bearer on `/notes/:id/done` is 401.
-- [ ] 12.2 GREEN: `infrastructure/http/push-routes.ts`; `server.ts` optional `push?`; `main.ts` passes it.
-- [ ] 12.3 `docs/CONTRACT.md`: move C15 from "Still todo" to the Slice 6 table; add C3 (from the notification) row, both citing c9 and c11 tests (rule 23).
+- [x] 12.1 RED: `apps/api/test/push-routes.test.ts`: subscribe 400 (no `keys.auth`, http, IP host), 401 no token; actions 401 same body for missing, malformed, forged, expired; 404 same body for disallowed action, unknown note, another user's note (never 403); 409 only `due_at_changed` and `not_open`; `push` absent gives 404; CORS preflight; action token as bearer on `/notes/:id/done` is 401.
+- [x] 12.2 GREEN: `infrastructure/http/push-routes.ts`; `server.ts` optional `push?`; `main.ts` passes it.
+- [x] 12.3 `docs/CONTRACT.md`: move C15 from "Still todo" to the Slice 6 table; add C3 (from the notification) row, both citing c9 and c11 tests (rule 23).
 
 ### PR2 close
 
-- [ ] 13.1 Final `npm run verify`; PR body with forecast and `size:exception`.
+- [x] 13.1 Final `npm run verify` (api 418 passed + 37 skipped, web 459, shared 290 + 3 todo; api 455 passed with a throwaway database) and `npm run build` green; PR body with forecast. Actual size is about 1,140 added lines against the 800 budget, so PR2 needs `size:exception` or a split (human decision).
 - [ ] 13.2 Manual smoke: `curl` subscribe twice with two users (one row, new owner); action with a forged token 401.
 
 ## PR3 — web: worker, manifest, control, bridge, sign-out (~1,080 lines, `size:exception`)

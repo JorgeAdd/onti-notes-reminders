@@ -34,6 +34,41 @@ export const actionClaimsSchema = z.object({
   exp: z.number().int(),
 })
 
+const IPV4_HOST = /^\d{1,3}(\.\d{1,3}){3}$/
+const BASE64URL = /^[A-Za-z0-9_-]+$/
+
+/**
+ * A push endpoint is a capability URL the API will POST to: https only, no userinfo, never a
+ * literal IP or `localhost`. No push-service allowlist (new browsers use new hosts).
+ */
+const pushEndpointSchema = z
+  .string()
+  .max(2048)
+  .refine((value) => {
+    const url = URL.parse(value)
+    if (url === null || url.protocol !== 'https:') return false
+    if (url.username !== '' || url.password !== '') return false
+    const host = url.hostname
+    return !(
+      host.startsWith('[') ||
+      IPV4_HOST.test(host) ||
+      host === 'localhost' ||
+      host.endsWith('.localhost')
+    )
+  })
+
+/** `PushSubscription.toJSON()` from the browser; extra fields (`expirationTime`) are ignored. */
+export const pushSubscriptionRequestSchema = z.object({
+  endpoint: pushEndpointSchema,
+  keys: z.object({ p256dh: z.string().regex(BASE64URL), auth: z.string().regex(BASE64URL) }),
+})
+
+export const pushUnsubscribeRequestSchema = z.object({ endpoint: pushEndpointSchema })
+
+/** The body of `POST /push-actions/*`: the signed token, instead of a JWT (ADR-004). */
+export const pushActionRequestSchema = z.object({ token: z.string().min(1) })
+
 export type PushAction = (typeof PUSH_ACTIONS)[number]
 export type PushPayload = z.infer<typeof pushPayloadSchema>
 export type ActionClaims = z.infer<typeof actionClaimsSchema>
+export type PushSubscriptionRequest = z.infer<typeof pushSubscriptionRequestSchema>
