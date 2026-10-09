@@ -115,7 +115,7 @@ Global checks for every commit:
 
 ### Commit 2.4 `refactor(shared): readDue and parseTagList` (2b)
 
-- [ ] 2.4.1 RED `tag.test.ts` `parseTagList`; capture tests `readDue` parity. GREEN `domain/{tag,capture}.ts`.
+- [x] 2.4.1 RED `tag.test.ts` `parseTagList`; capture tests `readDue` parity. GREEN `domain/{tag,capture}.ts`.
 
 ### Commit 2.5 `feat(web): DELETE and 204 in the api client` (2b)
 

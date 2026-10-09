@@ -8,6 +8,7 @@ import {
   NO_REMINDER,
   markNotified,
   parseCapture,
+  readDue,
   relativeTo,
   reschedule,
   snoozeDue,
@@ -191,5 +192,43 @@ describe('R8 · remove the reminder and reschedule (note editing, R20)', () => {
     expect(isNotificationDue(moved, at('2026-10-09 10:00'))).toBe(true)
     const same = reschedule(notified, at('2026-10-06 16:00'))
     expect(isNotificationDue(same, at('2026-10-06 16:30'))).toBe(false)
+  })
+})
+
+describe('R11 · readDue is the capture time grammar for one field', () => {
+  const now = at('2026-10-06 11:12')
+
+  it.each([
+    '09:00',
+    '14:30',
+    'today 09:00',
+    'today 23:59',
+    'tomorrow 08:30',
+    '+2h',
+    '+45m',
+    '+2H',
+    '09:00 14:00',
+    'remind me 09:00',
+  ])('gives the same due time as parseCapture for "%s"', (input) => {
+    const due = readDue(input, now, TZ)
+    expect(due).not.toBeNull()
+    expect(due).toEqual(parseCapture(input, now, TZ).dueAt)
+  })
+
+  it('reads the grammar: a passed time is tomorrow, relative is from the minute', () => {
+    expect(readDue('09:00', now, TZ)).toEqual(at('2026-10-07 09:00'))
+    expect(readDue('today 09:00', now, TZ)).toEqual(at('2026-10-06 09:00'))
+    expect(readDue('+2h', now, TZ)).toEqual(at('2026-10-06 13:12'))
+  })
+
+  it.each(['', '   ', 'soon', '25:00', 'today', 'tomorrow 9am', '+h'])(
+    'is null when there is no time expression in "%s"',
+    (input) => {
+      expect(readDue(input, now, TZ)).toBeNull()
+    },
+  )
+
+  it('ignores tags and other words around the time', () => {
+    expect(readDue('#client-a call 09:00', now, TZ)).toEqual(at('2026-10-07 09:00'))
   })
 })
