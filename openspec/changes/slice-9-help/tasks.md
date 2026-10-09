@@ -62,8 +62,8 @@ Global checks for every commit:
 
 ## Commit 5 `feat(web): help dialog and content` (unit 5)
 
-- [ ] 5.1 RED `apps/web/test/help-dialog.test.tsx`: `role=dialog`, `aria-modal`, name from `h2`, close button, esc, backdrop click, four sections, no touch wording on desktop, touch content at <= 640 px, desktop portal vs mobile inline (stub `matchMedia`); no user-facing literals outside messages [static].
-- [ ] 5.2 GREEN `features/help/{HelpContent,HelpDialog}.tsx` (+ CSS module stubs), using `useNarrow()` and `useFocusTrap`.
+- [x] 5.1 RED `apps/web/test/help-dialog.test.tsx`: `role=dialog`, `aria-modal`, name from `h2`, close button, esc, backdrop click, four sections, no touch wording on desktop, touch content at <= 640 px, desktop portal vs mobile inline (stub `matchMedia`); no user-facing literals outside messages [static].
+- [x] 5.2 GREEN `features/help/{HelpContent,HelpDialog}.tsx` (+ CSS module stubs), using `useNarrow()` and `useFocusTrap`.
 
 ## Commit 6 `style(web): help dialog tokens and fade` (unit 6)
 
