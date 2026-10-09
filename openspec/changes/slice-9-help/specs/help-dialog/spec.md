@@ -83,11 +83,12 @@ Key rows MUST derive from `KeyHint` in `keys.ts` and `messages.ts` `statusline.k
 
 Every capture example MUST be run through the shared R11 parser and MUST yield what the help says; no new CONTRACT numbers.
 
-#### Scenario: Examples at Tue 6 11:12
+#### Scenario: Examples at Wed 7 09:05 and 18:00
 
-- GIVEN the clock at Tue 6 11:12
+- GIVEN the clock at Wed 7 09:05 (America/Mexico_City)
 - WHEN each example is parsed
-- THEN `17:00` is today 17:00; `09:00` is tomorrow 09:00; `today 09:00` is today 09:00 (late); `tomorrow 09:00` is tomorrow 09:00; `+15m` and `+2h` are now plus that, to the minute; `#client-a` is tag `client-a`; no time gives no reminder (R11)
+- THEN `17:00` is today 17:00; `today 08:00` is today 08:00 (late); `tomorrow 9:00` is tomorrow 09:00; `+30m` and `+2h` are now plus that, to the minute; `#client-a` is tag `client-a`; no time gives no reminder (R11)
+- AND at Wed 7 18:00, `17:00` is tomorrow 17:00 and `today 08:00` is still today 08:00 (late)
 
 ### Requirement: Dialog accessibility
 
@@ -117,7 +118,7 @@ While help is open, the Today key layer, capture `c`, `/`, `#`, `j`/`k`, `[`/`]`
 
 ### Requirement: Motion and style
 
-Open and close MUST use only a fade of at most 150 ms with `--motion-*` and `--ease-paper`, and reduced motion MUST follow the global token block (SG15, SG16). Styles MUST use semantic tokens only [static]. The UI MUST show no internal IDs.
+Opening MUST use only a fade of at most 150 ms (closing removes it at once) with `--motion-*` and `--ease-paper`, and reduced motion MUST follow the global token block (SG15, SG16). Styles MUST use semantic tokens only [static]. The UI MUST show no internal IDs.
 
 #### Scenario: Static checks [static]
 
