@@ -17,6 +17,8 @@ interface Props {
   nav?: (DayNavState & { mobile: boolean }) | undefined
   /** Today only: the theme control sits above Sign out (not on All notes). */
   showTheme?: boolean
+  /** Today only, with the theme control: the notification control, right under it. */
+  notifications?: ReactNode
   /** R19: the "Without a reminder" list (or its phone link), below Sign out. */
   undated?: ReactNode
 }
@@ -29,6 +31,7 @@ export function DateColumn({
   onSignOut,
   nav,
   showTheme = false,
+  notifications = null,
   undated = null,
 }: Props) {
   const { day, weekday, month } = calendarDateBlock(date, timezone)
@@ -45,6 +48,7 @@ export function DateColumn({
       {nav ? <DayNav {...nav} /> : null}
       <div className={styles.account}>
         {showTheme ? <ThemeControl /> : null}
+        {showTheme ? notifications : null}
         <button className={styles.signOut} type="button" onClick={onSignOut}>
           {messages.today.signOut}
         </button>

@@ -1,6 +1,8 @@
 .bar {
   composes: last from '../../styles/entrance.module.css';
   display: flex;
+  /* Four targets can pass 375 px: the last wraps to a second row, never scrolls sideways. */
+  flex-wrap: wrap;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-lg);
   background: var(--color-panel);

@@ -1,6 +1,7 @@
 import type { SnoozePreset, TodayItem, TodayResponse } from '@onti/shared'
 import { lazy, Suspense } from 'react'
 import { useEntrance } from '../../lib/entrance'
+import { PushContainer } from '../push/PushContainer'
 import { messages } from '../../messages'
 import { ActionMessage } from './ActionMessage'
 import type { CaptureSubmit } from './capture-preview'
@@ -132,6 +133,8 @@ export function DayPage({
   // Decision 13: total notes derive from the page itself, no extra wire field.
   const totalCount = carriedCount + today.rail.length + today.otherCount
   const entrance = useEntrance()
+  // One instance, so its state cannot diverge: the column on a desktop, the bar on a phone.
+  const notifications = <PushContainer compact={mobile} />
   const empty = carriedCount === 0 && today.rail.length === 0
   return (
     <div className={styles.desk} {...entrance}>
@@ -143,6 +146,7 @@ export function DayPage({
           note={note}
           onSignOut={onSignOut}
           showTheme
+          notifications={mobile ? null : notifications}
           nav={nav ? { ...nav, mobile } : undefined}
           undated={
             <UndatedList
@@ -205,7 +209,12 @@ export function DayPage({
         )}
         {sheet === null ? null : <ActionSheet now={now} timezone={today.timezone} {...sheet} />}
         {mobile && capture === null && sheet === null && tagBar === null ? (
-          <MobileBar onSearch={onOpenSearch} onTags={onOpenTags} onCapture={onOpenCapture} />
+          <MobileBar
+            onSearch={onOpenSearch}
+            onTags={onOpenTags}
+            onCapture={onOpenCapture}
+            notifications={notifications}
+          />
         ) : null}
         <Statusline
           now={now}

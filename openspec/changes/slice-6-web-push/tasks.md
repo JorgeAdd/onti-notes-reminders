@@ -138,38 +138,38 @@ Global checks for every commit:
 
 ### Gate: rebase after slice 4 merges
 
-- [ ] 14.1 Wait until slice 4 is merged (and PR2). Branch or rebase onto `main`; resolve `DayPage`, `DateColumn`, `MobileBar`, `App.tsx`, `messages.ts`; `npm run verify`.
+- [x] 14.1 Wait until slice 4 is merged (and PR2). Branch or rebase onto `main`; resolve `DayPage`, `DateColumn`, `MobileBar`, `App.tsx`, `messages.ts`; `npm run verify`.
 
 ### Commit c12: `feat(web): service worker for push and actions` (~230)
 
-- [ ] 15.1 RED: `apps/web/test/sw.test.ts` (`node:vm`, stubbed `self`): show with title, body, tag, `renotify`; invalid payload still shows; no actions when `maxActions` 0; Done success posts `onti:refetch`; non-2xx, throw, missing token → fallback: focus + `onti:action` with `noteId` and `dueAt`, else `openWindow('/?action=…&note=…&due=…')`; body tap opens `/`.
-- [ ] 15.2 GREEN: `apps/web/public/sw.js` (decisions 18, 19); `eslint.config.js` worker globals.
+- [x] 15.1 RED: `apps/web/test/sw.test.ts` (`node:vm`, stubbed `self`): show with title, body, tag, `renotify`; invalid payload still shows; no actions when `maxActions` 0; Done success posts `onti:refetch`; non-2xx, throw, missing token → fallback: focus + `onti:action` with `noteId` and `dueAt`, else `openWindow('/?action=…&note=…&due=…')`; body tap opens `/`.
+- [x] 15.2 GREEN: `apps/web/public/sw.js` (decisions 18, 19); `eslint.config.js` worker globals.
 
 ### Commit c13: `feat(web): manifest, icons and worker registration` (~130 + PNGs)
 
-- [ ] 16.1 RED: `apps/web/test/pwa-assets.test.ts`: manifest fields; PNG signatures and sizes; `theme_color`/`background_color` equal light-mode tokens (parity, narrow rule 8 exception); `vercel.json` headers and unchanged rewrite; `index.html` links.
-- [ ] 16.2 RED: `apps/web/test/register-sw.test.ts`: skipped without `serviceWorker` or key; scope `/`, `updateViaCache: 'none'`, `update()`; `env` treats `''` as absent.
-- [ ] 16.3 GREEN: `manifest.webmanifest`, icons, `index.html`, `vercel.json`, `lib/env.ts`, `features/push/register-sw.ts`, `main.tsx`.
+- [x] 16.1 RED: `apps/web/test/pwa-assets.test.ts`: manifest fields; PNG signatures and sizes; `theme_color`/`background_color` equal light-mode tokens (parity, narrow rule 8 exception); `vercel.json` headers and unchanged rewrite; `index.html` links.
+- [x] 16.2 RED: `apps/web/test/register-sw.test.ts`: skipped without `serviceWorker` or key; scope `/`, `updateViaCache: 'none'`, `update()`; `env` treats `''` as absent.
+- [x] 16.3 GREEN: `manifest.webmanifest`, icons, `index.html`, `vercel.json`, `lib/env.ts`, `features/push/register-sw.ts`, `main.tsx`.
 
 ### Commit c14: `feat(web): opt-in notification control` (~420)
 
-- [ ] 17.1 RED: `apps/web/test/push-client.test.ts`: state from permission and subscription; `enable` order; POST failure rolls back; `unsubscribeThisBrowser` never throws.
-- [ ] 17.2 RED: `apps/web/test/push-control.test.tsx`: no `requestPermission` on mount; each state's copy from `messages`; hidden without key; resync once; CSS uses `--size-target`, `--focus-ring`, no `--color-date`, no `--core-*`; desktop column Today only, phone bar slot, absent on All notes.
-- [ ] 17.3 GREEN: `features/push/{push-client,push-api}.ts`, `PushControl.tsx` + CSS, `PushContainer.tsx`; `messages.notifications` appended last; slots in `DayPage`, `DateColumn`, `MobileBar`.
+- [x] 17.1 RED: `apps/web/test/push-client.test.ts`: state from permission and subscription; `enable` order; POST failure rolls back; `unsubscribeThisBrowser` never throws.
+- [x] 17.2 RED: `apps/web/test/push-control.test.tsx`: no `requestPermission` on mount; each state's copy from `messages`; hidden without key; resync once; CSS uses `--size-target`, `--focus-ring`, no `--color-date`, no `--core-*`; desktop column Today only, phone bar slot, absent on All notes.
+- [x] 17.3 GREEN: `features/push/{push-client,push-api}.ts`, `PushControl.tsx` + CSS, `PushContainer.tsx`; `messages.notifications` appended last; slots in `DayPage`, `DateColumn`, `MobileBar`.
 
 ### Commit c15: `feat(web): guarded open-the-app fallback` (~180)
 
-- [ ] 18.1 RED: `apps/web/test/push-bridge.test.tsx`: URL cleared first; same `due_at` and open → JWT mutation; changed `due_at`, done note, unknown action, bad `due` → nothing, Today shown; `onti:action` runs the same guard; `onti:refetch` invalidates.
-- [ ] 18.2 GREEN: `features/push/PushBridge.tsx`; rendered by `App` while signed in.
+- [x] 18.1 RED: `apps/web/test/push-bridge.test.tsx`: URL cleared first; same `due_at` and open → JWT mutation; changed `due_at`, done note, unknown action, bad `due` → nothing, Today shown; `onti:action` runs the same guard; `onti:refetch` invalidates.
+- [x] 18.2 GREEN: `features/push/PushBridge.tsx`; rendered by `App` while signed in.
 
 ### Commit c16: `feat(web): unsubscribe this browser on sign-out` (~120)
 
-- [ ] 19.1 RED: `apps/web/test/sign-out-push.test.tsx`: unsubscribe and delete with the captured token, then session ends; reject still ends; no subscription → no call, no wait; 2 s cap (fake timers).
-- [ ] 19.2 GREEN: `App.tsx` `signOut`; note the bounded-wait exception in its comment.
+- [x] 19.1 RED: `apps/web/test/sign-out-push.test.tsx`: unsubscribe and delete with the captured token, then session ends; reject still ends; no subscription → no call, no wait; 2 s cap (fake timers).
+- [x] 19.2 GREEN: `App.tsx` `signOut`; note the bounded-wait exception in its comment.
 
 ### PR3 close
 
-- [ ] 20.1 Final `npm run verify` and `npm run build`; record main JS size; PR body with `size:exception`.
+- [x] 20.1 Final `npm run verify` (api 491 passed + 49 skipped, web 693, shared 396 + 3 todo) and `npm run build` green; main JS 619.02 kB (178.98 kB gzip); PR body with `size:exception`.
 - [ ] 20.2 Manual: four bar targets at 375 px without horizontal scroll; if not, move phones to the date column only.
 - [ ] 20.3 Manual smoke after deploy (not CI): delivery within 30 s with the app closed; Done and "+1 h" from the notification; second tap opens Today and changes nothing; denied copy; sign-out removes the row; iOS installed PWA best effort.
 
